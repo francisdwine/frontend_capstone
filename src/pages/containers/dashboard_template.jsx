@@ -80,7 +80,7 @@ export default function DashBoardTemplate(props) {
       {/* sidenav color */}
       <List sx={{ backgroundColor: "black" }}>
         {NavItems.map((item, index) => (
-          <ListItem sx={props.title===item.name?selectedStyle:unselectedStyle} key={item.index} disablePadding>
+          <ListItem sx={props.title===item.name?selectedStyle:unselectedStyle} key={index} disablePadding>
             <ListItemButton>
               <ListItemIcon sx={{ color: "white" }}>
                 {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}
@@ -89,8 +89,7 @@ export default function DashBoardTemplate(props) {
               <ListItemText
                 sx={{ color: "white", fontWeight:'bold'}}
                 fontWeight='bold'
-                primary={item.name}
-               
+                primary={item.name}               
               />
             </ListItemButton>
           </ListItem>
@@ -100,8 +99,7 @@ export default function DashBoardTemplate(props) {
         <ListItem
           disablePadding
           sx={{ display: "flex", justifyContent: "center" }}
-        >
-          {/* <ListItemText backgroundColor='yellow' sx={{ color: "white" }} primary='Logout' /> */}
+        >          
           <Button
             variant="contained"
             sx={{
@@ -159,8 +157,7 @@ export default function DashBoardTemplate(props) {
         sx={{
           width: { sm: drawerWidth },
           flexShrink: { sm: 0 },
-          backgroundColor: "black",
-          
+          backgroundColor: "black",          
         }}
         aria-label="mailbox folders"
       >

@@ -35,7 +35,7 @@ export default function ModalOne(props) {
         <Modal
         disableAutoFocus={true}
         open={props.openModal1}
-        onEn
+        
         onClose={() => props.setOpenModal1(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -58,9 +58,9 @@ export default function ModalOne(props) {
                 e.preventDefault();
                 props.setOpenModal1(false);
               }}
-              sx={{ p: 0, m: 0, color: "white", maxWidth: "10px" }}
+              sx={{ p: 0, m: 0, color: "white"}}
             >
-              <CloseIcon maxWidth="10px"></CloseIcon>
+              <CloseIcon></CloseIcon>
             </Button>
           </Box>
 

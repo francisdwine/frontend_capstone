@@ -121,8 +121,7 @@ export default function Calendar(props) {
             flexDirection: "column",
             alignItems: "start",
           }}
-        >          
-
+        >
           <Typography
             sx={{ paddingLeft: 2, color: "darkred" }}
             fontFamily="Roboto"
@@ -187,12 +186,10 @@ export default function Calendar(props) {
               // function para sa pili ug timeslot calendar functions
               select={(info) => {
                 setOpenModal1(true);
-
                 var dateSplitted = info.startStr.split("T");
                 var startDate = dateSplitted[0];
                 var startTime = dateSplitted[1].split("+")[0];
                 var dateSplitted2 = info.endStr.split("T");
-
                 var endTime = dateSplitted2[1].split("+")[0];
                 var tempBooking = booking.current;
                 tempBooking.startTime = startTime;
@@ -287,9 +284,9 @@ export default function Calendar(props) {
               onClick={() => {
                 setOpenModal2(false);
               }}
-              sx={{ p: 0, m: 0, color: "white", maxWidth: "10px" }}
+              sx={{ p: 0, m: 0, color: "white" }}
             >
-              <CloseIcon maxWidth="10px"></CloseIcon>
+              <CloseIcon></CloseIcon>
             </Button>
           </Box>
 
@@ -304,16 +301,13 @@ export default function Calendar(props) {
                   inputProps: {
                     min: 0,
                     max: maxComputers,
-                    style: { textAlign: "center" },
                   },
                 }}
-                InputLabelProps={{ sx: { textAlign: "center" } }}
                 id="outlined-basic"
                 label="Computers"
                 variant="standard"
                 onChange={(e) => handleChange(e)}
                 autoFocus={false}
-                textAlign="center"
               />
             </Box>
             <br></br>
@@ -322,10 +316,9 @@ export default function Calendar(props) {
               fontWeight="bold"
               variant="h6"
               fontFamily="Oswald"
-              backgroundColor="black"
+              backgroundColor="#222222"
               color="white"
               p="5px 10px 5px 10px"
-              // textAlign='left'
               sx={{ display: "inline-block" }}
             >
               Attendees:
@@ -423,14 +416,17 @@ export default function Calendar(props) {
               </ListItem>
               {attendeeList.map((item, index) => (
                 <ListItem
+                  key={index}
                   sx={{ p: "0px 0px 0px 20px" }}
                   secondaryAction={
-                    <IconButton edge="end" aria-label="delete">
-                      <ClearIcon
-                        onClick={() => {
-                          deleteUser(index);
-                        }}
-                      ></ClearIcon>
+                    <IconButton
+                      edge="end"
+                      aria-label="delete"
+                      onClick={() => {
+                        deleteUser(index);
+                      }}
+                    >
+                      <ClearIcon></ClearIcon>
                     </IconButton>
                   }
                 >
@@ -494,7 +490,6 @@ export default function Calendar(props) {
       <Modal
         disableAutoFocus={true}
         open={openModal3}
-        onEn
         onClose={() => setOpenModal3(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -515,9 +510,9 @@ export default function Calendar(props) {
               onClick={() => {
                 setOpenModal3(false);
               }}
-              sx={{ p: 0, m: 0, color: "white", maxWidth: "10px" }}
+              sx={{ p: 0, m: 0, color: "white" }}
             >
-              <CloseIcon maxWidth="10px"></CloseIcon>
+              <CloseIcon></CloseIcon>
             </Button>
           </Box>
 
@@ -683,8 +678,8 @@ export default function Calendar(props) {
                 <Divider />
               </React.Fragment>
               {attendeeList.map((item, index) => (
-                <React.Fragment>
-                  <ListItem m={0}>
+                <React.Fragment key={index}>
+                  <ListItem m={0} key={index}>
                     <ListItemText
                       fontSize="12px"
                       primary={item.name}
@@ -716,9 +711,12 @@ export default function Calendar(props) {
               onClick={() => {
                 alert("booking created");
                 booking.current.attendees = attendeeList;
-                let toSubmit=booking.current;
-                toSubmit.attendees=[...toSubmit.attendees,{name:user.username,id:user.id}]
-                
+                let toSubmit = booking.current;
+                toSubmit.attendees = [
+                  ...toSubmit.attendees,
+                  { name: user.username, id: user.id },
+                ];
+
                 console.log(toSubmit);
               }}
               sx={ButtonStyle2}
