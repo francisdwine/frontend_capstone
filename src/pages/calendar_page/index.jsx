@@ -471,7 +471,7 @@ export default function Calendar(props) {
                       user_id: id,
                     };
                     setAttendeeList([...attendeeList, newUser]);
-                    // setRefresh(!refresh)
+                     setBookingsRefresher(!bookingsRefresher)
                   }
                 }}
                 sx={{
@@ -785,15 +785,6 @@ export default function Calendar(props) {
           >
             <Button
               onClick={() => {
-                setOpenModal3(false);
-                setOpenModal2(true);
-              }}
-              sx={ButtonStyle1}
-            >
-              Back
-            </Button>
-            <Button
-              onClick={() => {
                 alert("booking created")
                 submitBooking();
                 setBookingsRefresher(!bookingsRefresher);
@@ -815,9 +806,11 @@ export default function Calendar(props) {
                 setAttendeeList([]);
               }}
               sx={ButtonStyle2}
+              disabled={moment().isAfter(moment(booking.current.startTime))}
             >
               Book
             </Button>
+
           </Box>
         </Box>
       </Modal>
