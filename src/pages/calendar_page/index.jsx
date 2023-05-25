@@ -260,19 +260,28 @@ export default function Calendar(props) {
               }}
               // function para sa pili ug timeslot calendar functions
               select={(info) => {
-                setOpenModal1(true);
+                // setOpenModal1(true);
                 var dateSplitted = info.startStr.split("T");
                 var startDate = dateSplitted[0];
                 var startTime = dateSplitted[1].split("+")[0];
                 var dateSplitted2 = info.endStr.split("T");
                 var endTime = dateSplitted2[1].split("+")[0];
                 var tempBooking = booking.current;
+                // Get the current date and time
+                var currentDateTime = new Date().toISOString().split("T")[0] + "T" + new Date().toTimeString().split(" ")[0];
+
+                // Compare ang selected start and end times with the current time
+                if (startDate === currentDateTime.split("T")[0] && (startTime < currentDateTime || endTime < currentDateTime)) {
+                  alert("Please select a time that is in the future.");
+                  return; // Abort the selection
+                }
+                setOpenModal1(true);
                 tempBooking.startTime = startTime;
                 tempBooking.endTime = endTime;
                 tempBooking.date = startDate;
                 tempBooking.venue = venueSelected;
                 booking.current = tempBooking;
-              }}
+              }} 
               //function para ig click ug usa ka event
               eventClick={
                 (e)=>{
@@ -327,7 +336,7 @@ export default function Calendar(props) {
             ></FullCalendar>
           </Box>
 
-          <Typography>hello</Typography>
+          <Typography></Typography>
         </Box>
       </DashBoardTemplate>
       {/* modal 1 modal1 modal one modalone */}
@@ -785,6 +794,15 @@ export default function Calendar(props) {
           >
             <Button
               onClick={() => {
+                setOpenModal3(false);
+                setOpenModal2(true);
+              }}
+              sx={ButtonStyle1}
+            >
+              Back
+            </Button>
+            <Button
+              onClick={() => {
                 alert("booking created")
                 submitBooking();
                 setBookingsRefresher(!bookingsRefresher);
@@ -806,10 +824,10 @@ export default function Calendar(props) {
                 setAttendeeList([]);
               }}
               sx={ButtonStyle2}
-              disabled={moment().isAfter(moment(booking.current.startTime))}
             >
               Book
             </Button>
+
 
           </Box>
         </Box>
