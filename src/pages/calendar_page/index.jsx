@@ -993,7 +993,7 @@ export default function Calendar(props) {
             <Typography
             sx={{ paddingLeft: 2, color: "darkred" }}
             fontFamily="Roboto"
-          >Note: 30% of cost as cancellation fee</Typography>
+          ></Typography>
           </Box>
           <Box
             sx={{
