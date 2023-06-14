@@ -83,7 +83,11 @@ export default function Calendar(props) {
       officeName: booking.current.officeName,
       user_id: user.id,
       attendees: [...attendeeList, { user_id: user.id, name: user.username }],
-    });
+    }).then(()=>{
+      setBookingsRefresher(!bookingsRefresher);
+      alert("booking created")
+      });
+     
   };
   //data to send
   //new booking
@@ -480,7 +484,7 @@ export default function Calendar(props) {
                       user_id: id,
                     };
                     setAttendeeList([...attendeeList, newUser]);
-                     setBookingsRefresher(!bookingsRefresher)
+                     
                   }
                 }}
                 sx={{
@@ -803,9 +807,9 @@ export default function Calendar(props) {
             </Button>
             <Button
               onClick={() => {
-                alert("booking created")
+                
                 submitBooking();
-                setBookingsRefresher(!bookingsRefresher);
+                
                 setOpenModal3(false);
                 booking.current = {
                   purpose: "Studying",

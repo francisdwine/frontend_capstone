@@ -113,7 +113,8 @@ export default function MyReservations(props) {
       { name: "Celine", id: 4 },
     ];
 
-    
+    const [venueSelected, setVenueSelected] = useState("Coworking Space");
+    const [venueId, setVenueId] = useState(1);
     const [statusSelected, setStatusSelected] = useState("Upcoming");  
     const [attendeeList, setAttendeeList] = useState([{ name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
@@ -137,11 +138,12 @@ export default function MyReservations(props) {
     return (
         
       <div>
-        <DashBoardTemplate title="My Reservations"> 
+        <DashBoardTemplate title="Manage Reservations"> 
           <div style={{ display: "flex",flexDirection:'column',alignItems:'start' }}>
                 
           </div>
           <br></br>
+          
           <Box backgroundColor="white" display='flex' alignItems='center' flexDirection='column'>
           
             <Box
@@ -151,6 +153,50 @@ export default function MyReservations(props) {
               maxWidth='90%'
               
             >
+              <div style={{ display: "flex", marginBottom: "20px" }}>
+              <ButtonGroup>
+                <Button
+                  sx={
+                    venueSelected === "Coworking Space"
+                      ? selectedStyle
+                      : unselectedStyle
+                  }
+                  onClick={() => {
+                    setVenueSelected("Coworking Space");
+                    setVenueId(1);
+                  }}
+                >
+                  Co-working Space
+                </Button>
+                <Button
+                  sx={
+                    venueSelected === "Conference Room A"
+                      ? selectedStyle
+                      : unselectedStyle
+                  }
+                  onClick={() => {
+                    setVenueSelected("Conference Room A");
+                    setVenueId(2);
+                  }}
+                >
+                  Conference Room A
+                </Button>
+                <Button
+                  sx={
+                    venueSelected === "Conference Room B"
+                      ? selectedStyle
+                      : unselectedStyle
+                  }
+                  onClick={() => {
+                    setVenueSelected("Conference Room B");
+                    setVenueId(3);
+                  }}
+                >
+                  Conference Room B
+                </Button>
+              </ButtonGroup>
+            </div>
+              
                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
               <ButtonGroup>
                 
