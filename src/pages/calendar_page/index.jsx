@@ -67,7 +67,6 @@ export default function Calendar(props) {
   const [cancelModal, setCancelModal] = useState(false);
  // const [bookings, setBookings] = useState([...initialBookings]);
   const [viewModal, setViewModal] = useState(false);
-  const [bookingIdToDelete, setBookingIdToDelete] = useState(null);
   const [tempId, setTempId] = useState(0);
   const [info,setInfo]=useState({});
   const submitBooking = () => {
