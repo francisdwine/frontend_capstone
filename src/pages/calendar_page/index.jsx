@@ -60,16 +60,22 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
+
 const maxComputers = 10;
 export default function Calendar(props) {
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
+  const [cancelModal, setCancelModal] = useState(false);
+ // const [bookings, setBookings] = useState([...initialBookings]);
+  const [viewModal, setViewModal] = useState(false);
+  const [bookingIdToDelete, setBookingIdToDelete] = useState(null);
+  const [tempId, setTempId] = useState(0);
   const [info,setInfo]=useState({});
   const submitBooking = () => {
     setAttendeeList([
       ...attendeeList,
       { user_id: user.id, name: user.username },
     ]);
-    axios.post("http://localhost:8000/api/booking/", {
+    axios.post("http://localhost:8000/api/createBooking/", {
       purpose: booking.current.purpose,
       description: booking.current.description,
       venue: venueId,
@@ -98,7 +104,7 @@ export default function Calendar(props) {
   const [bookingAttendees,setBookingAttendees]=useState([]);
   const venueArray=["","Coworking Space","Conference Room A","Conference Room B"]
   const handleView = (id) => {
-   
+   setTempId(id);
      
      axios.get(`http://localhost:8000/api/getAttendees/${id}/`).then((res)=>{
         setBookingAttendees(res.data)
@@ -137,6 +143,19 @@ export default function Calendar(props) {
       })
       ;
   }, [bookingsRefresher]);
+// update the cancelled bookings
+const cancelBooking = () => {
+  axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
+    .then(() => {
+      setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
+      setCancelModal(false); // Close the cancellation modal
+      alert('Booking cancelled successfully');
+    })
+    .catch((error) => {
+      console.error('Error cancelling booking:', error);
+    });
+};
+
   const [eventData,setEventData]=useState([]);
   const [refresh, setRefresh] = useState(true);
   const [attendeeList, setAttendeeList] = useState([]);
@@ -176,6 +195,7 @@ export default function Calendar(props) {
   const [venueId, setVenueId] = useState(1);
   const [error, setError] = useState(false);
   const found = (element) => element.name === attendeeName;
+
   const deleteUser = (index) => {
     setAttendeeList([
       ...attendeeList.slice(0, index),
@@ -273,9 +293,10 @@ export default function Calendar(props) {
                 var tempBooking = booking.current;
                 // Get the current date and time
                 var currentDateTime = new Date().toISOString().split("T")[0] + "T" + new Date().toTimeString().split(" ")[0];
+                
 
                 // Compare ang selected start and end times with the current time
-                if (startDate === currentDateTime.split("T")[0] && (startTime < currentDateTime || endTime < currentDateTime)) {
+                if (startDate === currentDateTime.split("T")[0] && (startTime < currentDateTime && endTime < currentDateTime)) {
                   alert("Please select a time that is in the future.");
                   return; // Abort the selection
                 }
@@ -993,6 +1014,7 @@ export default function Calendar(props) {
                   <Divider />
                 </React.Fragment>
               ))}
+
             </List>
             <Typography
             sx={{ paddingLeft: 2, color: "darkred" }}
@@ -1008,8 +1030,8 @@ export default function Calendar(props) {
           >
             <Button sx={ButtonStyle1}
              variant="contained"
-            //  onClick={() => {setCancelModal(true);
-            //   setOpenInfoModal(false);} }
+              onClick={() => {setCancelModal(true);
+               setOpenInfoModal(false);} }
             >
               Cancel Booking
             </Button>
@@ -1017,7 +1039,7 @@ export default function Calendar(props) {
         </Box>
       </Modal>
       {/* Are you sure you want to cancel */}
-      {/* <Modal
+      <Modal
       disableAutoFocus={true}
       open={cancelModal}
       onEn
@@ -1025,7 +1047,31 @@ export default function Calendar(props) {
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       style={{width: "100%", overflow: "auto" }} 
-      ></Modal> */}
+      >
+        <Box sx={modalStyle}>
+        <Box sx={modalHeaderStyle}>
+            <Typography
+              sx={{ fontWeight: "bold" }}
+              id="modal-modal-title"
+              variant="h5"
+              component="h2"
+              fontFamily="Oswald"
+              color="white"
+            >
+              Are you sure you want to cancel?
+            </Typography>
+            
+          </Box>
+          <Box p={4}>
+          
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Button variant="contained" onClick={() => cancelBooking(tempId)}>Yes</Button>
+            <Button variant="contained" onClick={() => {setViewModal(true); setCancelModal(false);}}>No</Button>
+          </Box>
+          </Box>
+        </Box>
+
+      </Modal>
     </div>
   );
 }
