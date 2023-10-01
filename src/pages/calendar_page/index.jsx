@@ -60,15 +60,15 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
-
 const maxComputers = 10;
 export default function Calendar(props) {
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
- // const [bookings, setBookings] = useState([...initialBookings]);
   const [viewModal, setViewModal] = useState(false);
   const [tempId, setTempId] = useState(0);
+  const [role, setRole] = useState('user'); //default role
   const [info,setInfo]=useState({});
+
   const submitBooking = () => {
     setAttendeeList([
       ...attendeeList,
@@ -142,7 +142,7 @@ export default function Calendar(props) {
       })
       ;
   }, [bookingsRefresher]);
-// update the cancelled bookings
+// cancelled bookings
 const cancelBooking = () => {
   axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
     .then(() => {
@@ -152,6 +152,29 @@ const cancelBooking = () => {
     })
     .catch((error) => {
       console.error('Error cancelling booking:', error);
+    });
+};
+// calculation of 
+const [cost, setCost] = useState(0);
+const calculateCost = () => {
+  // Prepare the data needed for cost calculation
+  const costData = {
+    numOfComputers: booking.current.computers,
+    startTime: booking.current.startTime,
+    endTime: booking.current.endTime,
+    numOfStudents: attendeeList.length + 1, 
+    // Add any other necessary data here
+  };
+
+  axios.post(`http://localhost:8000/api/calculateCost/`, costData)
+    .then((response) => {
+      // Handle the response from the server, which might contain the calculated cost
+      const calculatedCost = response.data.cost; // Adjust this based on your server response
+      setBookingsRefresher(!bookingsRefresher);
+      setCost(calculatedCost);
+    })
+    .catch((error) => {
+      console.error('Error calculating cost:', error);
     });
 };
 
@@ -284,28 +307,33 @@ const cancelBooking = () => {
               // function para sa pili ug timeslot calendar functions
               select={(info) => {
                 // setOpenModal1(true);
+                var date=new Date();
+                var currentTime= date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()
                 var dateSplitted = info.startStr.split("T");
                 var startDate = dateSplitted[0];
                 var startTime = dateSplitted[1].split("+")[0];
                 var dateSplitted2 = info.endStr.split("T");
                 var endTime = dateSplitted2[1].split("+")[0];
                 var tempBooking = booking.current;
-                // Get the current date and time
-                var currentDateTime = new Date().toISOString().split("T")[0] + "T" + new Date().toTimeString().split(" ")[0];
-                
-
-                // Compare ang selected start and end times with the current time
-                if (startDate === currentDateTime.split("T")[0] && (startTime < currentDateTime && endTime < currentDateTime)) {
-                  alert("Please select a time that is in the future.");
-                  return; // Abort the selection
-                }
-                setOpenModal1(true);
                 tempBooking.startTime = startTime;
                 tempBooking.endTime = endTime;
                 tempBooking.date = startDate;
                 tempBooking.venue = venueSelected;
                 booking.current = tempBooking;
-              }} 
+                // Get the current date and time
+                var currentDateTime = new Date().toISOString().split("T")[0] + "T" + new Date().toTimeString().split(" ")[0];
+
+                
+                // Compare ang selected start and end times with the current time
+                if(currentTime>startTime&&startDate<=date.toISOString().split('T')[0]){
+                  alert("pls select future time");
+                }
+                else{
+                  setOpenModal1(true)
+                }
+
+
+              }}
               //function para ig click ug usa ka event
               eventClick={
                 (e)=>{
@@ -580,19 +608,21 @@ const cancelBooking = () => {
                 setOpenModal1(true);
                 setOpenModal2(false);
               }}
-              sx={ButtonStyle1}
+              sx={ButtonStyle2}
             >
               Back
             </Button>
             <ButtonGroup>
               <Button
-                sx={ButtonStyle2}
+                sx={ButtonStyle1}
                 onClick={() => {
                   if (booking.current.computers > attendeeList.length + 1) {
                     alert(
                       "You can't borrow computers more than the number of attendees"
                     );
                   } else {
+                    console.log(attendeeList.length);
+                    calculateCost();
                     setOpenModal3(true);
                     setOpenModal2(false);
                   }
@@ -809,9 +839,10 @@ const cancelBooking = () => {
               ))}
             </List>
           </Box>
+          
           <Box
             sx={{
-              margin: "10px 15px 15px 15px",
+              margin: "10px 10px 15px 15px",
               display: "flex",
               justifyContent: "space-between",
             }}
@@ -821,15 +852,15 @@ const cancelBooking = () => {
                 setOpenModal3(false);
                 setOpenModal2(true);
               }}
-              sx={ButtonStyle1}
+              sx={ButtonStyle2}
             >
               Back
             </Button>
+            {role === 'user' ? (
+          <Box>
+            <Typography>Total Cost: Php {cost}</Typography>
             <Button
               onClick={() => {
-                
-                submitBooking();
-                
                 setOpenModal3(false);
                 booking.current = {
                   purpose: "Studying",
@@ -847,14 +878,40 @@ const cancelBooking = () => {
                 };
                 setAttendeeList([]);
               }}
-              sx={ButtonStyle2}
+              sx={ButtonStyle1}
             >
-              Book
+              Pay
             </Button>
-
-
           </Box>
-        </Box>
+        ) : (
+          <Button
+            onClick={() => {
+              submitBooking();
+              setOpenModal3(false);
+              booking.current = {
+                purpose: "Studying",
+                description: "",
+                startTime: "",
+                venue: "",
+                endTime: "",
+                date: "",
+                computers: 0,
+                coins: 0,
+                points: 0,
+                user_id: user.id,
+                officeName: "",
+                attendees: [],
+              };
+              setAttendeeList([]);
+            }}
+            sx={ButtonStyle1}
+          >
+            Book
+          </Button>
+        )}
+      </Box>
+      </Box>
+
       </Modal>
       <Modal
         disableAutoFocus={true}
@@ -1027,6 +1084,8 @@ const cancelBooking = () => {
               justifyContent: "flex-end",
             }}
           >
+
+      
             <Button sx={ButtonStyle1}
              variant="contained"
               onClick={() => {setCancelModal(true);
@@ -1036,6 +1095,7 @@ const cancelBooking = () => {
             </Button>
           </Box>
         </Box>
+        
       </Modal>
       {/* Are you sure you want to cancel */}
       <Modal
@@ -1062,14 +1122,50 @@ const cancelBooking = () => {
             
           </Box>
           <Box p={4}>
-          
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button variant="contained" onClick={() => cancelBooking(tempId)}>Yes</Button>
-            <Button variant="contained" onClick={() => {setViewModal(true); setCancelModal(false);}}>No</Button>
-          </Box>
+          {role === 'user' ? (
+              <Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Cost of Cancellation: 10
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Button variant="contained">
+                    Pay
+                  </Button>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setViewModal(true);
+                      setCancelModal(false);
+                    }}
+                  >
+                    No
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Button variant="contained" onClick={() => cancelBooking(tempId)}>
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setViewModal(true);
+                    setCancelModal(false);
+                  }}
+                >
+                  No
+                </Button>
+              </Box>
+            )}
           </Box>
         </Box>
-
       </Modal>
     </div>
   );

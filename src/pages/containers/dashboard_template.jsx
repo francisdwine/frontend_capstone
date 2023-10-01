@@ -33,8 +33,9 @@ const drawerWidth = 200;
 export default function DashBoardTemplate(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  //const [role, setRole] = React.useState('admin');
 
-  const testUserType = "admin";
+  const testUserType = "user";
   //admin sidenav
   const adminNavItems = [
     { name: "Home", icon:HomeIcon},
@@ -53,6 +54,7 @@ export default function DashBoardTemplate(props) {
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
+
   const selectedStyle={
     backgroundColor:"#fecc00",
     
@@ -73,8 +75,8 @@ export default function DashBoardTemplate(props) {
   const drawer = (
     // sidenav sidenavbar
     <div>
-      <Toolbar sx={{ backgroundColor: "black" }}>
-        <Typography color={"white"}>Logo</Typography>
+      <Toolbar sx={{ backgroundColor: "#fecc00" }}>
+        <img src = "./images/image.png" alt="logo"/>
       </Toolbar>
       {/* <Divider sx={{ backgroundColor: "white" }} /> */}
       {/* sidenav color */}
@@ -181,7 +183,8 @@ export default function DashBoardTemplate(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-            },
+            }, 
+            border:"none"
           }}
         >
           {drawer}
@@ -193,6 +196,7 @@ export default function DashBoardTemplate(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
+              border:"none",
               // sidenav color
               backgroundColor: "black",
             },
