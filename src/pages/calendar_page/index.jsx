@@ -839,6 +839,9 @@ const calculateCost = () => {
               ))}
             </List>
           </Box>
+          {role === 'user' ? (
+            <Typography align="right" paddingRight="20px">Total Cost: Php {cost} </Typography>
+          ) : <div></div>}
           
           <Box
             sx={{
@@ -858,7 +861,6 @@ const calculateCost = () => {
             </Button>
             {role === 'user' ? (
           <Box>
-            <Typography>Total Cost: Php {cost}</Typography>
             <Button
               onClick={() => {
                 setOpenModal3(false);
