@@ -7,7 +7,7 @@ import MyReservations from './pages/my_reservations';
 function App() {
   return (
     <div className="App" >
-      <Calendar />
+      <MyReservations/>
     </div>
   );
 }

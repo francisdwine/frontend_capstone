@@ -139,7 +139,7 @@ export default function MyReservations(props) {
         
       <div>
         <DashBoardTemplate title="Manage Reservations"> 
-          <div style={{ display: "flex",flexDirection:'column',alignItems:'start' }}>
+          <div style={{ display: "flex",flexDirection:'column',alignItems:'start', fontFamily: 'Poppins' }}>
                 
           </div>
           <br></br>
@@ -155,7 +155,37 @@ export default function MyReservations(props) {
             >
               <div style={{ display: "flex", marginBottom: "20px" }}>
               <ButtonGroup>
+              <Button
+                sx={
+                    statusSelected === "Upcoming"
+                      ? selectedStyle
+                      : unselectedStyle
+                  }
+                  onClick={() => setStatusSelected("Upcoming")}
+                  >CANCELLED</Button>
                 <Button
+                sx={
+                  statusSelected === "History"
+                    ? selectedStyle
+                    : unselectedStyle
+                }
+                onClick={() => setStatusSelected("History")}>
+                NO SHOW</Button>
+                <Button
+                sx={
+                  statusSelected === "All"
+                    ? selectedStyle
+                    : unselectedStyle
+                }
+                onClick={() => setStatusSelected("All")}>
+                ALL</Button>
+              </ButtonGroup>
+            </div>
+              
+               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+              <ButtonGroup>
+                
+              <Button
                   sx={
                     venueSelected === "Coworking Space"
                       ? selectedStyle
@@ -166,7 +196,7 @@ export default function MyReservations(props) {
                     setVenueId(1);
                   }}
                 >
-                  Co-working Space
+                  CO-WORKING SPACE
                 </Button>
                 <Button
                   sx={
@@ -179,7 +209,7 @@ export default function MyReservations(props) {
                     setVenueId(2);
                   }}
                 >
-                  Conference Room A
+                  CONFERENCE A
                 </Button>
                 <Button
                   sx={
@@ -192,42 +222,20 @@ export default function MyReservations(props) {
                     setVenueId(3);
                   }}
                 >
-                  Conference Room B
+                  CONFERENCE B
                 </Button>
-              </ButtonGroup>
-            </div>
-              
-               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-              <ButtonGroup>
-                
-                <Button
-                sx={
-                    statusSelected === "Upcoming"
-                      ? selectedStyle
-                      : unselectedStyle
-                  }
-                  onClick={() => setStatusSelected("Upcoming")}
-                  >Upcoming</Button>
-                <Button
-                sx={
-                  statusSelected === "History"
-                    ? selectedStyle
-                    : unselectedStyle
-                }
-                onClick={() => setStatusSelected("History")}>
-                History</Button>
 
               </ButtonGroup>
               </div>
              <TableContainer>
-              <Table>
-                <TableHead>
+             <Table style={{ width: 1000, textAlign: "center", fontFamily: "Oswald"}}>
+                <TableHead >
                   <TableRow>
-                    <StyledTableCell align="left">Title</StyledTableCell>
-                    <StyledTableCell align="left">Date</StyledTableCell>
-                    <StyledTableCell align="left">Start</StyledTableCell>
-                    <StyledTableCell align="left">End</StyledTableCell>
-                    <StyledTableCell align="left">Venue</StyledTableCell>
+                    <StyledTableCell align="center">Title</StyledTableCell>
+                    <StyledTableCell align="center">Date</StyledTableCell>
+                    <StyledTableCell align="center">Start</StyledTableCell>
+                    <StyledTableCell align="center">End</StyledTableCell>
+                    <StyledTableCell align="center">Venue</StyledTableCell>
                     <StyledTableCell align="left"></StyledTableCell>
                     <StyledTableCell align="left"></StyledTableCell>
                   </TableRow>
@@ -235,18 +243,18 @@ export default function MyReservations(props) {
                 <TableBody>
                 {events.map((event,index) => (
             <StyledTableRow>
-              <StyledTableCell component="th" scope="row">
+              <StyledTableCell align="center" component="th" scope="row" fontFamily="Poppins">
                 {event.title}
               </StyledTableCell>
-              <StyledTableCell align="right">{event.date}</StyledTableCell>
-              <StyledTableCell align="right">{event.start}</StyledTableCell>
-              <StyledTableCell align="right">{event.end}</StyledTableCell>
-              <StyledTableCell align="right">{event.venue}</StyledTableCell>
-              <StyledTableCell align="right"><Button sx={ButtonStyle1} onClick={() => {handleView(event.title)}}>View</Button></StyledTableCell>
+              <StyledTableCell align="center">{event.date}</StyledTableCell>
+              <StyledTableCell align="center">{event.start}</StyledTableCell>
+              <StyledTableCell align="center">{event.end}</StyledTableCell>
+              <StyledTableCell align="center">{event.venue}</StyledTableCell>
+              <StyledTableCell align="center"><Button sx={ButtonStyle1} onClick={() => {handleView(event.title)}}>View</Button></StyledTableCell>
 
               {statusSelected === "Upcoming"
-              ? <StyledTableCell align="right"><Button sx={ButtonStyle2} onClick={() => {handleEdit(event.title)}}>Edit</Button></StyledTableCell>
-              : (<StyledTableCell align="right"><Button sx={ButtonStyle2}>Review</Button></StyledTableCell>)
+              ? <StyledTableCell align="center"><Button sx={ButtonStyle2} onClick={() => {handleEdit(event.title)}}>Edit</Button></StyledTableCell>
+              : (<StyledTableCell align="center"><Button sx={ButtonStyle2}>Review</Button></StyledTableCell>)
               }
                   
             </StyledTableRow>

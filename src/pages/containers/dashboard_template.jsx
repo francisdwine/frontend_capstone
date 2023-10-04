@@ -20,6 +20,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BookIcon from '@mui/icons-material/Book';
 import ListIcon from '@mui/icons-material/List';
+import Wild from '../../images/wild.png';
+
 const drawerWidth = 200;
 
 // interface Props {
@@ -35,7 +37,7 @@ export default function DashBoardTemplate(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   //const [role, setRole] = React.useState('admin');
 
-  const testUserType = "user";
+  const testUserType = "admin";
   //admin sidenav
   const adminNavItems = [
     { name: "Home", icon:HomeIcon},
@@ -76,7 +78,7 @@ export default function DashBoardTemplate(props) {
     // sidenav sidenavbar
     <div>
       <Toolbar sx={{ backgroundColor: "#fecc00" }}>
-        <img src = "./images/image.png" alt="logo"/>
+      <img src={Wild} alt="logo" width={200} height={50}/>
       </Toolbar>
       {/* <Divider sx={{ backgroundColor: "white" }} /> */}
       {/* sidenav color */}
@@ -89,7 +91,7 @@ export default function DashBoardTemplate(props) {
                 <Icon component={item.icon}></Icon>
               </ListItemIcon> 
               <ListItemText
-                sx={{ color: "white", fontWeight:'bold'}}
+                sx={{ color: "white", fontWeight:'bold', fontFamily: 'Poppins'}}
                 fontWeight='bold'
                 primary={item.name}               
               />
@@ -116,7 +118,7 @@ export default function DashBoardTemplate(props) {
               borderRadius: "10px",
             }}
           >
-            <Typography fontFamily="Oswald" fontWeight="bold">
+            <Typography fontFamily="Roboto" fontWeight="bold">
               Logout
             </Typography>
           </Button>
@@ -149,7 +151,7 @@ export default function DashBoardTemplate(props) {
             <MenuIcon />
           </IconButton>
           {/* Roboto Slab */}
-          <Typography variant="h4" noWrap component="div" fontFamily="Oswald" color='black' fontWeight='bold' >
+          <Typography variant="h4" noWrap component="div" fontFamily="Poppins" color='black' fontWeight='bold' >
             {props.title}
           </Typography>
         </Toolbar>

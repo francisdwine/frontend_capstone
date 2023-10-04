@@ -66,7 +66,7 @@ export default function Calendar(props) {
   const [cancelModal, setCancelModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
   const [tempId, setTempId] = useState(0);
-  const [role, setRole] = useState('user'); //default role
+  const [role, setRole] = useState('admin'); //default role
   const [info,setInfo]=useState({});
 
   const submitBooking = () => {
@@ -147,7 +147,7 @@ const cancelBooking = () => {
   axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
     .then(() => {
       setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
-      setCancelModal(false); // Close the cancellation modal
+      setCancelModal(false);
       alert('Booking cancelled successfully');
     })
     .catch((error) => {
@@ -840,7 +840,8 @@ const calculateCost = () => {
             </List>
           </Box>
           {role === 'user' ? (
-            <Typography align="right" paddingRight="20px">Total Cost: Php {cost} </Typography>
+            <Typography align="right" paddingRight="20px"  
+            sx={{ fontWeight: 'bold', fontFamily: 'Monospace' }}>Total Cost: Php {cost} </Typography>
           ) : <div></div>}
           
           <Box
@@ -882,8 +883,10 @@ const calculateCost = () => {
               }}
               sx={ButtonStyle1}
             >
-              Pay
+              coins 
             </Button>
+            <Button variant="contained" margin="0px"
+            sx={{...ButtonStyle1, marginLeft: '20px'}}>points</Button>
           </Box>
         ) : (
           <Button
