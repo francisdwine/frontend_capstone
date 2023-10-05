@@ -1,3 +1,6 @@
+import { styled } from '@mui/material/styles';
+import TableCell, { tableCellClasses } from '@mui/material/TableCell';
+import { TableRow} from "@mui/material";
 export const selectedStyle = {
     backgroundColor: "#fecc00",
     color: "white",
@@ -10,7 +13,7 @@ export const selectedStyle = {
       borderColor: '#fecc00',
       fontFamily:'Oswald',
     },
-  
+
   };
   export const unselectedStyle = {
     fontFamily:'Oswald',
@@ -25,8 +28,8 @@ export const selectedStyle = {
       borderColor: "#5A5A5A",
       fontFamily:'Oswald',
     },
-    
-    
+
+
   };
   export const modalHeaderStyle = {
     p: 3,
@@ -38,14 +41,14 @@ export const selectedStyle = {
     justifyContent: "space-between",
     backgroundColor: "black",
   };
-  
+
   export const modalStyle = {
     position: "absolute",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: { lg: 400, xs: 350, sm: 400, md: 400, xl: 400 },
-    
+
     bgcolor: "background.paper",
     // border: "1px solid #fff",
     boxShadow: 24,
@@ -74,3 +77,23 @@ export const selectedStyle = {
       color: "white",
     },
   };
+
+  export const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 14,
+    },
+  }));
+
+  export const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      backgroundColor: theme.palette.action.hover,
+    },
+    // hide last border
+    '&:last-child td, &:last-child th': {
+      border: 0,
+    },
+  }));
