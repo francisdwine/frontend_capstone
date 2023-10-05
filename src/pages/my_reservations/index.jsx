@@ -67,7 +67,7 @@ export default function MyReservations(props) {
   const [eventData,setEventData]=useState([]);
   const [refresh, setRefresh] = useState(true);
   const [attendeeName, setAttendeeName] = useState("");
-  const [tempId, setTempId] = useState(0);
+  const [tempId, setTempId] = useState([]);
   const [viewModal, setViewModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
   //const [events, setEvents] = useState([]);
@@ -76,6 +76,9 @@ export default function MyReservations(props) {
   const [role, setRole] = useState('admin'); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
+  const [bookingID, setBookingID] = useState();
+
+
   const found = (element) => element.name === attendeeName;
   const deleteUser = (index) => {
     setAttendeeList([
@@ -89,12 +92,13 @@ export default function MyReservations(props) {
     username: "joe",
   });
 
-  const handleView = (title) => {
+  const handleView = (id) => {
     setViewModal(true);
     let a = events.find((item) => {
-      return item.title === title;
+      return item.id === id;
     });
     setViewDetails(a);
+    setTempId(id);
     console.log(a);
   };
 
@@ -106,6 +110,7 @@ export default function MyReservations(props) {
     setViewDetails(b);
     console.log(b);
   };
+
     //init page
     React.useEffect(() => {
       axios.get("http://127.0.0.1:8000/api/users/").then((res) => {
@@ -139,12 +144,13 @@ export default function MyReservations(props) {
   const cancelledBooking = () => {
     axios.get(`http://localhost:8000/api/getAllCancelledBookings/`)
     .then((response) => {
+      setBookingsRefresher(!bookingsRefresher);
       setEvents(response.data); // Update state with canceled bookings
     })
     .catch((error) => {
       console.error('Error fetching canceled bookings:', error);
     });
-};
+}; 
 
 const cancelBooking = (props) => {
   axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
@@ -179,7 +185,7 @@ const cancelBooking = (props) => {
       axios.get(`http://localhost:8000/api/getAllCancelledBookings/`)
         .then((response) => {
           setEvents(response.data);
-        })
+        },[bookingsRefresher])
         .catch((error) => {
           console.error('Error fetching canceled bookings:', error);
         });
@@ -484,27 +490,29 @@ const cancelBooking = (props) => {
                             <Button
                               sx={ButtonStyle1}
                               onClick={() => {
-                                handleView(event.title);
+                                handleView(event.id);
                               }}
                             >
                               View
                             </Button>
-                          </StyledTableCell>
-    
-                          
+                          </StyledTableCell>                       
                           {statusSelected === "All" ? (
-                            <StyledTableCell align="right">
-                              <Button
+                            <StyledTableCell align="center">
+                                
+                                <Button
                                 sx={ButtonStyle2}
                                 onClick={() => {
-                                  handleEdit(event.title);
+                                  setEditModal(true)
                                 }}
                               >
                                 Edit
                               </Button>
+                              
+                              
+                              
                             </StyledTableCell>
                           ) : (
-                            <StyledTableCell align="right">
+                            <StyledTableCell align="center">
                               <Button sx={{...ButtonStyle1, backgroundColor: "#ff595e"}}>Review</Button>
                             </StyledTableCell>
                           )}
@@ -539,184 +547,313 @@ const cancelBooking = (props) => {
               fontFamily="Oswald"
               color="white"
             >
-              Booking Enrollment
+              Booking Details
             </Typography>
           </Box>
 
           <Box p={4}>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Title:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.title}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Reference No:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.reference}
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Computers:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.computers}
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Start Time:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.start}
-              </Typography>
-            </Box>
-
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                End Time:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.end}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Status:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.status}
-              </Typography>
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                Venue:
-              </Typography>
-              <Typography
-                fontWeight="bold"
-                marginBottom="5px"
-                fontFamily="Roboto Slab"
-              >
-                {viewDetails.venue}
-              </Typography>
-            </Box>
-
-            <br></br>
-            <Typography
-              fontWeight="bold"
-              marginTop="0px"
-              fontFamily="Oswald"
-              backgroundColor="black"
-              sx={{ float: "left", transform: "rotate(-5deg)" }}
-              p="5px 10px 5px 10px"
-              color="white"
-            >
-              Attendees
-            </Typography>
-            <List
-              className="userList"
-              dense={true}
-              style={{ maxHeight: "150px", width: "100%", overflow: "auto" }}
-            >
-              {attendeeList.map((item, i) => (
-                <React.Fragment key={i}>
-                  <ListItem m={0} key={i}>
-                    <ListItemText
-                      fontSize="12px"
-                      primary={item.name}
-                      // secondary={secondary ? 'Secondary text' : null}
-                    />
-                  </ListItem>
-                  <Divider />
-                </React.Fragment>
-              ))}
-            </List>
-            <Typography
-              sx={{ paddingLeft: 2, color: "darkred" }}
-              fontFamily="Roboto"
-            >
-              Note: 30% of cost as cancellation fee
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              margin: "10px 15px 15px 10px",
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Button
-              sx={ButtonStyle1}
-              variant="contained"
-              onClick={() => {
-                setCancelModal(true);
-                setViewModal(false);
-              }}
-            >
-              Cancel Booking
-            </Button>
-          </Box>
+              {viewDetails.status === 'Cancelled' ? (
+            <><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Typography
+                  fontWeight="bold"
+                  marginBottom="5px"
+                  fontFamily="Roboto Slab"
+                >
+                  Title:
+                </Typography>
+                <Typography
+                  fontWeight="bold"
+                  marginBottom="5px"
+                  fontFamily="Roboto Slab"
+                >
+                  {viewDetails.description}
+                </Typography>
+              </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Reference No:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.referenceNo}
+                  </Typography>
+                </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Computers:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.computers}
+                  </Typography>
+                </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Start Time:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.startTime}
+                  </Typography>
+                </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    End Time:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.endTime}
+                  </Typography>
+                </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Status:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.status}
+                  </Typography>
+                </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Venue:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.venue}
+                  </Typography>
+                </Box><br></br><Typography
+                  fontWeight="bold"
+                  marginTop="0px"
+                  fontFamily="Oswald"
+                  backgroundColor="black"
+                  sx={{ float: "left", transform: "rotate(-5deg)" }}
+                  p="5px 10px 5px 10px"
+                  color="white"
+                >
+                  Attendees
+                </Typography><List
+                  className="userList"
+                  dense={true}
+                  style={{ maxHeight: "150px", width: "100%", overflow: "auto" }}
+                >
+                  {attendeeList.map((item, i) => (
+                    <React.Fragment key={i}>
+                      <ListItem m={0} key={i}>
+                        <ListItemText
+                          fontSize="12px"
+                          primary={item.name} />
+                      </ListItem>
+                      <Divider />
+                    </React.Fragment>
+                  ))}
+                </List><Box
+                  sx={{
+                    margin: "10px 15px 15px 10px",
+                    display: "flex",
+                    justifyContent: "flex-end",
+                  }}
+                >
+                </Box></>
+                ) : ( 
+            <><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    Title:
+                  </Typography>
+                  <Typography
+                    fontWeight="bold"
+                    marginBottom="5px"
+                    fontFamily="Roboto Slab"
+                  >
+                    {viewDetails.description}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Reference No:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.referenceNo}
+                    </Typography>
+                  </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Computers:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.computers}
+                    </Typography>
+                  </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Start Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.startTime}
+                    </Typography>
+                  </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      End Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.endTime}
+                    </Typography>
+                  </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Status:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.status}
+                    </Typography>
+                  </Box><Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Venue:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.venue}
+                    </Typography>
+                  </Box><br></br><Typography
+                    fontWeight="bold"
+                    marginTop="0px"
+                    fontFamily="Oswald"
+                    backgroundColor="black"
+                    sx={{ float: "left", transform: "rotate(-5deg)" }}
+                    p="5px 10px 5px 10px"
+                    color="white"
+                  >
+                    Attendees
+                  </Typography><List
+                    className="userList"
+                    dense={true}
+                    style={{ maxHeight: "150px", width: "100%", overflow: "auto" }}
+                  >
+                    {attendeeList.map((item, i) => (
+                      <React.Fragment key={i}>
+                        <ListItem m={0} key={i}>
+                          <ListItemText
+                            fontSize="12px"
+                            primary={item.name} />
+                        </ListItem>
+                        <Divider />
+                      </React.Fragment>
+                    ))}
+                  </List>
+                  <Typography
+                  sx={{ paddingLeft: 2, color: "darkred" }}
+                  fontFamily="Roboto"
+                >
+                  Note: 30% of cost as cancellation fee
+                </Typography>
+                  <Box
+                    sx={{
+                      margin: "10px 15px 15px 10px",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Button
+                    sx={ButtonStyle1}
+                    variant="contained"
+                    onClick={() => {
+                      setCancelModal(true);
+                      setViewModal(false);
+                    } }
+                  >
+                    Cancel Booking
+                  </Button>
+                  </Box></>
+                  )} 
+        </Box>
         </Box>
       </Modal>
+
+
       {/* Are you sure you want to cancel */}
       <Modal
       disableAutoFocus={true}
@@ -742,6 +879,7 @@ const cancelBooking = (props) => {
             
           </Box>
           <Box p={4}>
+          {role === 'user' ? (
               <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography
@@ -754,21 +892,41 @@ const cancelBooking = (props) => {
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button variant="contained" onClick={() => cancelBooking(tempId)}>
-                    Yes
+                    Yes </Button>
+                  <Button variant="contained">
+                    Pay
                   </Button>
                   <Button
                     variant="contained"
                     onClick={() => {
                       setViewModal(true);
+                      setViewModal(false);
                       setCancelModal(false);
                     }}
                   >
                     No
                   </Button>
                 </Box>
+              </Box>
+            ) : (
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Button variant="contained" onClick={() => cancelBooking(tempId)}>
+                  Yes
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    setViewModal(false);
+                    setCancelModal(false);
+                  }}
+                >
+                  No
+                </Button>
+                </Box>
+                )}
                 </Box>
           </Box>
-        </Box>
+        
       </Modal>
 
       {/*EDIT Modal */}
