@@ -97,8 +97,8 @@ export default function Calendar(props) {
   //data to send
   //new booking
   const [user, setUser] = useState({
-    id: 1,
-    username: "francis",
+    id: 2,
+    username: "pam",
   });
   const [bookingAttendees,setBookingAttendees]=useState([]);
   const venueArray=["","Coworking Space","Conference Room A","Conference Room B"]

@@ -21,13 +21,13 @@ import {
   Autocomplete,
   IconButton,
 } from "@mui/material";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
 import axios from 'axios';
-import ClearIcon from "@mui/icons-material/Clear";
 import * as React from "react";
 import {
   selectedStyle,
@@ -70,11 +70,12 @@ export default function MyReservations(props) {
   const [tempId, setTempId] = useState(0);
   const [viewModal, setViewModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
+  //const [events, setEvents] = useState([]);
   const [editModal, setEditModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
-  const [role, setRole] = useState('user'); //default role
-  const [viewDetails, setViewDetails] = useState({});
+  const [role, setRole] = useState('admin'); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
+  const [viewDetails, setViewDetails] = useState({});
   const found = (element) => element.name === attendeeName;
   const deleteUser = (index) => {
     setAttendeeList([
@@ -137,24 +138,25 @@ export default function MyReservations(props) {
 
   const cancelledBooking = () => {
     axios.get(`http://localhost:8000/api/getAllCancelledBookings/`)
-    .then(() => {
-      // put here joann hehe
+    .then((response) => {
+      setEvents(response.data); // Update state with canceled bookings
     })
-  }
+    .catch((error) => {
+      console.error('Error fetching canceled bookings:', error);
+    });
+};
 
-  const cancelBooking = () => {
-    axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
-      .then(() => {
-        setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
-        setCancelModal(false);
-        alert('Booking cancelled successfully');
-      })
-      .catch((error) => {
-        console.error('Error cancelling booking:', error);
-      });
-  };
-
- 
+const cancelBooking = (props) => {
+  axios.get(`http://localhost:8000/api/cancelBooking/${tempId}`)
+    .then(() => {
+      setBookingsRefresher(!bookingsRefresher);
+      setCancelModal(false);
+      alert('Booking cancelled successfully');
+    })
+    .catch((error) => {
+      console.error('Error cancelling booking:', error);
+    });
+};
   
 
   // const fakeUserDb = [
@@ -165,12 +167,64 @@ export default function MyReservations(props) {
 
   const [venueSelected, setVenueSelected] = useState("Coworking Space");
   const [venueId, setVenueId] = useState(1);
-  const [statusSelected, setStatusSelected] = useState("Upcoming");
+  const [statusSelected, setStatusSelected] = useState("All");
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
     { name: "Celine", id: 4 },
   ]);
+
+  useEffect(() => {
+    if (statusSelected === 'Cancelled') {
+      axios.get(`http://localhost:8000/api/getAllCancelledBookings/`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching canceled bookings:', error);
+        });
+    } else if (statusSelected === 'All') {
+      axios.get(`http://localhost:8000/api/getAllBookings/`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching all bookings:', error);
+        });
+    } else if (statusSelected === 'No Show') {
+      axios.get(`http://localhost:8000/api/getAllNoShowBookings/`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching no show bookings:', error);
+        });
+    } else if (statusSelected === 'No Show') {
+      axios.get(`http://localhost:8000/api/getAllNoShowBookings/${tempId}`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching no show bookings:', error);
+        });
+    } else if (statusSelected === 'Upcoming') {
+      axios.get(`http://localhost:8000/api/getUpcomingUserBookings/${user.id}`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching no show bookings:', error);
+        });
+    } else if (statusSelected === 'History') {
+      axios.get(`http://localhost:8000/api/getHistoryUserBookings/${user.id}`)
+        .then((response) => {
+          setEvents(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching no show bookings:', error);
+        });
+    } 
+  }, [statusSelected]);
 
   const editAttendee = () => {
     setAttendeeList([
@@ -261,19 +315,19 @@ export default function MyReservations(props) {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {events.map((event) => (
+                      {events.map((event, index) => (
                         <StyledTableRow>
                           <StyledTableCell component="th" scope="row">
-                            {event.title}
+                            {event.description}
                           </StyledTableCell>
                           <StyledTableCell align="right">
                             {event.date}
                           </StyledTableCell>
                           <StyledTableCell align="right">
-                            {event.start}
+                            {event.startTime}
                           </StyledTableCell>
                           <StyledTableCell align="right">
-                            {event.end}
+                            {event.endTime}
                           </StyledTableCell>
                           <StyledTableCell align="right">
                             {event.venue}
@@ -330,29 +384,23 @@ export default function MyReservations(props) {
               <div style={{ display: "flex", marginBottom: "20px" }}>
               <ButtonGroup>
               <Button
-                sx={
-                    statusSelected === "Cancelled"
-                      ? selectedStyle
-                      : unselectedStyle
-                  }
-                  onClick={() => setStatusSelected("Cancelled")}
-                  >CANCELLED</Button>
-                <Button
-                sx={
-                  statusSelected === "No Show"
-                    ? selectedStyle
-                    : unselectedStyle
-                }
-                onClick={() => setStatusSelected("No Show")}>
-                NO SHOW</Button>
-                <Button
-                sx={
-                  statusSelected === "All"
-                    ? selectedStyle
-                    : unselectedStyle
-                }
-                onClick={() => setStatusSelected("All")}>
-                ALL</Button>
+            sx={statusSelected === 'Cancelled' ? selectedStyle : unselectedStyle}
+            onClick={() => setStatusSelected('Cancelled')}
+          >
+            CANCELLED
+          </Button>
+          <Button
+            sx={statusSelected === 'No Show' ? selectedStyle : unselectedStyle}
+            onClick={() => setStatusSelected('No Show')}
+          >
+            NO SHOW
+          </Button>
+          <Button
+            sx={statusSelected === 'All' ? selectedStyle : unselectedStyle}
+            onClick={() => setStatusSelected('All')}
+          >
+            ALL
+          </Button>
               </ButtonGroup>
             </div>
               
@@ -401,7 +449,7 @@ export default function MyReservations(props) {
 
               </ButtonGroup>
               </div>
-             <TableContainer>
+              <TableContainer>
              <Table style={{ width: 1000, textAlign: "center", fontFamily: "Oswald"}}>
                 <TableHead >
                   <TableRow>
@@ -415,26 +463,59 @@ export default function MyReservations(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                {events.map((event,index) => (
-            <StyledTableRow>
-              <StyledTableCell align="center" component="th" scope="row" fontFamily="Poppins">
-                {event.title}
-              </StyledTableCell>
-              <StyledTableCell align="center">{event.date}</StyledTableCell>
-              <StyledTableCell align="center">{event.start}</StyledTableCell>
-              <StyledTableCell align="center">{event.end}</StyledTableCell>
-              <StyledTableCell align="center">{event.venue}</StyledTableCell>
-              <StyledTableCell align="center"><Button sx={ButtonStyle1} onClick={() => {handleView(event.title)}}>View</Button></StyledTableCell>
-
-              {statusSelected === "Upcoming"
-              ? <StyledTableCell align="center"><Button sx={ButtonStyle2} onClick={() => {handleEdit(event.title)}}>Edit</Button></StyledTableCell>
-              : (<StyledTableCell align="center"><Button sx={ButtonStyle2}>Review</Button></StyledTableCell>)
-              }    
-            </StyledTableRow>
-          ))}
-                </TableBody>
+                      {events.map((event,index) => (
+                        <StyledTableRow key={index}>
+                          <StyledTableCell component="th" scope="row">
+                            {event.description}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.date}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.startTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.endTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.venue}
+                          </StyledTableCell>
+                          <StyledTableCell align="right">
+                            <Button
+                              sx={ButtonStyle1}
+                              onClick={() => {
+                                handleView(event.title);
+                              }}
+                            >
+                              View
+                            </Button>
+                          </StyledTableCell>
+    
+                          
+                          {statusSelected === "All" ? (
+                            <StyledTableCell align="right">
+                              <Button
+                                sx={ButtonStyle2}
+                                onClick={() => {
+                                  handleEdit(event.title);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </StyledTableCell>
+                          ) : (
+                            <StyledTableCell align="right">
+                              <Button sx={{...ButtonStyle1, backgroundColor: "#ff595e"}}>Review</Button>
+                            </StyledTableCell>
+                          )}
+                  
+                
+                {/* Add other table cells for additional actions if needed */}
+              </StyledTableRow>
+            ))}
+          </TableBody>
               </Table>
-             </TableContainer>  
+             </TableContainer>
             </Box>
           </Box>
         </DashBoardTemplate>
@@ -552,6 +633,22 @@ export default function MyReservations(props) {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
+                Status:
+              </Typography>
+              <Typography
+                fontWeight="bold"
+                marginBottom="5px"
+                fontFamily="Roboto Slab"
+              >
+                {viewDetails.status}
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Typography
+                fontWeight="bold"
+                marginBottom="5px"
+                fontFamily="Roboto Slab"
+              >
                 Venue:
               </Typography>
               <Typography
@@ -593,7 +690,12 @@ export default function MyReservations(props) {
                 </React.Fragment>
               ))}
             </List>
-            
+            <Typography
+              sx={{ paddingLeft: 2, color: "darkred" }}
+              fontFamily="Roboto"
+            >
+              Note: 30% of cost as cancellation fee
+            </Typography>
           </Box>
           <Box
             sx={{
@@ -640,7 +742,6 @@ export default function MyReservations(props) {
             
           </Box>
           <Box p={4}>
-          {role === 'user' ? (
               <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography
@@ -652,39 +753,22 @@ export default function MyReservations(props) {
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Button variant="contained">
-                    Pay
+                  <Button variant="contained" onClick={() => cancelBooking(tempId)}>
+                    Yes
                   </Button>
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setViewModal(false);
+                      setViewModal(true);
                       setCancelModal(false);
                     }}
                   >
                     No
                   </Button>
                 </Box>
-              </Box>
-            ) : (
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Button variant="contained" onClick={() => cancelBooking(tempId)}>
-                  Yes
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setViewModal(false);
-                    setCancelModal(false);
-                  }}
-                >
-                  No
-                </Button>
                 </Box>
-                )}
-                </Box>
-              </Box>
-          
+          </Box>
+        </Box>
       </Modal>
 
       {/*EDIT Modal */}
@@ -779,72 +863,9 @@ export default function MyReservations(props) {
           </Box>
         </Box>
       </Modal>
+
     {/*Attendees Edit*/}
       <Modal
-        disableAutoFocus={true}
-        //open={editAttendee}
-        onEn
-        onClose={() => setEditModal(true)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        style={{ width: "100%", overflow: "auto" }}
-      >
-        <Box sx={modalStyle}>
-          <Box sx={modalHeaderStyle}>
-            <Typography
-              sx={{ fontWeight: "bold" }}
-              id="modal-modal-title"
-              variant="h5"
-              component="h2"
-              fontFamily="Oswald"
-              color="white"
-            >
-              Attendees
-            </Typography>
-          </Box>
-          <TextField
-              name="attendee"
-              sx={{ width: "100%" }}
-              id="outlined-basic"
-              label="Attendee Name"
-              variant="standard"
-              inputProps={{ maxLength: 20 }}
-            />
-          <List
-              className="userList"
-              dense={true}
-              style={{ maxHeight: "150px", width: "100%", overflow: "auto" }}
-            >
-              <React.Fragment>
-                <ListItem m={0}>
-                  <ListItemText
-                    fontSize="12px"
-                    primary={user.username}
-                    // secondary={secondary ? 'Secondary text' : null}
-                  />
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-              {attendeeList.map((item, index) => (
-                <React.Fragment key={index}>
-                  <ListItem m={0} key={index}>
-                    <ListItemText
-                      fontSize="12px"
-                      primary={item.name}
-                      // secondary={secondary ? 'Secondary text' : null}
-                    />
-                  </ListItem>
-                  <Divider />
-                </React.Fragment>
-              ))}
-            </List>
-        </Box>
-      </Modal>
-
-
-
-       {/* add or remove attendees */}
-       <Modal
       disableAutoFocus={true}
       open={attendeesModal}
       onClose={() => setAttendeesModal(false)}
