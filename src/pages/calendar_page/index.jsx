@@ -885,7 +885,10 @@ const calculateCost = () => {
             >
               coins 
             </Button>
-            <Button variant="contained" margin="0px"
+            <Button onClick={() => {
+              submitBooking();
+              setOpenModal3(false);
+            }}variant="contained" margin="0px"
             sx={{...ButtonStyle1, marginLeft: '20px'}}>points</Button>
           </Box>
         ) : (
@@ -1145,6 +1148,7 @@ const calculateCost = () => {
                   <Button
                     variant="contained"
                     onClick={() => {
+                      submitBooking();
                       setViewModal(true);
                       setCancelModal(false);
                     }}

@@ -21,6 +21,8 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import BookIcon from '@mui/icons-material/Book';
 import ListIcon from '@mui/icons-material/List';
 import Wild from '../../images/wild.png';
+import MyReservations from "../my_reservations";
+import Logs from "../attendance_logs";
 
 const drawerWidth = 200;
 
@@ -35,22 +37,23 @@ const drawerWidth = 200;
 export default function DashBoardTemplate(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  //const [role, setRole] = React.useState('admin');
+  const [selectedFunction, setSelectedFunction] = React.useState("");
 
-  const testUserType = "admin";
+  const testUserType = "user";
   //admin sidenav
   const adminNavItems = [
-    { name: "Home", icon:HomeIcon},
-    { name: "Dashboard", icon:DashboardIcon },
-    { name: "Calendar", icon: CalendarMonthIcon },
-    { name: "Logs", icon: BookIcon },
-    { name: "Bookings", icon: ListIcon},
+    { name: "Home", icon: HomeIcon, function: () => window.location.assign("/home") },
+    { name: "Dashboard", icon: DashboardIcon, function: () => window.location.assign("/dashboard") },
+    { name: "Calendar", icon: CalendarMonthIcon, function: () => window.location.assign("/calendar") },
+    { name: "Logs", icon: BookIcon, function: () => window.location.assign("/logs")},
+    { name: "Bookings", icon: ListIcon, function: () => window.location.assign("/bookings")},
   ];
+  
   //user sidenav
   const userNavItems = [
-    { name: "Home", icon: HomeIcon},
-    { name: "Calendar", icon: CalendarMonthIcon },
-    { name: "Bookings", icon: ListIcon},
+    { name: "Home", icon: HomeIcon, function: () => window.location.assign("/home") },
+    { name: "Calendar", icon: CalendarMonthIcon, function: () => window.location.assign("/calendar") },
+    { name: "Bookings", icon: ListIcon, function: () => window.location.assign("/bookings") },
   ];
   const NavItems = testUserType === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
