@@ -23,6 +23,7 @@ import ListIcon from '@mui/icons-material/List';
 import Wild from '../../images/wild.png';
 import MyReservations from "../my_reservations";
 import Logs from "../attendance_logs";
+import { useNavigate } from "react-router-dom";
 
 const drawerWidth = 200;
 
@@ -39,21 +40,23 @@ export default function DashBoardTemplate(props) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [selectedFunction, setSelectedFunction] = React.useState("");
 
-  const testUserType = "user";
-  //admin sidenav
+  const testUserType = "admin";
+  const navigate = useNavigate();
+  //admin sidenav 
   const adminNavItems = [
-    { name: "Home", icon: HomeIcon, function: () => window.location.assign("/home") },
-    { name: "Dashboard", icon: DashboardIcon, function: () => window.location.assign("/dashboard") },
-    { name: "Calendar", icon: CalendarMonthIcon, function: () => window.location.assign("/calendar") },
-    { name: "Logs", icon: BookIcon, function: () => window.location.assign("/logs")},
-    { name: "Bookings", icon: ListIcon, function: () => window.location.assign("/bookings")},
+    { name: "Home", icon: HomeIcon, link: "/home" },
+    { name: "Dashboard", icon: DashboardIcon, link: "/dashboard" },
+    { name: "Calendar", icon: CalendarMonthIcon, link: "/calendar" },
+    { name: "Logs", icon: BookIcon, link: "/logs" },
+    //test
+    { name: "Bookings", icon: ListIcon, link: "/bookings", onClick: () => {navigate("/bookings");  }, },
   ];
   
   //user sidenav
   const userNavItems = [
-    { name: "Home", icon: HomeIcon, function: () => window.location.assign("/home") },
-    { name: "Calendar", icon: CalendarMonthIcon, function: () => window.location.assign("/calendar") },
-    { name: "Bookings", icon: ListIcon, function: () => window.location.assign("/bookings") },
+    { name: "Home", icon: HomeIcon, link:"/home" },
+    { name: "Calendar", icon: CalendarMonthIcon, link: "/calendar" },
+    { name: "Bookings", icon: ListIcon, link: "/bookings" },
   ];
   const NavItems = testUserType === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
@@ -88,6 +91,7 @@ export default function DashBoardTemplate(props) {
       <List sx={{ backgroundColor: "black" }}>
         {NavItems.map((item, index) => (
           <ListItem sx={props.title===item.name?selectedStyle:unselectedStyle} key={index} disablePadding>
+             <li key={index} onClick={() => navigate(item.link)}></li>
             <ListItemButton>
               <ListItemIcon sx={{ color: "white" }}>
                 {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}

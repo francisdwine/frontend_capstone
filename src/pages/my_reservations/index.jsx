@@ -20,7 +20,7 @@ import {
   Autocomplete,
   IconButton,
 } from "@mui/material";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useNavigate } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -73,7 +73,7 @@ export default function MyReservations(props) {
   const [cancelModal, setCancelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
-  const [role, setRole] = useState("user"); //default role
+  const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
 
@@ -92,19 +92,19 @@ export default function MyReservations(props) {
 
   const handleView = (id) => {
     setTempId(id);
-    setViewModal(true);
 
     let a = events.find((item) => {
       return item.id === id;
     });
     axios
-      .get(`http://localhost:8000/api/getAttendees/${tempId}/`)
+      .get(`http://localhost:8000/api/getAttendees/${a.id}/`)
       .then((res) => {
-        setBookingAttendees(res.data);
-      });
+        setAttendeeList(res.data);
     setViewDetails(a);
-    setTempId(id);
     console.log(a);
+    setViewModal(true);
+    console.log(id);
+  });
   };
 
   const handleEdit = (id) => {
@@ -114,6 +114,7 @@ export default function MyReservations(props) {
       return item.id === id;
     });
     setViewDetails(b);
+    booking.current.title = b.description;
     console.log(b);
   };
 
@@ -263,11 +264,11 @@ export default function MyReservations(props) {
       return item.venue === venueId;
       //  && item.referenceNo.contains(searchText)
     })
-    .sort(
-      (first, second) =>
-        second.date > first.date ? 1 : second.date < first.date ? -1 : 0
-      // (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
-    );
+    // .sort(
+    //   (first, second) =>
+    //     second.date > first.date ? 1 : second.date < first.date ? -1 : 0
+    //   (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
+    // );
   const addAttendee = () => {
     let isExisting = false;
     let id = null;
@@ -322,10 +323,14 @@ export default function MyReservations(props) {
   };
 
   const editBooking = () => {
+    const requestBody = {
+      title: booking.current.title,
+      purpose: booking.current.purpose,
+      computers: booking.current.computers,
+    };
     //setTempId(id);
-    console.log("edit Booking", tempId);
     axios
-      .put(`http://localhost:8000/api/editBooking/${tempId}/`)
+      .put(`http://localhost:8000/api/editBooking/${tempId}/`, requestBody)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
@@ -337,7 +342,7 @@ export default function MyReservations(props) {
   };
 
   const booking = useRef({
-    purpose: "",
+    purpose: "Studying",
     title: "",
     description: "",
     startTime: "",
@@ -449,14 +454,14 @@ export default function MyReservations(props) {
                             sx={ButtonStyle1}
                             onClick={() => {
                               handleView(event.id);
-                              axios
-                                .get(
-                                  `http://localhost:8000/api/getAttendees/${tempId}/`
-                                )
-                                .then((res) => {
-                                  setRefresh(!refresh);
-                                  setAttendeeList(res.data);
-                                });
+                              // axios
+                              //   .get(
+                              //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                              //   )
+                              //   .then((res) => {
+                              //     setRefresh(!refresh);
+                              //     setAttendeeList(res.data);
+                              //   });
                             }}
                             p={200}
                           >
@@ -638,14 +643,14 @@ export default function MyReservations(props) {
                             sx={ButtonStyle1}
                             onClick={() => {
                               handleView(event.id);
-                              axios
-                                .get(
-                                  `http://localhost:8000/api/getAttendees/${tempId}/`
-                                )
-                                .then((res) => {
-                                  setRefresh(!refresh);
-                                  setAttendeeList(res.data);
-                                });
+                              // axios
+                              //   .get(
+                              //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                              //   )
+                              //   .then((res) => {
+                              //     setRefresh(!refresh);
+                              //     setAttendeeList(res.data);
+                              //   });
                             }}
                           >
                             View
@@ -657,7 +662,10 @@ export default function MyReservations(props) {
                               sx={ButtonStyle2}
                               onClick={() => {
                                 setEditModal(true);
+                                setTempId(event.id);
+                                //alert(event.id);
                               }}
+                              
                             >
                               Edit
                             </Button>
@@ -1144,7 +1152,8 @@ export default function MyReservations(props) {
           </Box>
           <Box p={4}>
             <TextField
-              name="description"
+              name="title"
+              value={booking.current.title}
               onChange={(e) => handleChange(e)}
               sx={{ width: "100%" }}
               id="outlined-basic"
@@ -1157,6 +1166,8 @@ export default function MyReservations(props) {
                 Purpose
               </InputLabel>
               <Select
+                value={booking.current.purpose}
+                onChange={props.handleChange}
                 labelId="demo-simple-select-standard-label"
                 id="demo-simple-select-standard"
                 label="Purpose"
@@ -1190,6 +1201,7 @@ export default function MyReservations(props) {
                 name="computers"
                 type="number"
                 sx={{ width: "40%" }}
+                value={booking.current.computers}
                 InputProps={{
                   inputProps: {
                     min: 0,
@@ -1199,17 +1211,18 @@ export default function MyReservations(props) {
                 id="outlined-basic"
                 label="Computers"
                 variant="standard"
+                onChange={(e) => handleChange(e)}
                 autoFocus={false}
               />
             </Box>
             <Button
               variant="contained"
               onClick={() => {
+                // if()
                 setViewModal(false);
                 setCancelModal(false);
                 setAttendeesModal(true);
                 editBooking(tempId);
-                console.log("save button called")
               }}
               sx={{ ...ButtonStyle1, marginLeft: "260px", marginTop: "20px" }}
             >
