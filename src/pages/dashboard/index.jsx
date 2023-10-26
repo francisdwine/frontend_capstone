@@ -24,7 +24,7 @@ import axios from "axios";
 import * as React from "react";
 
 import {
-  StyledTableCell,
+  StyledTableCell, StyledTableRow,
 } from "./styles";
 
 //temp deets
@@ -67,6 +67,7 @@ import {
 //   },
 // ];
 const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
+// const colors = ["#000000","#fecc00",];
 // for Reviews
 const reviews = [
   { label: "Name", value: "John Doe" },
@@ -297,21 +298,21 @@ export default function Dashboard(props) {
         >
           <Table>
             <TableHead>
-              <TableRow>
+              <StyledTableRow>
                 <StyledTableCell align="center">Booking ID</StyledTableCell>
                 <StyledTableCell align="center">Name</StyledTableCell>
                 <StyledTableCell align="center">Venue</StyledTableCell>
                 <StyledTableCell align="center">Time Signed in</StyledTableCell>
-              </TableRow>
+              </StyledTableRow>
             </TableHead>
             <TableBody>
               {data.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell align="center">{row.booking}</TableCell>
-                  <TableCell align="center">{row.name}</TableCell>
-                  <TableCell align="center">{row.venueName}</TableCell>
-                  <TableCell align="center">{row.signInTime}</TableCell>
-                </TableRow>
+                <StyledTableRow key={index}>
+                  <StyledTableCell align="center">{row.booking}</StyledTableCell>
+                  <StyledTableCell align="center">{row.name}</StyledTableCell>
+                  <StyledTableCell align="center">{row.venueName}</StyledTableCell>
+                  <StyledTableCell align="center">{row.signInTime}</StyledTableCell>
+                </StyledTableRow>
               ))}
             </TableBody>
           </Table>
@@ -367,7 +368,7 @@ export default function Dashboard(props) {
         </Container>
 
         // {/* TEMP COMMENTS */}
-        {/* <Container
+      {/* <Container
           sx={{ display: "flex", justifyContent: "flex-end", height: "100%" }}
         >
           <Paper
@@ -381,7 +382,7 @@ export default function Dashboard(props) {
               // alignItems: "center",
             }}
           > */}
-            {/* <TableContainer>
+      {/* <TableContainer>
               <Table>
                 <TableRow>
                   {reviews.map((item, index) => (
@@ -404,7 +405,7 @@ export default function Dashboard(props) {
             </TableContainer>
           </Paper>
         </Container>
-      </Container> */} 
+      </Container> */}
     </DashBoardTemplate>
   );
 }

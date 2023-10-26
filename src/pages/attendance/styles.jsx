@@ -8,17 +8,17 @@ export const selectedStyle = {
     color: "white",
     fontWeight: "bold",
     borderColor: "#fecc00",
-    fontFamily:'Oswald',
+    fontFamily:'Poppins',
     "&:hover": {
       backgroundColor: "#fecc00",
       color: "white",
       borderColor: '#fecc00',
-      fontFamily:'Oswald',
+      fontFamily:'Poppins',
     },
 
   };
   export const unselectedStyle = {
-    fontFamily:'Oswald',
+    fontFamily:'Poppins',
     backgroundColor: "",
     fontWeight: "bold",
     borderColor: "black",
@@ -28,7 +28,7 @@ export const selectedStyle = {
       backgroundColor: "#5A5A5A",
       color: "white",
       borderColor: "#5A5A5A",
-      fontFamily:'Oswald',
+      fontFamily:'Poppins',
     },
 
 

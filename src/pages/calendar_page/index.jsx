@@ -240,7 +240,7 @@ const calculateCost = () => {
         >
           <Typography
             sx={{ paddingLeft: 2, color: "darkred" }}
-            fontFamily="Roboto"
+            fontFamily="Poppins"
           >
             *Click and drag on time-slots to start booking
           </Typography>
@@ -659,14 +659,14 @@ const calculateCost = () => {
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography
                 fontWeight="bold"
-                fontFamily="Roboto Slab"
+                fontFamily="Poppins"
                 fontSize={15}
               >
                 Venue:
               </Typography>
               <Typography
                 fontWeight="bold"
-                fontFamily="Roboto Slab"
+                fontFamily="Poppins"
                 fontSize={15}
               >
                 {booking.current.venue}
@@ -677,14 +677,14 @@ const calculateCost = () => {
               <Typography
                 fontWeight="bold"
                 fontSize={15}
-                fontFamily="Roboto Slab"
+                fontFamily="Poppins"
               >
                 Date:
               </Typography>
               <Typography
                 fontWeight="bold"
                 fontSize={15}
-                fontFamily="Roboto Slab"
+                fontFamily="Poppins"
               >
                 {moment(booking.current.date).format("MMMM D Y")}
               </Typography>
@@ -1080,7 +1080,7 @@ const calculateCost = () => {
             </List>
             <Typography
               sx={{ paddingLeft: 2, color: "darkred" }}
-              fontFamily="Roboto"
+              fontFamily="Poppins"
             ></Typography>
           </Box>
 
@@ -1155,7 +1155,7 @@ const calculateCost = () => {
                   <Typography
                     fontWeight="bold"
                     marginBottom="5px"
-                    fontFamily="Roboto Slab"
+                    fontFamily="Poppins"
                   >
                     Cost of Cancellation: 10
                   </Typography>

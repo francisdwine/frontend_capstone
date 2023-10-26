@@ -65,16 +65,18 @@ export default function DashBoardTemplate(props) {
 
   const selectedStyle = {
     backgroundColor: "#fecc00",
-
+    fontFamily: "Poppins",
     borderRadius: "0px",
     color: "black",
   };
   const unselectedStyle = {
     backgroundColor: "#black",
+    fontFamily: "Poppins",
     transition: "background 0.7s, color 0.7s",
     ":hover": {
       bgcolor: "#9c7b16",
       color: "white",
+      fontFamily: "Poppins",
     },
   };
   const location = useLocation();
@@ -130,7 +132,7 @@ export default function DashBoardTemplate(props) {
               borderRadius: "10px",
             }}
           >
-            <Typography fontFamily="Roboto" fontWeight="bold">
+            <Typography fontFamily="Poppins" fontWeight="bold">
               Logout
             </Typography>
           </Button>

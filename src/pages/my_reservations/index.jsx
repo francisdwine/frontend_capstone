@@ -409,7 +409,7 @@ export default function MyReservations(props) {
                   style={{
                     width: 1000,
                     textAlign: "center",
-                    fontFamily: "Oswald",
+                    fontFamily: "Poppins",
                   }}
                 >
                   <TableHead>
@@ -426,11 +426,7 @@ export default function MyReservations(props) {
                     {/* user */}
                     {filteredEvents.map((event, index) => (
                       <StyledTableRow>
-                        <StyledTableCell
-                          component="th"
-                          scope="row"
-                          align="center"
-                        >
+                        <StyledTableCell component="th" scope="row" align="center">
                           {event?.description}
                         </StyledTableCell>
                         <StyledTableCell align="center">
@@ -604,7 +600,7 @@ export default function MyReservations(props) {
                   style={{
                     width: 1000,
                     textAlign: "center",
-                    fontFamily: "Oswald",
+                    fontFamily: "Poppins",
                   }}
                 >
                   <TableHead>
@@ -707,7 +703,7 @@ export default function MyReservations(props) {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Booking Details
@@ -1021,7 +1017,7 @@ export default function MyReservations(props) {
                 </List>
                 <Typography
                   sx={{ paddingLeft: 2, color: "darkred" }}
-                  fontFamily="Roboto"
+                  fontFamily="Poppins"
                 >
                   Note: 30% of cost as cancellation fee
                 </Typography>
@@ -1066,7 +1062,7 @@ export default function MyReservations(props) {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Are you sure you want to cancel?
@@ -1079,7 +1075,7 @@ export default function MyReservations(props) {
                   <Typography
                     fontWeight="bold"
                     marginBottom="5px"
-                    fontFamily="Roboto Slab"
+                    fontFamily="Poppins"
                   >
                     Cost of Cancellation: 10
                   </Typography>
@@ -1143,7 +1139,7 @@ export default function MyReservations(props) {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Edit Booking Details
@@ -1245,7 +1241,7 @@ export default function MyReservations(props) {
             <Typography
               fontWeight="bold"
               variant="h6"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
               p="5px 10px 5px 10px"
               sx={{ display: "inline-block" }}

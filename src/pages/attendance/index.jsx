@@ -84,10 +84,11 @@ export default function Attendance(props) {
               border: "2px solid #000",
               boxShadow: 24,
               p: 4,
+              fontFamily: "Poppins",
             }}
           >
             <h2 sx={{ modalHeaderStyle }}>Tap In</h2>
-            <Typography>Please input your ID number or name:</Typography>
+            <Typography sx={{fontFamily: "Poppins"}}>Please input your ID number or name:</Typography>
             <div style={{ margin: "20px" }}></div>
             <TextField
               label="ID Number"
@@ -95,6 +96,7 @@ export default function Attendance(props) {
               fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
+              sx={{ fontFamily: 'Poppins' }}
             />
             <Box sx={{ justifyContent: "space-between" }}>
               <div style={{ margin: "20px" }}></div>
