@@ -68,6 +68,7 @@ export default function Calendar(props) {
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState('admin'); //default role
   const [info,setInfo]=useState({});
+  const [tempuser_id, setTempuser_id] = useState(0);
 
   const submitBooking = () => {
     setAttendeeList([
@@ -97,27 +98,30 @@ export default function Calendar(props) {
   //data to send
   //new booking
   const [user, setUser] = useState({
-    id: 2,
-    username: "pam",
+    id: 1,
+    username: "francis",
   });
   const [bookingAttendees,setBookingAttendees]=useState([]);
   const venueArray=["","Coworking Space","Conference Room A","Conference Room B"]
+
   const handleView = (id) => {
-   setTempId(id);
-     
-     axios.get(`http://localhost:8000/api/getAttendees/${id}/`).then((res)=>{
-        setBookingAttendees(res.data)
-     })
-     const res = eventData.find((item) => {
-       return item?.id === parseInt(id);
-     });
-     setInfo(res)
-     setOpenInfoModal(true)
-    
+    setTempId(id);
+  
+    axios.get(`http://localhost:8000/api/getAttendees/${id}/`).then((res) => {
+      setBookingAttendees(res.data);
+    });
+  
+    const res = eventData.find((item) => {
+      return item?.id === parseInt(id);
+    });
+    console.log('user called ID:', info.user_id);
+    setInfo(res);
+    setOpenInfoModal(true);
   };
+
   //init page
   React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/users/").then((res) => {
+    axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
       setFakeUserDb(res?.data);
     });
   }, []);
@@ -168,7 +172,7 @@ const calculateCost = () => {
 
   axios.post(`http://localhost:8000/api/calculateCost/`, costData)
     .then((response) => {
-      // Handle the response from the server, which might contain the calculated cost
+      //contain the calculated cost
       const calculatedCost = response.data.cost; // Adjust this based on your server response
       setBookingsRefresher(!bookingsRefresher);
       setCost(calculatedCost);
@@ -306,43 +310,31 @@ const calculateCost = () => {
               }}
               // function para sa pili ug timeslot calendar functions
               select={(info) => {
-                // setOpenModal1(true);
-                var date=new Date();
-                var currentTime= date.getHours()+":"+date.getMinutes()+":"+date.getSeconds()
-                var dateSplitted = info.startStr.split("T");
-                var startDate = dateSplitted[0];
-                var startTime = dateSplitted[1].split("+")[0];
-                var dateSplitted2 = info.endStr.split("T");
-                var endTime = dateSplitted2[1].split("+")[0];
-                var tempBooking = booking.current;
-                tempBooking.startTime = startTime;
-                tempBooking.endTime = endTime;
-                tempBooking.date = startDate;
-                tempBooking.venue = venueSelected;
-                booking.current = tempBooking;
-                // Get the current date and time
-                var currentDateTime = new Date().toISOString().split("T")[0] + "T" + new Date().toTimeString().split(" ")[0];
+                var currentDate = new Date();
+                var selectedStartTime = new Date(info.startStr);
 
-                
-                // Compare ang selected start and end times with the current time
-                if(currentTime>startTime&&startDate<=date.toISOString().split('T')[0]){
-                  alert("pls select future time");
+                // Check if the selected start time is in the past
+                if (selectedStartTime <= currentDate) {
+                  alert("Please select a future time");
+                } else {
+                  var dateSplitted = info.startStr.split("T");
+                  var startDate = dateSplitted[0];
+                  var startTime = dateSplitted[1].split("+")[0];
+                  var dateSplitted2 = info.endStr.split("T");
+                  var endTime = dateSplitted2[1].split("+")[0];
+                  var tempBooking = booking.current;
+                  tempBooking.startTime = startTime;
+                  tempBooking.endTime = endTime;
+                  tempBooking.date = startDate;
+                  tempBooking.venue = venueSelected;
+                  booking.current = tempBooking;
+                  setOpenModal1(true);
                 }
-                else{
-                  setOpenModal1(true)
-                }
-
-
               }}
               //function para ig click ug usa ka event
-              eventClick={
-                (e)=>{
-                  handleView(e.event.id)              
-                                    
-                }
-                
-              }
-              
+              eventClick={(e) => {
+                handleView(e.event.id);
+              }}
               unselect={(jsEvent, view) => {}}
               // dayClick={(date, jsEvent, view) => {}}
               selectOverlap={(event) => {}}
@@ -415,7 +407,7 @@ const calculateCost = () => {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Booking Enrollment
@@ -460,7 +452,7 @@ const calculateCost = () => {
             <Typography
               fontWeight="bold"
               variant="h6"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               backgroundColor="#222222"
               color="white"
               p="5px 10px 5px 10px"
@@ -532,7 +524,6 @@ const calculateCost = () => {
                       user_id: id,
                     };
                     setAttendeeList([...attendeeList, newUser]);
-                     
                   }
                 }}
                 sx={{
@@ -649,7 +640,7 @@ const calculateCost = () => {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Summary
@@ -802,7 +793,7 @@ const calculateCost = () => {
             <Typography
               fontWeight="bold"
               marginTop="0px"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               backgroundColor="black"
               sx={{ float: "left", transform: "rotate(-5deg)" }}
               p="5px 10px 5px 10px"
@@ -839,11 +830,18 @@ const calculateCost = () => {
               ))}
             </List>
           </Box>
-          {role === 'user' ? (
-            <Typography align="right" paddingRight="20px"  
-            sx={{ fontWeight: 'bold', fontFamily: 'Monospace' }}>Total Cost: Php {cost} </Typography>
-          ) : <div></div>}
-          
+          {role === "user" ? (
+            <Typography
+              align="right"
+              paddingRight="20px"
+              sx={{ fontWeight: "bold", fontFamily: "Monospace" }}
+            >
+              Total Cost: Php {cost}{" "}
+            </Typography>
+          ) : (
+            <div></div>
+          )}
+
           <Box
             sx={{
               margin: "10px 10px 15px 15px",
@@ -860,66 +858,71 @@ const calculateCost = () => {
             >
               Back
             </Button>
-            {role === 'user' ? (
-          <Box>
-            <Button
-              onClick={() => {
-                setOpenModal3(false);
-                booking.current = {
-                  purpose: "Studying",
-                  description: "",
-                  startTime: "",
-                  venue: "",
-                  endTime: "",
-                  date: "",
-                  computers: 0,
-                  coins: 0,
-                  points: 0,
-                  user_id: user.id,
-                  officeName: "",
-                  attendees: [],
-                };
-                setAttendeeList([]);
-              }}
-              sx={ButtonStyle1}
-            >
-              coins 
-            </Button>
-            <Button onClick={() => {
-              submitBooking();
-              setOpenModal3(false);
-            }}variant="contained" margin="0px"
-            sx={{...ButtonStyle1, marginLeft: '20px'}}>points</Button>
+            {role === "user" ? (
+              <Box>
+                <Button
+                  onClick={() => {
+                    setOpenModal3(false);
+                    booking.current = {
+                      purpose: "Studying",
+                      description: "",
+                      startTime: "",
+                      venue: "",
+                      endTime: "",
+                      date: "",
+                      computers: 0,
+                      coins: 0,
+                      points: 0,
+                      user_id: user.id,
+                      officeName: "",
+                      attendees: [],
+                    };
+                    setAttendeeList([]);
+                  }}
+                  sx={ButtonStyle1}
+                >
+                  coins
+                </Button>
+                <Button
+                  onClick={() => {
+                    submitBooking();
+                    setOpenModal3(false);
+                  }}
+                  variant="contained"
+                  margin="0px"
+                  sx={{ ...ButtonStyle1, marginLeft: "20px" }}
+                >
+                  points
+                </Button>
+              </Box>
+            ) : (
+              <Button
+                onClick={() => {
+                  submitBooking();
+                  setOpenModal3(false);
+                  booking.current = {
+                    purpose: "Studying",
+                    description: "",
+                    startTime: "",
+                    venue: "",
+                    endTime: "",
+                    date: "",
+                    computers: 0,
+                    coins: 0,
+                    points: 0,
+                    user_id: user.id,
+                    officeName: "",
+                    attendees: [],
+                  };
+                  setAttendeeList([]);
+                }}
+                sx={ButtonStyle1}
+              >
+                Book
+              </Button>
+            )}
           </Box>
-        ) : (
-          <Button
-            onClick={() => {
-              submitBooking();
-              setOpenModal3(false);
-              booking.current = {
-                purpose: "Studying",
-                description: "",
-                startTime: "",
-                venue: "",
-                endTime: "",
-                date: "",
-                computers: 0,
-                coins: 0,
-                points: 0,
-                user_id: user.id,
-                officeName: "",
-                attendees: [],
-              };
-              setAttendeeList([]);
-            }}
-            sx={ButtonStyle1}
-          >
-            Book
-          </Button>
-        )}
-      </Box>
-      </Box>
-
+        </Box>
       </Modal>
       <Modal
         disableAutoFocus={true}
@@ -928,7 +931,7 @@ const calculateCost = () => {
         onClose={() => setOpenInfoModal(false)}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
-        style={{width: "100%", overflow: "auto" }} 
+        style={{ width: "100%", overflow: "auto" }}
       >
         <Box sx={modalStyle}>
           <Box sx={modalHeaderStyle}>
@@ -937,17 +940,14 @@ const calculateCost = () => {
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Details
             </Typography>
-            
           </Box>
 
           <Box p={4}>
-            
-
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <Typography
                 fontWeight="bold"
@@ -961,7 +961,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {info?.description}
+                {info?.description}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -977,7 +977,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {info?.referenceNo}
+                {info?.referenceNo}
               </Typography>
             </Box>
 
@@ -994,7 +994,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {info?.computers}
+                {info?.computers}
               </Typography>
             </Box>
 
@@ -1011,7 +1011,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {info?.startTime}
+                {info?.startTime}
               </Typography>
             </Box>
 
@@ -1028,7 +1028,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {info?.endTime}
+                {info?.endTime}
               </Typography>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -1044,7 +1044,7 @@ const calculateCost = () => {
                 marginBottom="5px"
                 fontFamily="Roboto Slab"
               >
-               {venueArray[info?.venue]}
+                {venueArray[info?.venue]}
               </Typography>
             </Box>
 
@@ -1052,7 +1052,7 @@ const calculateCost = () => {
             <Typography
               fontWeight="bold"
               marginTop="0px"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               backgroundColor="black"
               sx={{ float: "left", transform: "rotate(-5deg)" }}
               p="5px 10px 5px 10px"
@@ -1065,7 +1065,6 @@ const calculateCost = () => {
               dense={true}
               style={{ maxHeight: "150px", width: "100%", overflow: "auto" }}
             >
-
               {bookingAttendees.map((item, index) => (
                 <React.Fragment key={index}>
                   <ListItem m={0} key={index}>
@@ -1078,59 +1077,79 @@ const calculateCost = () => {
                   <Divider />
                 </React.Fragment>
               ))}
-
             </List>
             <Typography
-            sx={{ paddingLeft: 2, color: "darkred" }}
-            fontFamily="Roboto"
-          ></Typography>
+              sx={{ paddingLeft: 2, color: "darkred" }}
+              fontFamily="Roboto"
+            ></Typography>
           </Box>
-          <Box
-            sx={{
-              margin: "10px 15px 15px 10px",
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
 
-      
-            <Button sx={ButtonStyle1}
-             variant="contained"
-              onClick={() => {setCancelModal(true);
-               setOpenInfoModal(false);} }
+          {role === "user" && user.id === info.user_id ? (
+            <Box
+              sx={{
+                margin: "10px 15px 15px 10px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
             >
-              Cancel Booking
-            </Button>
-          </Box>
+              <Button
+                sx={ButtonStyle1}
+                variant="contained"
+                onClick={() => {
+                  setCancelModal(true);
+                  setOpenInfoModal(false);
+                }}
+              >
+                Cancel Booking
+              </Button>
+            </Box>
+          ) : role === "admin" ? (
+            <Box
+              sx={{
+                margin: "10px 15px 15px 10px",
+                display: "flex",
+                justifyContent: "flex-end",
+              }}
+            >
+              <Button
+                sx={ButtonStyle1}
+                variant="contained"
+                onClick={() => {
+                  setCancelModal(true);
+                  setOpenInfoModal(false);
+                }}
+              >
+                Cancel Booking
+              </Button>
+            </Box>
+          ) : null}
         </Box>
-        
       </Modal>
       {/* Are you sure you want to cancel */}
       <Modal
-      disableAutoFocus={true}
-      open={cancelModal}
-      onEn
-      onClose={() => setCancelModal(false)}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-      style={{width: "100%", overflow: "auto" }} 
+        disableAutoFocus={true}
+        open={cancelModal}
+        onEn
+        onClose={() => setCancelModal(false)}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+        style={{ width: "100%", overflow: "auto" }}
       >
         <Box sx={modalStyle}>
-        <Box sx={modalHeaderStyle}>
+          <Box sx={modalHeaderStyle}>
             <Typography
               sx={{ fontWeight: "bold" }}
               id="modal-modal-title"
               variant="h5"
               component="h2"
-              fontFamily="Oswald"
+              fontFamily="Poppins"
               color="white"
             >
               Are you sure you want to cancel?
             </Typography>
-            
           </Box>
           <Box p={4}>
-          {role === 'user' ? (
+            {role === "user" ? (
               <Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Typography
@@ -1142,13 +1161,11 @@ const calculateCost = () => {
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Button variant="contained">
-                    Pay
-                  </Button>
+                  <Button variant="contained">Pay</Button>
                   <Button
                     variant="contained"
                     onClick={() => {
-                      submitBooking();
+                      // submitBooking();
                       setViewModal(true);
                       setCancelModal(false);
                     }}
@@ -1159,7 +1176,10 @@ const calculateCost = () => {
               </Box>
             ) : (
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Button variant="contained" onClick={() => cancelBooking(tempId)}>
+                <Button
+                  variant="contained"
+                  onClick={() => cancelBooking(tempId)}
+                >
                   Yes
                 </Button>
                 <Button

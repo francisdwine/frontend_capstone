@@ -5,7 +5,6 @@ import {
   Button,
   ButtonGroup,
   Divider,
-  Grid,
   TableContainer,
   TableHead,
   TableRow,
@@ -20,7 +19,7 @@ import {
   Autocomplete,
   IconButton,
 } from "@mui/material";
-import { useState, useRef, useEffect, useNavigate } from "react";
+import { useState, useRef, useEffect } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -87,7 +86,7 @@ export default function MyReservations(props) {
 
   const [user, setUser] = useState({
     id: 1,
-    username: "mbmb",
+    username: "francis",
   });
 
   const handleView = (id) => {
@@ -120,7 +119,7 @@ export default function MyReservations(props) {
 
   //init page
   React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/users/").then((res) => {
+    axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
       setFakeUserDb(res?.data);
     });
   }, []);
@@ -139,7 +138,7 @@ export default function MyReservations(props) {
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
-    if (role == "admin") {
+    if (role === "admin") {
       axios.get("http://localhost:8000/api/getAllBookings/").then((res) => {
         setEventData(res.data);
         setEvents(

@@ -15,15 +15,13 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Button, Icon } from "@mui/material";
-import HomeIcon from '@mui/icons-material/Home';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import BookIcon from '@mui/icons-material/Book';
-import ListIcon from '@mui/icons-material/List';
-import Wild from '../../images/wild.png';
-import MyReservations from "../my_reservations";
-import Logs from "../attendance_logs";
-import { useNavigate } from "react-router-dom";
+import HomeIcon from "@mui/icons-material/Home";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import BookIcon from "@mui/icons-material/Book";
+import ListIcon from "@mui/icons-material/List";
+import Wild from "../../images/wild.png";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const drawerWidth = 200;
 
@@ -38,69 +36,76 @@ const drawerWidth = 200;
 export default function DashBoardTemplate(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [selectedFunction, setSelectedFunction] = React.useState("");
 
   const testUserType = "admin";
   const navigate = useNavigate();
-  //admin sidenav 
+
+  // const handleNavItemClick = (item) => {
+  //   navigate(item.link);
+
+  //admin sidenav
   const adminNavItems = [
-    { name: "Home", icon: HomeIcon, link: "/home" },
-    { name: "Dashboard", icon: DashboardIcon, link: "/dashboard" },
-    { name: "Calendar", icon: CalendarMonthIcon, link: "/calendar" },
-    { name: "Logs", icon: BookIcon, link: "/logs" },
-    //test
-    { name: "Bookings", icon: ListIcon, link: "/bookings", onClick: () => {navigate("/bookings");  }, },
+    { name: "Home", icon: HomeIcon, path: "/" },
+    { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
+    { name: "Logs", icon: BookIcon, path: "/logs" },
+    { name: "Bookings", icon: ListIcon, path: "/bookings",},
   ];
-  
+
   //user sidenav
   const userNavItems = [
-    { name: "Home", icon: HomeIcon, link:"/home" },
-    { name: "Calendar", icon: CalendarMonthIcon, link: "/calendar" },
-    { name: "Bookings", icon: ListIcon, link: "/bookings" },
+    { name: "Home", icon: HomeIcon, path: "/home" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
+    { name: "Bookings", icon: ListIcon, path: "/bookings" },
   ];
   const NavItems = testUserType === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const selectedStyle={
-    backgroundColor:"#fecc00",
-    
-    borderRadius:'0px',
-    color:'black'
-   
-  }
-  const unselectedStyle={
-    backgroundColor:"#black",
+  const selectedStyle = {
+    backgroundColor: "#fecc00",
+
+    borderRadius: "0px",
+    color: "black",
+  };
+  const unselectedStyle = {
+    backgroundColor: "#black",
     transition: "background 0.7s, color 0.7s",
     ":hover": {
       bgcolor: "#9c7b16",
       color: "white",
-    },   
-  
-  }
+    },
+  };
+  const location = useLocation();
 
   const drawer = (
     // sidenav sidenavbar
     <div>
       <Toolbar sx={{ backgroundColor: "#fecc00" }}>
-      <img src={Wild} alt="logo" width={200} height={50}/>
+        <img src={Wild} alt="logo" width={200} height={50} />
       </Toolbar>
       {/* <Divider sx={{ backgroundColor: "white" }} /> */}
       {/* sidenav color */}
       <List sx={{ backgroundColor: "black" }}>
         {NavItems.map((item, index) => (
-          <ListItem sx={props.title===item.name?selectedStyle:unselectedStyle} key={index} disablePadding>
-             <li key={index} onClick={() => navigate(item.link)}></li>
-            <ListItemButton>
+          <ListItem
+            sx={item.path === location.pathname ? selectedStyle : unselectedStyle}
+            key={index}
+            disablePadding
+          >
+            <ListItemButton onClick={() => navigate(item.path)}>
               <ListItemIcon sx={{ color: "white" }}>
-                {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}
                 <Icon component={item.icon}></Icon>
-              </ListItemIcon> 
+              </ListItemIcon>
               <ListItemText
-                sx={{ color: "white", fontWeight:'bold', fontFamily: 'Poppins'}}
-                fontWeight='bold'
-                primary={item.name}               
+                sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  fontFamily: "Poppins",
+                }}
+                fontWeight="bold"
+                primary={item.name}
               />
             </ListItemButton>
           </ListItem>
@@ -110,7 +115,7 @@ export default function DashBoardTemplate(props) {
         <ListItem
           disablePadding
           sx={{ display: "flex", justifyContent: "center" }}
-        >          
+        >
           <Button
             variant="contained"
             sx={{
@@ -158,7 +163,14 @@ export default function DashBoardTemplate(props) {
             <MenuIcon />
           </IconButton>
           {/* Roboto Slab */}
-          <Typography variant="h4" noWrap component="div" fontFamily="Poppins" color='black' fontWeight='bold' >
+          <Typography
+            variant="h4"
+            noWrap
+            component="div"
+            fontFamily="Poppins"
+            color="black"
+            fontWeight="bold"
+          >
             {props.title}
           </Typography>
         </Toolbar>
@@ -168,7 +180,7 @@ export default function DashBoardTemplate(props) {
         sx={{
           width: { sm: drawerWidth },
           flexShrink: { sm: 0 },
-          backgroundColor: "black",          
+          backgroundColor: "black",
         }}
         aria-label="mailbox folders"
       >
@@ -177,7 +189,6 @@ export default function DashBoardTemplate(props) {
           PaperProps={{
             sx: {
               backgroundColor: "black",
-              
             },
           }}
           container={container}
@@ -192,8 +203,8 @@ export default function DashBoardTemplate(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-            }, 
-            border:"none"
+            },
+            border: "none",
           }}
         >
           {drawer}
@@ -205,7 +216,7 @@ export default function DashBoardTemplate(props) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
-              border:"none",
+              border: "none",
               // sidenav color
               backgroundColor: "black",
             },
@@ -213,7 +224,6 @@ export default function DashBoardTemplate(props) {
           PaperProps={{
             sx: {
               backgroundColor: "#white",
-              
             },
           }}
           open
