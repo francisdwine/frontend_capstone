@@ -72,7 +72,7 @@ export default function MyReservations(props) {
   const [cancelModal, setCancelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
-  const [role, setRole] = useState("admin"); //default role
+  const [role, setRole] = useState("user"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
 
@@ -118,11 +118,11 @@ export default function MyReservations(props) {
   };
 
   //init page
-  React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
-      setFakeUserDb(res?.data);
-    });
-  }, []);
+  // React.useEffect(() => {
+  //   axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
+  //     setFakeUserDb(res?.data);
+  //   });
+  // }, []);
 
   const handleChange = (e) => {
     var tempBooking = booking.current;
@@ -155,25 +155,27 @@ export default function MyReservations(props) {
           res?.data
         );
       });
-    } else if (role === "user") {
-      axios
-        .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
-        .then((res) => {
-          setEventData(res.data);
-          setEvents(
-            // res?.data.map((item) => {
-            //   return {
-            //     id: item?.id,
-            //     title: item?.description,
-            //     date: item?.date,
-            //     start: item?.startTime,
-            //     end: item?.endTime,
-            //     venue: item?.venue,
-            //   };
-            // })
-            res.data
-          );
-        });
+    // } else if (role === "user") {
+    //   setUser({id:1,
+    //             username: "francis",})
+    //   axios
+    //     .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
+    //     .then((res) => {
+    //       setEventData(res.data);
+    //       setEvents(
+    //         // res?.data.map((item) => {
+    //         //   return {
+    //         //     id: item?.id,
+    //         //     title: item?.description,
+    //         //     date: item?.date,
+    //         //     start: item?.startTime,
+    //         //     end: item?.endTime,
+    //         //     venue: item?.venue,
+    //         //   };
+    //         // })
+    //         res.data
+    //       );
+    //     });
     }
   }, [bookingsRefresher]);
 
@@ -325,7 +327,7 @@ export default function MyReservations(props) {
     const requestBody = {
       title: booking.current.title,
       purpose: booking.current.purpose,
-      computers: booking.current.computers,
+      // computers: booking.current.computers,
     };
     //setTempId(id);
     axios
@@ -414,36 +416,37 @@ export default function MyReservations(props) {
                 >
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell align="center">Title</StyledTableCell>
-                      <StyledTableCell align="center">Date</StyledTableCell>
-                      <StyledTableCell align="center">Start</StyledTableCell>
-                      <StyledTableCell align="center">End</StyledTableCell>
-                      <StyledTableCell align="center">Venue</StyledTableCell>
-                      <StyledTableCell align="center"></StyledTableCell>
+                      <StyledTableCell >Title</StyledTableCell>
+                      <StyledTableCell >Date</StyledTableCell>
+                      <StyledTableCell >Start</StyledTableCell>
+                      <StyledTableCell>End</StyledTableCell>
+                      <StyledTableCell >Venue</StyledTableCell>
+                      <StyledTableCell ></StyledTableCell>
+                      <StyledTableCell ></StyledTableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {/* user */}
                     {filteredEvents.map((event, index) => (
                       <StyledTableRow>
-                        <StyledTableCell component="th" scope="row" align="center">
+                        <StyledTableCell component="th" scope="row">
                           {event?.description}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell  >
                           {event?.date}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell  >
                           {event?.startTime}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell  >
                           {event?.endTime}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell  >
                           {event?.venue}
                         </StyledTableCell>
                         <StyledTableCell
                           align="center"
-                          justifyContent="space-between"
+
                         >
                           <Button
                             sx={ButtonStyle1}
@@ -465,17 +468,17 @@ export default function MyReservations(props) {
                         </StyledTableCell>
 
                         {timeSelected === "Upcoming" ? (
-                          <StyledTableCell>
+                          <StyledTableCell align="center">
                             <Button
                               sx={ButtonStyle2}
                               onClick={() => {
-                                axios
-                                  .get(
-                                    `http://localhost:8000/api/getAttendees/${tempId}/`
-                                  )
-                                  .then((res) => {
-                                    setAttendeeList(res.data);
-                                  });
+                                // axios
+                                //   .get(
+                                //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                //   )
+                                //   .then((res) => {
+                                //     setAttendeeList(res.data);
+                                //   });
                                 handleEdit(event.id);
                               }}
                             >
@@ -486,7 +489,7 @@ export default function MyReservations(props) {
                           // <StyledTableCell align="right">
                           //   <Button sx={{...ButtonStyle2, marginLeft: "5px"}}>Review</Button>
                           // </StyledTableCell>
-                          <></>
+                          <div></div>
                         )}
                       </StyledTableRow>
                     ))}
@@ -605,35 +608,35 @@ export default function MyReservations(props) {
                 >
                   <TableHead>
                     <TableRow>
-                      <StyledTableCell align="center">Title</StyledTableCell>
-                      <StyledTableCell align="center">Date</StyledTableCell>
-                      <StyledTableCell align="center">Start</StyledTableCell>
-                      <StyledTableCell align="center">End</StyledTableCell>
-                      <StyledTableCell align="center">Venue</StyledTableCell>
-                      <StyledTableCell align="left"></StyledTableCell>
-                      <StyledTableCell align="left"></StyledTableCell>
+                      <StyledTableCell >Title</StyledTableCell>
+                      <StyledTableCell >Date</StyledTableCell>
+                      <StyledTableCell >Start</StyledTableCell>
+                      <StyledTableCell >End</StyledTableCell>
+                      <StyledTableCell >Venue</StyledTableCell>
+                      <StyledTableCell ></StyledTableCell>
+                      <StyledTableCell ></StyledTableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {/* admin*/}
                     {filteredEvents.map((event, index) => (
                       <StyledTableRow key={index}>
-                        <StyledTableCell component="th" scope="row" align="center">
+                        <StyledTableCell >
                           {event.description}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell >
                           {event.date}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell >
                           {event.startTime}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell >
                           {event.endTime}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell >
                           {event.venue}
                         </StyledTableCell>
-                        <StyledTableCell align="center">
+                        <StyledTableCell >
                           <Button
                             sx={ButtonStyle1}
                             onClick={() => {
@@ -660,7 +663,7 @@ export default function MyReservations(props) {
                                 setTempId(event.id);
                                 //alert(event.id);
                               }}
-                              
+
                             >
                               Edit
                             </Button>
@@ -675,7 +678,7 @@ export default function MyReservations(props) {
                           //   >
                           //     Review
                           //   </Button>
-                          //   </StyledTableCell> 
+                          //   </StyledTableCell>
                           <div></div>
                         )}
                       </StyledTableRow>
@@ -1123,7 +1126,7 @@ export default function MyReservations(props) {
         </Box>
       </Modal>
 
-      {/*EDIT Modal */}
+      {/*Edit Modal */}
       <Modal
         disableAutoFocus={true}
         open={editModal}
@@ -1183,15 +1186,15 @@ export default function MyReservations(props) {
               </Select>
             </FormControl>
 
-            {/*<TextField
+            <TextField
               name="officeName"
               sx={{ width: "100%" }}
               id="outlined-basic"
               label="Office Name"
               variant="standard"
               inputProps={{ maxLength: 20 }}
-            />*/}
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
+            />
+            {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
               <TextField
                 name="computers"
                 type="number"
@@ -1209,7 +1212,7 @@ export default function MyReservations(props) {
                 onChange={(e) => handleChange(e)}
                 autoFocus={false}
               />
-            </Box>
+            </Box> */}
             <Button
               variant="contained"
               onClick={() => {
@@ -1228,7 +1231,7 @@ export default function MyReservations(props) {
       </Modal>
 
       {/*Attendees Edit*/}
-      <Modal
+      {/* <Modal
         disableAutoFocus={true}
         open={attendeesModal}
         onClose={() => setAttendeesModal(false)}
@@ -1250,7 +1253,7 @@ export default function MyReservations(props) {
             </Typography>
           </Box>
           <Box p={4}>
-            <Box sx={{ display: "flex", marginTop: "20px" }}>
+            <Box sx={{ display: "flex", marginTop: "20px" }}> */}
               {/* <TextField
                 sx={{ width: "100%", marginRight: "20px" }}
                 id="outlined-basic"
@@ -1260,7 +1263,7 @@ export default function MyReservations(props) {
                   setAttendeeName(e.target.value);
                 }}
               /> */}
-              <Autocomplete
+              {/* <Autocomplete
                 freeSolo
                 defaultValue=""
                 autoSelect={false}
@@ -1356,13 +1359,13 @@ export default function MyReservations(props) {
                         <ClearIcon></ClearIcon>
                       </IconButton>
                     }
-                  >
+                  > */}
                     {/* <ListItemAvatar>
                   <Avatar>
                     <PersonIcon></PersonIcon>
                   </Avatar>
                 </ListItemAvatar> */}
-                    <ListItemText
+                    {/* <ListItemText
                       primary={item.name}
                       secondary={
                         item.existing === true ? (
@@ -1394,7 +1397,7 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Box>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

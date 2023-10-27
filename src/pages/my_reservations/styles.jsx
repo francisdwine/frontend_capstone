@@ -88,6 +88,8 @@ export const selectedStyle = {
       fontSize: 14,
       fontFamily: "Poppins",
     },
+    width: "100px",
+    textAlign: 'center',
   }));
 
   export const StyledTableRow = styled(TableRow)(({ theme }) => ({
