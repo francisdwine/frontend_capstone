@@ -1,24 +1,19 @@
 import React from "react";
+import DashboardContainer from "../containers/dashboard_container";
+import TextField from '@mui/material/TextField';
+import { Button } from "@mui/material";
 
 // Wala pani heheh
 
 const Home = () => {
     return (
             <div>
-                <h1>Login Page</h1>
-                <form>
-                    <label>
-                        Email:
-                        <input type="email" name="email" />
-                    </label>
-                    <br />
-                    <label>
-                        Password:
-                        <input type="password" name="password" />
-                    </label>
-                    <br />
-                    <button type="submit">Login</button>
-                </form>
+                <DashboardContainer title="Home">
+                <TextField label={'Email'} id="email" /> <br /><br />
+                <TextField label={'Password'} id="pw" type="password" />
+                <br /><br />
+                <Button variant="contained" color="primary" style={{marginLeft: '10px', width: '50px'}}>Login</Button>
+                </DashboardContainer>
             </div>
     );
 };
