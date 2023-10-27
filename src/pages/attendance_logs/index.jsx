@@ -5,23 +5,10 @@ import {
   Box,
   Button,
   ButtonGroup,
-  Divider,
-  Grid,
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  FormControl,
-  MenuItem,
-  InputLabel,
-  Autocomplete,
-  IconButton,
-  AppBar,
-  Toolbar,
+  TablePagination,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import Table from "@mui/material/Table";
@@ -30,10 +17,6 @@ import axios from "axios";
 import {
   selectedStyle,
   unselectedStyle,
-  modalHeaderStyle,
-  modalStyle,
-  ButtonStyle1,
-  ButtonStyle2,
   StyledTableCell,
   StyledTableRow,
   SearchIconWrapper,
@@ -44,38 +27,52 @@ import {
 export default function Logs(props) {
   const [venueSelected, setVenueSelected] = useState("Coworking Space");
   const [venueId, setVenueId] = useState(1);
-  const [openInfoModal, setOpenInfoModal] = useState(false);
-  const [info, setInfo] = useState({});
-  const [user, setUser] = useState('');
   const [searchText, setSearchText] = useState("");
-  const [events, setEvents] = useState([
-    {
-      name: "pam",
-      isLoggedin: "Yes",
-      isOverstaying: "No",
-      loginTime: "19:30:00",
-      logoutTime: "21:30:50",
-    },
-    {
-      name: "pam1",
-      isLoggedin: "Yes",
-      isOverstaying: "Yes",
-      loginTime: "13:50:00",
-      logoutTime: "14:06:00",
-    },
-  ]);
-  // const [user, setUser] = useState({
-  //   id: user.id,
-  //   name: user.name,
-  // });
-  // const searchInput = (e) => {
-  //   setSearchText(e.target.value);
-  // };
-  let filteredEvents = events
-    .filter((item) => {
-      return item.name === user.id && item.referenceNo.contains(searchText)
-    })
+  const [filteredEvents, setFilteredEvents] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [page, setPage] = useState(0);
 
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/getAllAttendance/")
+      .then((response) => {
+        setEvents(response.data);
+        setFilteredEvents(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data", error);
+      });
+  }, []);
+  //let filteredEvents = events.filter((item) => item.venue === venueId);
+
+  const handleSearchTextChange = (e) => {
+    const searchText = e.target.value;
+    setSearchText(searchText);
+
+    //filter events
+    const filtered = events.filter((item) => {
+      return (
+        // item.venue === venueId && 
+        item.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        // item.venue === venueId && 
+        item.date.toString().includes(searchText) 
+      );
+    });
+    setFilteredEvents(filtered);
+  };
+
+  //pagination
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset page to the first page when changing rowsPerPage
+  };
+  
+  
   return (
     <div>
       <DashBoardTemplate title="Attendance Logs">
@@ -95,26 +92,29 @@ export default function Logs(props) {
           flexDirection="column"
         >
           <div>
-            <Box sx={{ flexGrow: 1, border: '3px solid rgba(0, 0, 0, 0.05)' , marginLeft: "745px"}}>
-              <Search sx={{paddingRight: "-2000px"}}>
-                <SearchIconWrapper>
-                  <SearchIcon />
-                  
-                  {/* {filteredEvents((item, index) => {
-
-                  })} */}
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search ID..."
-                  value={searchText}
-                  onChange={(e) => {
-                    setSearchText(e.target.value);
-                  }}
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Search>
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: "flex",
+                border: "3px solid rgba(0, 0, 0, 0.05)",
+                marginLeft: "745px",
+                alignItems: "center",
+                paddingLeft: 2,
+                backgroundColor: "white",
+              }}
+            >
+              <SearchIconWrapper>
+                <SearchIcon />
+              </SearchIconWrapper>
+              <StyledInputBase
+                placeholder="Search..."
+                value={searchText}
+                onChange={handleSearchTextChange}
+                inputProps={{ "aria-label": "search" }}
+              />
             </Box>
           </div>
+  
           <Box
             sx={{
               p: "0px 0px 0px 0px",
@@ -122,47 +122,47 @@ export default function Logs(props) {
             maxWidth="90%"
           >
             <div style={{ display: "flex", justifyContent: "flex-start" }}>
-              <ButtonGroup>
-                <Button
-                  sx={
-                    venueSelected === "Coworking Space"
-                      ? selectedStyle
-                      : unselectedStyle
-                  }
-                  onClick={() => {
-                    setVenueSelected("Coworking Space");
-                    setVenueId(1);
-                  }}
-                >
-                  CO-WORKING SPACE
-                </Button>
-                <Button
-                  sx={
-                    venueSelected === "Conference Room A"
-                      ? selectedStyle
-                      : unselectedStyle
-                  }
-                  onClick={() => {
-                    setVenueSelected("Conference Room A");
-                    setVenueId(2);
-                  }}
-                >
-                  CONFERENCE A
-                </Button>
-                <Button
-                  sx={
-                    venueSelected === "Conference Room B"
-                      ? selectedStyle
-                      : unselectedStyle
-                  }
-                  onClick={() => {
-                    setVenueSelected("Conference Room B");
-                    setVenueId(3);
-                  }}
-                >
-                  CONFERENCE B
-                </Button>
-              </ButtonGroup>
+            <ButtonGroup>
+                  <Button
+                    sx={
+                      venueSelected === "Coworking Space"
+                        ? selectedStyle
+                        : unselectedStyle
+                    }
+                    onClick={() => {
+                      setVenueSelected("Coworking Space");
+                      setVenueId(1);
+                    }}
+                  >
+                    CO-WORKING SPACE
+                  </Button>
+                  <Button
+                    sx={
+                      venueSelected === "Conference Room A"
+                        ? selectedStyle
+                        : unselectedStyle
+                    }
+                    onClick={() => {
+                      setVenueSelected("Conference Room A");
+                      setVenueId(2);
+                    }}
+                  >
+                    CONFERENCE A
+                  </Button>
+                  <Button
+                    sx={
+                      venueSelected === "Conference Room B"
+                        ? selectedStyle
+                        : unselectedStyle
+                    }
+                    onClick={() => {
+                      setVenueSelected("Conference Room B");
+                      setVenueId(3);
+                    }}
+                  >
+                    CONFERENCE B
+                  </Button>
+                </ButtonGroup>
             </div>
             <TableContainer>
               <Table
@@ -176,13 +176,18 @@ export default function Logs(props) {
                   <TableRow>
                     <StyledTableCell align="center">Name</StyledTableCell>
                     <StyledTableCell align="center">isLoggedin</StyledTableCell>
-                    <StyledTableCell align="center">isOverstaying</StyledTableCell>
+                    <StyledTableCell align="center">
+                      isOverstaying
+                    </StyledTableCell>
+                    <StyledTableCell align="center">Date</StyledTableCell>
                     <StyledTableCell align="center">Login Time</StyledTableCell>
-                    <StyledTableCell align="center">Logout Time</StyledTableCell>
+                    <StyledTableCell align="center">
+                      Logout Time
+                    </StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {events.map((event, index) => (
+                {filteredEvents.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((event, index) => (
                     <StyledTableRow key={index}>
                       <StyledTableCell
                         component="th"
@@ -192,21 +197,33 @@ export default function Logs(props) {
                         {event.name}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {event.isLoggedin}
+                        {event.isSignedIn === true ? "Yes" : "No"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {event.isOverstaying}
+                        {event.isOverstaying === true ? "Yes" : "No"}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {event.loginTime}
+                        {event.date}
                       </StyledTableCell>
                       <StyledTableCell align="center">
-                        {event.logoutTime}
+                        {event.signInTime}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {event.signOutTime}
                       </StyledTableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>
               </Table>
+              <TablePagination
+                  component="div"
+                  count={filteredEvents.length}
+                  page={page}
+                  onPageChange={handlePageChange}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  labelRowsPerPage=""
+                />
             </TableContainer>
           </Box>
         </Box>

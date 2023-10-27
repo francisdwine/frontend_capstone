@@ -16,12 +16,12 @@ import {
   FormControl,
   MenuItem,
   InputLabel,
-  Autocomplete,
-  IconButton,
+  TablePagination
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
+import SearchIcon from "@mui/icons-material/Search";
 import TableBody from "@mui/material/TableBody";
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
@@ -36,6 +36,8 @@ import {
   ButtonStyle2,
   StyledTableCell,
   StyledTableRow,
+  SearchIconWrapper,
+  StyledInputBase,
 } from "./styles";
 
 // const events = [
@@ -71,7 +73,6 @@ export default function MyReservations(props) {
   const [viewModal, setViewModal] = useState(false);
   const [cancelModal, setCancelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
-  const [reviewModal, setReviewModal] = useState(false);
   const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
@@ -134,45 +135,23 @@ export default function MyReservations(props) {
     booking.current = tempBooking;
     setRefresh(!refresh);
   };
-
+  
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
     if (role === "admin") {
       axios.get("http://localhost:8000/api/getAllBookings/").then((res) => {
         setEventData(res.data);
-        setEvents(
-          // res?.data.map((item) => {
-          //   return {
-          //     id: item?.id,
-          //     title: item?.description,
-          //     date: item?.date,
-          //     start: item?.startTime,
-          //     end: item?.endTime,
-          //     venue: item?.venue,
-          //   };
-          // })
-          res?.data
-        );
+        setEvents(res.data);
+        // ...
       });
     } else if (role === "user") {
       axios
         .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
         .then((res) => {
-          setEventData(res.data);
-          setEvents(
-            // res?.data.map((item) => {
-            //   return {
-            //     id: item?.id,
-            //     title: item?.description,
-            //     date: item?.date,
-            //     start: item?.startTime,
-            //     end: item?.endTime,
-            //     venue: item?.venue,
-            //   };
-            // })
-            res.data
-          );
+          // setEventData(res.data);
+          setEvents(res.data);
+          // ...
         });
     }
   }, [bookingsRefresher]);
@@ -200,14 +179,47 @@ export default function MyReservations(props) {
   const [venueId, setVenueId] = useState(1);
   const [statusSelected, setStatusSelected] = useState("All");
   const [timeSelected, setTimeSelected] = useState("Upcoming");
-  const [openInfoModal, setOpenInfoModal] = useState(false);
-  const [info, setInfo] = useState({});
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [openInfoModal, setOpenInfoModal] = useState(false);
+  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [page, setPage] = useState(0);
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
     { name: "Celine", id: 4 },
   ]);
+
+  useEffect(() => {
+    const filtered = events.filter((item) => item.venue === venueId);
+    setFilteredEvents(filtered);
+  }, [venueId, events]);
+
+    //searchbar
+    const handleSearchTextChange = (e) => {
+      const searchText = e.target.value;
+      setSearchText(searchText);
+  
+      //filter events
+      const filtered = events.filter((item) => {
+        return (
+          (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+          (item.venue === venueId && item.date.toString().includes(searchText)) || 
+          (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+        );
+      });
+      setFilteredEvents(filtered);
+    };
+
+    // let filteredEvents = events
+    // .filter((item) => {
+    //   return item.venue === venueId;
+    // })
+    // .sort(
+    //   (first, second) =>
+    //     second.date > first.date ? 1 : second.date < first.date ? -1 : 0
+    //   (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
+    // );
 
   useEffect(() => {
     if (statusSelected === "Cancelled" && role === "admin") {
@@ -258,16 +270,6 @@ export default function MyReservations(props) {
         });
     }
   }, [statusSelected, timeSelected]);
-  let filteredEvents = events
-    .filter((item) => {
-      return item.venue === venueId;
-      //  && item.referenceNo.contains(searchText)
-    })
-    // .sort(
-    //   (first, second) =>
-    //     second.date > first.date ? 1 : second.date < first.date ? -1 : 0
-    //   (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
-    // );
   const addAttendee = () => {
     let isExisting = false;
     let id = null;
@@ -325,7 +327,6 @@ export default function MyReservations(props) {
     const requestBody = {
       title: booking.current.title,
       purpose: booking.current.purpose,
-      computers: booking.current.computers,
     };
     //setTempId(id);
     axios
@@ -354,6 +355,16 @@ export default function MyReservations(props) {
     points: 0,
     user: 0,
   });
+  //pagination
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); // Reset page to the first page when changing rowsPerPage
+  };
+  
 
   return (
     <div>
@@ -374,6 +385,29 @@ export default function MyReservations(props) {
             alignItems="center"
             flexDirection="column"
           >
+            <div>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  border: "3px solid rgba(0, 0, 0, 0.05)",
+                  marginLeft: "745px",
+                  alignItems: "center",
+                  paddingLeft: 2,
+                  backgroundColor: "white",
+                }}
+              >
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search..."
+                  value={searchText}
+                  onChange={handleSearchTextChange}
+                  inputProps={{ "aria-label": "search" }}
+                />
+              </Box>
+            </div>
             <Box
               sx={{
                 p: "0px 0px 0px 0px",
@@ -426,7 +460,11 @@ export default function MyReservations(props) {
                     {/* user */}
                     {filteredEvents.map((event, index) => (
                       <StyledTableRow>
-                        <StyledTableCell component="th" scope="row" align="center">
+                        <StyledTableCell
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
                           {event?.description}
                         </StyledTableCell>
                         <StyledTableCell align="center">
@@ -519,6 +557,29 @@ export default function MyReservations(props) {
               }}
               maxWidth="90%"
             >
+              <div>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    border: "3px solid rgba(0, 0, 0, 0.05)",
+                    marginLeft: "745px",
+                    alignItems: "center",
+                    paddingLeft: 2,
+                    backgroundColor: "white",
+                  }}
+                >
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    placeholder="Search..."
+                    value={searchText}
+                    onChange={handleSearchTextChange}
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                </Box>
+              </div>
               <div style={{ display: "flex", marginBottom: "20px" }}>
                 <ButtonGroup>
                   <Button
@@ -605,6 +666,9 @@ export default function MyReservations(props) {
                 >
                   <TableHead>
                     <TableRow>
+                      <StyledTableCell align="center">
+                        Reference No.
+                      </StyledTableCell>
                       <StyledTableCell align="center">Title</StyledTableCell>
                       <StyledTableCell align="center">Date</StyledTableCell>
                       <StyledTableCell align="center">Start</StyledTableCell>
@@ -616,72 +680,87 @@ export default function MyReservations(props) {
                   </TableHead>
                   <TableBody>
                     {/* admin*/}
-                    {filteredEvents.map((event, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell component="th" scope="row" align="center">
-                          {event.description}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.date}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.startTime}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.endTime}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.venue}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          <Button
-                            sx={ButtonStyle1}
-                            onClick={() => {
-                              handleView(event.id);
-                              // axios
-                              //   .get(
-                              //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                              //   )
-                              //   .then((res) => {
-                              //     setRefresh(!refresh);
-                              //     setAttendeeList(res.data);
-                              //   });
-                            }}
+                    {filteredEvents.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((event, index) => (
+                        <StyledTableRow key={index}>
+                          <StyledTableCell align="center">
+                            WIL{event.referenceNo.toUpperCase()}
+                          </StyledTableCell>
+                          <StyledTableCell
+                            component="th"
+                            scope="row"
+                            align="center"
                           >
-                            View
-                          </Button>
-                        </StyledTableCell>
-                        {statusSelected === "All" ? (
+                            {event.description}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.date}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.startTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.endTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.venue}
+                          </StyledTableCell>
                           <StyledTableCell align="center">
                             <Button
-                              sx={ButtonStyle2}
+                              sx={ButtonStyle1}
                               onClick={() => {
-                                setEditModal(true);
-                                setTempId(event.id);
-                                //alert(event.id);
+                                handleView(event.id);
+                                // axios
+                                //   .get(
+                                //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                //   )
+                                //   .then((res) => {
+                                //     setRefresh(!refresh);
+                                //     setAttendeeList(res.data);
+                                //   });
                               }}
-                              
                             >
-                              Edit
+                              View
                             </Button>
                           </StyledTableCell>
-                        ) : (
-                          // <StyledTableCell align="center">
-                          //    <Button
-                          //     sx={{
-                          //       ...ButtonStyle1,
-                          //       backgroundColor: "#ff595e",
-                          //     }}
-                          //   >
-                          //     Review
-                          //   </Button>
-                          //   </StyledTableCell> 
-                          <div></div>
-                        )}
-                      </StyledTableRow>
-                    ))}
+                          {statusSelected === "All" ? (
+                            <StyledTableCell align="center">
+                              <Button
+                                sx={ButtonStyle2}
+                                onClick={() => {
+                                  setEditModal(true);
+                                  setTempId(event.id);
+                                  //alert(event.id);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                            </StyledTableCell>
+                          ) : (
+                            // <StyledTableCell align="center">
+                            //    <Button
+                            //     sx={{
+                            //       ...ButtonStyle1,
+                            //       backgroundColor: "#ff595e",
+                            //     }}
+                            //   >
+                            //     Review
+                            //   </Button>
+                            //   </StyledTableCell>
+                            <div></div>
+                          )}
+                        </StyledTableRow>
+                      ))}
                   </TableBody>
                 </Table>
+                <TablePagination
+                  component="div"
+                  count={filteredEvents.length}
+                  page={page}
+                  onPageChange={handlePageChange}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  labelRowsPerPage=""
+                />
               </TableContainer>
             </Box>
           </Box>
@@ -1191,7 +1270,7 @@ export default function MyReservations(props) {
               variant="standard"
               inputProps={{ maxLength: 20 }}
             />*/}
-            <Box sx={{ display: "flex", justifyContent: "center" }}>
+            {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
               <TextField
                 name="computers"
                 type="number"
@@ -1209,7 +1288,7 @@ export default function MyReservations(props) {
                 onChange={(e) => handleChange(e)}
                 autoFocus={false}
               />
-            </Box>
+            </Box> */}
             <Button
               variant="contained"
               onClick={() => {
@@ -1228,7 +1307,7 @@ export default function MyReservations(props) {
       </Modal>
 
       {/*Attendees Edit*/}
-      <Modal
+      {/* <Modal
         disableAutoFocus={true}
         open={attendeesModal}
         onClose={() => setAttendeesModal(false)}
@@ -1251,7 +1330,7 @@ export default function MyReservations(props) {
           </Box>
           <Box p={4}>
             <Box sx={{ display: "flex", marginTop: "20px" }}>
-              {/* <TextField
+              <TextField
                 sx={{ width: "100%", marginRight: "20px" }}
                 id="outlined-basic"
                 placeholder="Enter Name or Id"
@@ -1259,7 +1338,7 @@ export default function MyReservations(props) {
                 onChange={(e) => {
                   setAttendeeName(e.target.value);
                 }}
-              /> */}
+              />
               <Autocomplete
                 freeSolo
                 defaultValue=""
@@ -1357,11 +1436,11 @@ export default function MyReservations(props) {
                       </IconButton>
                     }
                   >
-                    {/* <ListItemAvatar>
+                    <ListItemAvatar>
                   <Avatar>
                     <PersonIcon></PersonIcon>
                   </Avatar>
-                </ListItemAvatar> */}
+                </ListItemAvatar>
                     <ListItemText
                       primary={item.name}
                       secondary={
@@ -1394,7 +1473,7 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Box>
-      </Modal>
+      </Modal> */}
     </div>
   );
 }

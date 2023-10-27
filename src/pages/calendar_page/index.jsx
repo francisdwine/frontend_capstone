@@ -68,7 +68,6 @@ export default function Calendar(props) {
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState('admin'); //default role
   const [info,setInfo]=useState({});
-  const [tempuser_id, setTempuser_id] = useState(0);
 
   const submitBooking = () => {
     setAttendeeList([
