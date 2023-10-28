@@ -46,7 +46,7 @@ export default function DashBoardTemplate(props) {
   //admin sidenav
   const adminNavItems = [
     { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "Dashboard", icon: DashboardIcon, path: "/dashboard" },
+    { name: "Tracker", icon: DashboardIcon, path: "/tracker" },
     { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
     { name: "Logs", icon: BookIcon, path: "/logs" },
     { name: "Bookings", icon: ListIcon, path: "/bookings",},

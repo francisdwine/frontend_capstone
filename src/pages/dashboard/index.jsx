@@ -66,8 +66,8 @@ import {
 //     ],
 //   },
 // ];
-const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
-// const colors = ["#000000","#fecc00",];
+// const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
+const colors = ["#fecc00",];
 // for Reviews
 const reviews = [
   { label: "Name", value: "John Doe" },
@@ -80,7 +80,7 @@ const reviews = [
   },
 ];
 
-export default function Dashboard(props) {
+export default function Tracker(props) {
   //const [ratingFilter, setRatingFilter] = useState([0, 5]);
   const [data, setData] = useState([]);
   const [value, setValue] = React.useState([
@@ -176,7 +176,7 @@ export default function Dashboard(props) {
   }, []);
 
   return (
-    <DashBoardTemplate title="Dashboard">
+    <DashBoardTemplate title="Tracker">
       <div
         style={{
           display: "flex",
@@ -188,13 +188,14 @@ export default function Dashboard(props) {
           sx={{
             paddingLeft: 2,
             color: "lightblack",
-            fontSize: 40,
+            fontSize: 30,
             fontWeight: "bold",
             paddingLeft: 10,
+            marginTop: 4,
           }}
           fontFamily="Poppins"
         >
-          Dashboard - Access Logs
+          Activity Tracker
         </Typography>
       </div>
 
@@ -210,14 +211,15 @@ export default function Dashboard(props) {
           <Grid container spacing={2}>
             {containerDetails.map((card, index) => (
               <Grid key={index} item xs={4} md={3}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    width: 243,
-                    height: 260,
-                    backgroundColor: colors[index % colors.length],
-                  }}
-                >
+              <Paper
+                elevation={3}
+                sx={{
+                  width: 243,
+                  height: 260,
+                  backgroundColor: colors[index % colors.length],
+                  marginBottom: 7, 
+                }}
+              >
                   <CardContent>
                     <Typography
                       sx={{
@@ -231,7 +233,7 @@ export default function Dashboard(props) {
                     </Typography>
                     <Typography
                       variant="body2"
-                      color="text.secondary"
+                      color="text.primary"
                       textAlign="left"
                       fontFamily="Poppins"
                       fontSize={17}
@@ -270,7 +272,7 @@ export default function Dashboard(props) {
           sx={{
             paddingLeft: 2,
             color: "lightblack",
-            fontSize: 40,
+            fontSize: 30,
             fontWeight: "bold",
             paddingLeft: 10,
           }}
