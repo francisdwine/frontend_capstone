@@ -74,7 +74,7 @@ export default function MyReservations(props) {
   const [cancelModal, setCancelModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [reviewModal, setReviewModal] = useState(false);
-  const [role, setRole] = useState("user"); //default role
+  const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
 
@@ -196,7 +196,7 @@ export default function MyReservations(props) {
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [openInfoModal, setOpenInfoModal] = useState(false);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
@@ -213,16 +213,18 @@ export default function MyReservations(props) {
     const handleSearchTextChange = (e) => {
       const searchText = e.target.value;
       setSearchText(searchText);
-
-      //filter events
-      const filtered = events.filter((item) => {
-        return (
-          (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
-          (item.venue === venueId && item.date.toString().includes(searchText)) ||
-          (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
-        );
-      });
-      setFilteredEvents(filtered);
+      if (searchText === "") { // if empty dipslay all events
+        setFilteredEvents(events);
+      } else {
+        const filtered = events.filter((item) => {
+          return (
+            (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId && item.date.toString().includes(searchText)) ||
+            (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+          );
+        });
+        setFilteredEvents(filtered);
+      }
     };
 
     // let filteredEvents = events

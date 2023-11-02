@@ -15,14 +15,17 @@ export const ButtonStyle1 = {
     width: "300px"
   };
 
-export const loginstyle = {
+  export const loginstyle = {
     marginTop: "30px",
     position: "absolute",
     boxShadow: '1px 2px 9px #C0C0C0',
     borderRadius: "15px",
-    marginLeft: "450px",
-   
-}
+    left: 0,
+    right: 0,
+    marginLeft: "auto",
+    marginRight: "auto",
+    width: "300px", // You can adjust the width as needed
+  }  
 
 export const fields = {
     width: "300px"

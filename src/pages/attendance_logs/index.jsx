@@ -30,7 +30,7 @@ export default function Logs(props) {
   const [searchText, setSearchText] = useState("");
   const [filteredEvents, setFilteredEvents] = useState([]);
   const [events, setEvents] = useState([]);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -44,23 +44,31 @@ export default function Logs(props) {
         console.error("Error fetching data", error);
       });
   }, []);
+
   //let filteredEvents = events.filter((item) => item.venue === venueId);
 
-  const handleSearchTextChange = (e) => {
-    const searchText = e.target.value;
-    setSearchText(searchText);
-
-    //filter events
-    const filtered = events.filter((item) => {
-      return (
-        // item.venue === venueId && 
-        item.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        // item.venue === venueId && 
-        item.date.toString().includes(searchText) 
-      );
-    });
+  useEffect(() => {
+    const filtered = events.filter((item) => item.venueName === venueSelected);
     setFilteredEvents(filtered);
-  };
+  }, [venueSelected, events]);
+
+    //searchbar
+    const handleSearchTextChange = (e) => {
+      const searchText = e.target.value;
+      setSearchText(searchText);
+    
+      if (searchText === "") { // if empty dipslay all events
+        setFilteredEvents(events);
+      } else {
+        const filtered = events.filter((item) => {
+          return (
+            (item.venue === venueId && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId && item.date.toString().includes(searchText))
+          );
+        });
+        setFilteredEvents(filtered);
+      }
+    };
 
   //pagination
   const handlePageChange = (event, newPage) => {
@@ -69,7 +77,7 @@ export default function Logs(props) {
 
   const handleRowsPerPageChange = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset page to the first page when changing rowsPerPage
+    setPage(0); //reset to first page
   };
   
   
