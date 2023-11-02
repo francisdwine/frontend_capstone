@@ -37,7 +37,8 @@ const Home = () => {
               component="h2"
               fontFamily="Poppins"
               color="black"
-            > Log In </Typography>
+            > Log In 
+            </Typography>
 
                 <br/> <br/>
                 <TextField label={'Email'} id="email" name="email" onChange={(e)=>onInputChange(e)} style={fields}/> <br /><br />
