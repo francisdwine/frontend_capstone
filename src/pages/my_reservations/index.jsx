@@ -210,29 +210,30 @@ export default function MyReservations(props) {
     setFilteredEvents(filtered);
   }, [venueId, events]);
 
-  //searchbar
-  const handleSearchTextChange = (e) => {
-    const searchText = e.target.value;
-    setSearchText(searchText);
-    if (searchText === "") {
-      // if empty dipslay all events
-      setFilteredEvents(events);
-    } else {
-      const filtered = events.filter((item) => {
-        return (
-          (item.venue === venueId &&
-            item.description
-              .toLowerCase()
-              .includes(searchText.toLowerCase())) ||
-          (item.venue === venueId &&
-            item.date.toString().includes(searchText)) ||
-          (item.venue === venueId &&
-            item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
-        );
-      });
-      setFilteredEvents(filtered);
-    }
-  };
+    //searchbar
+    const handleSearchTextChange = (e) => {
+      const searchText = e.target.value;
+      setSearchText(searchText);
+      if (searchText === "") { // if empty dipslay events
+        const filtered = events.filter((item) => {
+          return (
+            (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId && item.date.toString().includes(searchText)) ||
+            (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+          );
+        });
+        setFilteredEvents(filtered);
+      } else {
+        const filtered = events.filter((item) => {
+          return (
+            (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId && item.date.toString().includes(searchText)) ||
+            (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+          );
+        });
+        setFilteredEvents(filtered);
+      }
+    };
 
   // let filteredEvents = events
   // .filter((item) => {

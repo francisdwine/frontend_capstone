@@ -58,13 +58,18 @@ export default function Logs(props) {
       setSearchText(searchText);
     
       if (searchText === "") { // if empty dipslay all events
-        setFilteredEvents(events);
+        const filtered = events.filter((item) => {
+          return (
+            (item.venueName === venueSelected && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venueName === venueSelected && item.date.toString().includes(searchText))
+          );
+        });
+        setFilteredEvents(filtered);
       } else {
         const filtered = events.filter((item) => {
           return (
-            (item.venueId ===venueId && item.name.toLowerCase().includes(searchText.toLowerCase()))
-          ||
-            (item.venueId ===venueId&& item.date.toString().includes(searchText))
+            (item.venueName === venueSelected && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venueName === venueSelected && item.date.toString().includes(searchText))
           );
         });
         console.log(filtered)
