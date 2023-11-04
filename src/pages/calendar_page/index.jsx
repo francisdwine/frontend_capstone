@@ -423,7 +423,7 @@ export default function Calendar(props) {
                 allDaySlot={false}
                 initialView="timeGridWeek"
                 aspectRatio={25.0}
-                weekends={true}
+                
                 //events data
 
                 eventContent={renderEventContent}
@@ -435,6 +435,8 @@ export default function Calendar(props) {
                 eventTextColor="black"
                 height="100"
                 contentHeight="auto"
+                weekends={false}
+                
               ></FullCalendar>
             </Box>
 
@@ -969,7 +971,7 @@ export default function Calendar(props) {
                       computers: 0,
                       coins: 0,
                       points: 0,
-                      user_id: user?.id,
+                      user_id: user?.user_id,
                       officeName: "",
                       attendees: [],
                     };
@@ -1143,7 +1145,7 @@ export default function Calendar(props) {
               ></Typography>
             </Box>
 
-            {user?.role === "user" && user?.id === info.user_id ? (
+            {user?.role === "user" && user?.user_id === info.user_id ? (
               <Box
                 sx={{
                   margin: "10px 15px 15px 10px",

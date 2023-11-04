@@ -303,7 +303,7 @@ export default function MyReservations(props) {
         });
     }
     
-  }, [statusSelected, timeSelected]);
+  }, [statusSelected, timeSelected,bookingsRefresher]);
   const addAttendee = () => {
     let isExisting = false;
     let id = null;
