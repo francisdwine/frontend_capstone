@@ -1,5 +1,6 @@
 import * as React from "react";
 import DashBoardTemplate from "../containers/dashboard_template";
+import { BASE_URL } from "../../links";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -83,7 +84,7 @@ export default function Calendar(props) {
     }
     console.log(booking.current);
     axios
-      .post("http://localhost:8000/api/createBooking/", {
+      .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
         purpose: booking.current.purpose,
         description: booking.current.description,
@@ -125,7 +126,7 @@ export default function Calendar(props) {
   const handleView = (id) => {
     setTempId(id);
 
-    axios.get(`http://localhost:8000/api/getAttendees/${id}/`).then((res) => {
+    axios.get(`${BASE_URL}/api/getAttendees/${id}/`).then((res) => {
       setBookingAttendees(res.data);
     });
 
@@ -139,14 +140,14 @@ export default function Calendar(props) {
 
   //init page
   React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
+    axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
     });
   }, []);
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
-    axios.get("http://localhost:8000/api/currentBookings/").then((res) => {
+    axios.get(`${BASE_URL}/api/currentBookings/`).then((res) => {
       setEventData(res.data);
       setEvents(
         res?.data.map((item) => {
@@ -164,7 +165,7 @@ export default function Calendar(props) {
   // cancelled bookings
   const cancelBooking = () => {
     axios
-      .get(`http://localhost:8000/api/cancelBooking/${tempId}`)
+      .get(`${BASE_URL}/api/cancelBooking/${tempId}/`)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
         setCancelModal(false);
@@ -187,7 +188,7 @@ export default function Calendar(props) {
     };
 
     axios
-      .post(`http://localhost:8000/api/calculateCost/`, costData)
+      .post(`${BASE_URL}/api/calculateCost/${costData}/`)
       .then((response) => {
         //contain the calculated cost
         const calculatedCost = response.data.cost; // Adjust this based on your server response
@@ -355,7 +356,7 @@ export default function Calendar(props) {
                       (endTimeSeconds - startTimeSeconds) / (60 * 60);
                     var totalDuration = 0;
                     axios
-                      .post(`http://localhost:8000/api/getDurations/`, {
+                      .post(`${BASE_URL}/api/getDurations/`, {
                         id: user?.user_id,
                         date: startDate,
                       })

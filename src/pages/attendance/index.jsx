@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { BASE_URL } from "../../links";
 import axios from "axios";
 import Modal from "@mui/material/Modal";
 import { Box, Button, TextField, Typography } from "@mui/material";
@@ -36,7 +37,7 @@ export default function Attendance(props) {
 
   const handleSave = () => {
     const data = { name: name };
-    axios.post("http://127.0.0.1:8000/api/logAttendance/", data)
+    axios.post(`${BASE_URL}/api/logAttendance/${data}`)
       .then((response) => {
         if (response.data.state === "login") {
           console.log("Data saved successfully", response.data);

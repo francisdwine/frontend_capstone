@@ -100,7 +100,7 @@ export default function MyReservations(props) {
     let a = events.find((item) => {
       return item.id === id;
     });
-    axios.get(`http://localhost:8000/api/getAttendees/${a.id}/`).then((res) => {
+    axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
       console.log(a);
@@ -208,11 +208,7 @@ export default function MyReservations(props) {
   useEffect(() => {
     
     const filtered = events.filter((item) => item.venue === venueId);
-    
       setFilteredEvents(filtered);
-    
-   
-    
     
   }, [venueId, events]);
 

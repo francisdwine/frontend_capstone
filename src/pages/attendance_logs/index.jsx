@@ -1,5 +1,6 @@
 import DashBoardTemplate from "../containers/dashboard_template";
 import { useState, useEffect } from "react";
+import { BASE_URL } from "../../links";
 
 import {
   Box,
@@ -35,7 +36,7 @@ export default function Logs(props) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/getAllAttendance/")
+      .get(`${BASE_URL}/api/getAllAttendance/`)
       .then((response) => {
         setEvents(response.data);
         setFilteredEvents(response.data);
@@ -44,8 +45,6 @@ export default function Logs(props) {
         console.error("Error fetching data", error);
       });
   }, []);
-
-  //let filteredEvents = events.filter((item) => item.venue === venueId);
 
   useEffect(() => {
     const filtered = events.filter((item) => item.venueName === venueSelected);
