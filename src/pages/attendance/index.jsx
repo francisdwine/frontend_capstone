@@ -142,7 +142,7 @@ export default function Attendance(props) {
           >
             <h2 sx={{ modalHeaderStyle }}>Welcome!</h2>
             <Typography>
-              You can now proceed to 
+              Your attendance has been logged, you can now proceed!
               {/* {venueName} */}
             </Typography>
             <div style={{ margin: "20px" }}></div>

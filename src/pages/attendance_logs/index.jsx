@@ -62,10 +62,12 @@ export default function Logs(props) {
       } else {
         const filtered = events.filter((item) => {
           return (
-            (item.venue === venueId && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
-            (item.venue === venueId && item.date.toString().includes(searchText))
+            (item.venueId ===venueId && item.name.toLowerCase().includes(searchText.toLowerCase()))
+          ||
+            (item.venueId ===venueId&& item.date.toString().includes(searchText))
           );
         });
+        console.log(filtered)
         setFilteredEvents(filtered);
       }
     };

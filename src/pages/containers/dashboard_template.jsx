@@ -22,6 +22,8 @@ import BookIcon from "@mui/icons-material/Book";
 import ListIcon from "@mui/icons-material/List";
 import Wild from "../../images/wild.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import AuthContext from "../../context/AuthContext";
+import { useContext } from "react";
 
 const drawerWidth = 200;
 
@@ -34,9 +36,10 @@ const drawerWidth = 200;
 // }
 
 export default function DashBoardTemplate(props) {
+  const{user}=useContext(AuthContext)
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-
+  const {logoutUser}=React.useContext(AuthContext)
   const testUserType = "admin";
   const navigate = useNavigate();
 
@@ -45,7 +48,7 @@ export default function DashBoardTemplate(props) {
 
   //admin sidenav
   const adminNavItems = [
-    { name: "Home", icon: HomeIcon, path: "/" },
+    // { name: "Home", icon: HomeIcon, path: "/" },
     { name: "Tracker", icon: DashboardIcon, path: "/tracker" },
     { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
     { name: "Logs", icon: BookIcon, path: "/logs" },
@@ -54,11 +57,11 @@ export default function DashBoardTemplate(props) {
 
   //user sidenav
   const userNavItems = [
-    { name: "Home", icon: HomeIcon, path: "/home" },
+    // { name: "Home", icon: HomeIcon, path: "/home" },
     { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
     { name: "Bookings", icon: ListIcon, path: "/bookings" },
   ];
-  const NavItems = testUserType === "admin" ? adminNavItems : userNavItems;
+  const NavItems = user?.role === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -130,6 +133,9 @@ export default function DashBoardTemplate(props) {
                 color: "white",
               },
               borderRadius: "10px",
+            }}
+            onClick={()=>{
+              logoutUser()
             }}
           >
             <Typography fontFamily="Poppins" fontWeight="bold">

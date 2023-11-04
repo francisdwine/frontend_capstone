@@ -1,5 +1,5 @@
 import DashBoardTemplate from "../containers/dashboard_template";
-
+import { BASE_URL } from "../../links";
 import {
   Box,
   Button,
@@ -16,7 +16,7 @@ import {
   FormControl,
   MenuItem,
   InputLabel,
-  TablePagination
+  TablePagination,
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -39,6 +39,8 @@ import {
   SearchIconWrapper,
   StyledInputBase,
 } from "./styles";
+import AuthContext from "../../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // const events = [
 //   {
@@ -86,10 +88,11 @@ export default function MyReservations(props) {
     ]);
   };
 
-  const [user, setUser] = useState({
-    id: 1,
-    username: "francis",
-  });
+  // const [user, setUser] = useState({
+  //   id: 1,
+  //   username: "francis",
+  // });
+  const { user, userLogout } = React.useContext(AuthContext);
 
   const handleView = (id) => {
     setTempId(id);
@@ -97,15 +100,13 @@ export default function MyReservations(props) {
     let a = events.find((item) => {
       return item.id === id;
     });
-    axios
-      .get(`http://localhost:8000/api/getAttendees/${a.id}/`)
-      .then((res) => {
-        setAttendeeList(res.data);
-    setViewDetails(a);
-    console.log(a);
-    setViewModal(true);
-    console.log(id);
-  });
+    axios.get(`http://localhost:8000/api/getAttendees/${a.id}/`).then((res) => {
+      setAttendeeList(res.data);
+      setViewDetails(a);
+      console.log(a);
+      setViewModal(true);
+      console.log(id);
+    });
   };
 
   const handleEdit = (id) => {
@@ -140,39 +141,39 @@ export default function MyReservations(props) {
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
-    if (role === "admin") {
-      axios.get("http://localhost:8000/api/getAllBookings/").then((res) => {
+    if (user?.role === "admin") {
+      axios.get(`${BASE_URL}/api/getAllBookings/`).then((res) => {
         setEventData(res.data);
         setEvents(res.data);
         // ...
       });
-    // } else if (role === "user") {
-    //   setUser({id:1,
-    //             username: "francis",})
-    //   axios
-    //     .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
-    //     .then((res) => {
-    //       setEventData(res.data);
-    //       setEvents(
-    //         // res?.data.map((item) => {
-    //         //   return {
-    //         //     id: item?.id,
-    //         //     title: item?.description,
-    //         //     date: item?.date,
-    //         //     start: item?.startTime,
-    //         //     end: item?.endTime,
-    //         //     venue: item?.venue,
-    //         //   };
-    //         // })
-    //         res.data
-    //       );
-    //     });
+      // } else if (role === "user") {
+      //   setUser({id:1,
+      //             username: "francis",})
+      //   axios
+      //     .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
+      //     .then((res) => {
+      //       setEventData(res.data);
+      //       setEvents(
+      //         // res?.data.map((item) => {
+      //         //   return {
+      //         //     id: item?.id,
+      //         //     title: item?.description,
+      //         //     date: item?.date,
+      //         //     start: item?.startTime,
+      //         //     end: item?.endTime,
+      //         //     venue: item?.venue,
+      //         //   };
+      //         // })
+      //         res.data
+      //       );
+      //     });
     }
   }, [bookingsRefresher]);
 
   const cancelBooking = () => {
     axios
-      .get(`http://localhost:8000/api/cancelBooking/${tempId}`)
+      .get(`${BASE_URL}/api/cancelBooking/${tempId}`)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
@@ -209,56 +210,62 @@ export default function MyReservations(props) {
     setFilteredEvents(filtered);
   }, [venueId, events]);
 
-    //searchbar
-    const handleSearchTextChange = (e) => {
-      const searchText = e.target.value;
-      setSearchText(searchText);
-      if (searchText === "") { // if empty dipslay all events
-        setFilteredEvents(events);
-      } else {
-        const filtered = events.filter((item) => {
-          return (
-            (item.venue === venueId && item.description.toLowerCase().includes(searchText.toLowerCase())) ||
-            (item.venue === venueId && item.date.toString().includes(searchText)) ||
-            (item.venue === venueId && item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
-          );
-        });
-        setFilteredEvents(filtered);
-      }
-    };
+  //searchbar
+  const handleSearchTextChange = (e) => {
+    const searchText = e.target.value;
+    setSearchText(searchText);
+    if (searchText === "") {
+      // if empty dipslay all events
+      setFilteredEvents(events);
+    } else {
+      const filtered = events.filter((item) => {
+        return (
+          (item.venue === venueId &&
+            item.description
+              .toLowerCase()
+              .includes(searchText.toLowerCase())) ||
+          (item.venue === venueId &&
+            item.date.toString().includes(searchText)) ||
+          (item.venue === venueId &&
+            item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+        );
+      });
+      setFilteredEvents(filtered);
+    }
+  };
 
-    // let filteredEvents = events
-    // .filter((item) => {
-    //   return item.venue === venueId;
-    // })
-    // .sort(
-    //   (first, second) =>
-    //     second.date > first.date ? 1 : second.date < first.date ? -1 : 0
-    //   (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
-    // );
+  // let filteredEvents = events
+  // .filter((item) => {
+  //   return item.venue === venueId;
+  // })
+  // .sort(
+  //   (first, second) =>
+  //     second.date > first.date ? 1 : second.date < first.date ? -1 : 0
+  //   (a,b)=>a.date.localCompare(b.date)||a.startTime.localCompare(b.startTime)
+  // );
 
   useEffect(() => {
-    if (statusSelected === "Cancelled" && role === "admin") {
+    if (statusSelected === "Cancelled" && user?.role === "admin") {
       axios
-        .get(`http://localhost:8000/api/getAllCancelledBookings/`)
+        .get(`${BASE_URL}/api/getAllCancelledBookings/`)
         .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching canceled bookings:", error);
         });
-    } else if (statusSelected === "All" && role === "admin") {
+    } else if (statusSelected === "All" && user?.role === "admin") {
       axios
-        .get(`http://localhost:8000/api/getAllBookings/`)
+        .get(`${BASE_URL}/api/getAllBookings/`)
         .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching all bookings:", error);
         });
-    } else if (statusSelected === "No Show" && role === "admin") {
+    } else if (statusSelected === "No Show" && user?.role === "admin") {
       axios
-        .get(`http://localhost:8000/api/getAllNoShowBookings/`)
+        .get(`${BASE_URL}/api/getAllNoShowBookings/`)
         .then((response) => {
           setEvents(response.data);
         })
@@ -266,18 +273,18 @@ export default function MyReservations(props) {
           console.error("Error fetching no show bookings:", error);
         });
     }
-    if (timeSelected === "Upcoming" && role === "user") {
+    if (timeSelected === "Upcoming" && user?.role === "user") {
       axios
-        .get(`http://localhost:8000/api/getUpcomingUserBookings/${user.id}`)
+        .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.id}`)
         .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching no show bookings:", error);
         });
-    } else if (timeSelected === "History" && role === "user") {
+    } else if (timeSelected === "History" && user?.role === "user") {
       axios
-        .get(`http://localhost:8000/api/getHistoryUserBookings/${user.id}`)
+        .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.id}`)
         .then((response) => {
           setEvents(response.data);
         })
@@ -307,16 +314,14 @@ export default function MyReservations(props) {
       // setRefresh(!refresh)
     }
     axios
-      .post(`http://localhost:8000/api/addAttendee/${tempId}/`, {
+      .post(`${BASE_URL}api/addAttendee/${tempId}/`, {
         name: attendeeName,
         user_id: id,
       })
       .then(() => {
-        axios
-          .get(`http://localhost:8000/api/getAttendees/${tempId}/`)
-          .then((res) => {
-            setAttendeeList(res.data);
-          });
+        axios.get(`${BASE_URL}/api/getAttendees/${tempId}/`).then((res) => {
+          setAttendeeList(res.data);
+        });
         alert("Attendee added to the booking.");
       })
       .catch((error) => {
@@ -326,13 +331,11 @@ export default function MyReservations(props) {
 
   const deleteAttendee = (id) => {
     axios
-      .delete(`http://localhost:8000/api/deleteAttendee/${id}/`)
+      .delete(`${BASE_URL}/api/deleteAttendee/${id}/`)
       .then(() => {
-        axios
-          .get(`http://localhost:8000/api/getAttendees/${tempId}/`)
-          .then((res) => {
-            setAttendeeList(res.data);
-          });
+        axios.get(`${BASE_URL}/api/getAttendees/${tempId}/`).then((res) => {
+          setAttendeeList(res.data);
+        });
       })
       .catch((error) => {
         console.error("Error removing attendee from the booking:", error);
@@ -347,7 +350,7 @@ export default function MyReservations(props) {
     };
     //setTempId(id);
     axios
-      .put(`http://localhost:8000/api/editBooking/${tempId}/`, requestBody)
+      .put(`${BASE_URL}/api/editBooking/${tempId}/`, requestBody)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
@@ -381,209 +384,28 @@ export default function MyReservations(props) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0); // Reset page to the first page when changing rowsPerPage
   };
-
-
-  return (
-    <div>
-      {role === "user" ? (
-        <DashBoardTemplate title="My Reservations">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "start",
-              fontFamily: "Poppins",
-            }}
-          ></div>
-          <br></br>
-          <Box
-            backgroundColor="white"
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-          >
-            <div>
-              <Box
-                sx={{
-                  flexGrow: 1,
-                  display: "flex",
-                  border: "3px solid rgba(0, 0, 0, 0.05)",
-                  marginLeft: "745px",
-                  alignItems: "center",
-                  paddingLeft: 2,
-                  backgroundColor: "white",
-                }}
-              >
-                <SearchIconWrapper>
-                  <SearchIcon />
-                </SearchIconWrapper>
-                <StyledInputBase
-                  placeholder="Search..."
-                  value={searchText}
-                  onChange={handleSearchTextChange}
-                  inputProps={{ "aria-label": "search" }}
-                />
-              </Box>
-            </div>
-            <Box
-              sx={{
-                p: "0px 0px 0px 0px",
+  const navigate = useNavigate();
+  if (user === null) {
+    userLogout();
+  } else {
+    return (
+      <div>
+        {user?.role === "user" ? (
+          <DashBoardTemplate title="My Reservations">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+                fontFamily: "Poppins",
               }}
-              maxWidth="90%"
-            >
-              <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <ButtonGroup>
-                  <Button
-                    sx={
-                      timeSelected === "Upcoming"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => setTimeSelected("Upcoming")}
-                  >
-                    Upcoming
-                  </Button>
-                  <Button
-                    sx={
-                      timeSelected === "History"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => setTimeSelected("History")}
-                  >
-                    History
-                  </Button>
-                </ButtonGroup>
-              </div>
-              <TableContainer>
-                <Table
-                  style={{
-                    width: 1000,
-                    textAlign: "center",
-                    fontFamily: "Poppins",
-                  }}
-                >
-                  <TableHead>
-                    <TableRow>
-                    <StyledTableCell >Reference No.</StyledTableCell>
-                      <StyledTableCell >Title</StyledTableCell>
-                      <StyledTableCell >Date</StyledTableCell>
-                      <StyledTableCell >Start</StyledTableCell>
-                      <StyledTableCell>End</StyledTableCell>
-                      <StyledTableCell >Venue</StyledTableCell>
-                      <StyledTableCell ></StyledTableCell>
-                      <StyledTableCell ></StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {/* user */}
-                    {filteredEvents.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((event, index) => (
-
-                      <StyledTableRow key={index}>
-                         <StyledTableCell >
-                            WIL{event.referenceNo.toUpperCase()}
-                          </StyledTableCell>
-                        <StyledTableCell component="th" scope="row">
-                          {event?.description}
-                        </StyledTableCell>
-                        <StyledTableCell  >
-                          {event?.date}
-                        </StyledTableCell>
-                        <StyledTableCell  >
-                          {event?.startTime}
-                        </StyledTableCell>
-                        <StyledTableCell  >
-                          {event?.endTime}
-                        </StyledTableCell>
-                        <StyledTableCell  >
-                          {event?.venue}
-                        </StyledTableCell>
-                        <StyledTableCell
-                          align="center"
-
-                        >
-                          <Button
-                            sx={ButtonStyle1}
-                            onClick={() => {
-                              handleView(event.id);
-                              // axios
-                              //   .get(
-                              //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                              //   )
-                              //   .then((res) => {
-                              //     setRefresh(!refresh);
-                              //     setAttendeeList(res.data);
-                              //   });
-                            }}
-                            p={200}
-                          >
-                            View
-                          </Button>
-                        </StyledTableCell>
-
-                        {timeSelected === "Upcoming" ? (
-                          <StyledTableCell align="center">
-                            <Button
-                              sx={ButtonStyle2}
-                              onClick={() => {
-                                // axios
-                                //   .get(
-                                //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                //   )
-                                //   .then((res) => {
-                                //     setAttendeeList(res.data);
-                                //   });
-                                handleEdit(event.id);
-                              }}
-                            >
-                              Edit
-                            </Button>
-                          </StyledTableCell>
-                        ) : (
-                          // <StyledTableCell align="right">
-                          //   <Button sx={{...ButtonStyle2, marginLeft: "5px"}}>Review</Button>
-                          // </StyledTableCell>
-                          <div></div>
-                        )}
-                      </StyledTableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  component="div"
-                  count={filteredEvents.length}
-                  page={page}
-                  onPageChange={handlePageChange}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  labelRowsPerPage=""
-                />
-              </TableContainer>
-            </Box>
-          </Box>
-        </DashBoardTemplate>
-      ) : (
-        <DashBoardTemplate title="Manage Reservations">
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "start",
-              fontFamily: "Poppins",
-            }}
-          ></div>
-          <br></br>
-          <Box
-            backgroundColor="white"
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-          >
+            ></div>
+            <br></br>
             <Box
-              sx={{
-                p: "0px 0px 0px 0px",
-              }}
-              maxWidth="90%"
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
             >
               <div>
                 <Box
@@ -608,597 +430,815 @@ export default function MyReservations(props) {
                   />
                 </Box>
               </div>
-              <div style={{ display: "flex", marginBottom: "20px" }}>
-                <ButtonGroup>
-                  <Button
-                    sx={
-                      statusSelected === "Cancelled"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => setStatusSelected("Cancelled")}
-                  >
-                    CANCELLED
-                  </Button>
-                  <Button
-                    sx={
-                      statusSelected === "No Show"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => setStatusSelected("No Show")}
-                  >
-                    NO SHOW
-                  </Button>
-                  <Button
-                    sx={
-                      statusSelected === "All" ? selectedStyle : unselectedStyle
-                    }
-                    onClick={() => setStatusSelected("All")}
-                  >
-                    ALL
-                  </Button>
-                </ButtonGroup>
-              </div>
-
-              <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <ButtonGroup>
-                  <Button
-                    sx={
-                      venueSelected === "Coworking Space"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => {
-                      setVenueSelected("Coworking Space");
-                      setVenueId(1);
+              <Box
+                sx={{
+                  p: "0px 0px 0px 0px",
+                }}
+                maxWidth="90%"
+              >
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <ButtonGroup>
+                    <Button
+                      sx={
+                        timeSelected === "Upcoming"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => setTimeSelected("Upcoming")}
+                    >
+                      Upcoming
+                    </Button>
+                    <Button
+                      sx={
+                        timeSelected === "History"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => setTimeSelected("History")}
+                    >
+                      History
+                    </Button>
+                  </ButtonGroup>
+                </div>
+                <TableContainer>
+                  <Table
+                    style={{
+                      width: 1000,
+                      textAlign: "center",
+                      fontFamily: "Poppins",
                     }}
                   >
-                    CO-WORKING SPACE
-                  </Button>
-                  <Button
-                    sx={
-                      venueSelected === "Conference Room A"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => {
-                      setVenueSelected("Conference Room A");
-                      setVenueId(2);
-                    }}
-                  >
-                    CONFERENCE A
-                  </Button>
-                  <Button
-                    sx={
-                      venueSelected === "Conference Room B"
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => {
-                      setVenueSelected("Conference Room B");
-                      setVenueId(3);
-                    }}
-                  >
-                    CONFERENCE B
-                  </Button>
-                </ButtonGroup>
-              </div>
-              <TableContainer>
-                <Table
-                  style={{
-                    width: 1000,
-                    textAlign: "center",
-                    fontFamily: "Poppins",
-                  }}
-                >
-                  <TableHead>
-                    <TableRow>
-                      <StyledTableCell align="center">
-                        Reference No.
-                      </StyledTableCell>
-                      <StyledTableCell >Title</StyledTableCell>
-                      <StyledTableCell >Date</StyledTableCell>
-                      <StyledTableCell >Start</StyledTableCell>
-                      <StyledTableCell >End</StyledTableCell>
-                      <StyledTableCell >Venue</StyledTableCell>
-                      <StyledTableCell ></StyledTableCell>
-                      <StyledTableCell ></StyledTableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {/* admin*/}
-                    {filteredEvents.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((event, index) => (
-                        <StyledTableRow key={index}>
-                          <StyledTableCell >
-                            WIL{event.referenceNo.toUpperCase()}
-                          </StyledTableCell>
-                          <StyledTableCell
-                            component="th"
-                            scope="row"
-
-                          >
-                            {event.description}
-                          </StyledTableCell>
-                          <StyledTableCell >
-                            {event.date}
-                          </StyledTableCell>
-                          <StyledTableCell >
-                            {event.startTime}
-                          </StyledTableCell>
-                          <StyledTableCell >
-                            {event.endTime}
-                          </StyledTableCell>
-                          <StyledTableCell >
-                            {event.venue}
-                          </StyledTableCell>
-                          <StyledTableCell >
-                            <Button
-                              sx={ButtonStyle1}
-                              onClick={() => {
-                                handleView(event.id);
-                                // axios
-                                //   .get(
-                                //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                //   )
-                                //   .then((res) => {
-                                //     setRefresh(!refresh);
-                                //     setAttendeeList(res.data);
-                                //   });
-                              }}
-                            >
-                              View
-                            </Button>
-                          </StyledTableCell>
-                          {statusSelected === "All" ? (
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell>Reference No.</StyledTableCell>
+                        <StyledTableCell>Title</StyledTableCell>
+                        <StyledTableCell>Date</StyledTableCell>
+                        <StyledTableCell>Start</StyledTableCell>
+                        <StyledTableCell>End</StyledTableCell>
+                        <StyledTableCell>Venue</StyledTableCell>
+                        <StyledTableCell></StyledTableCell>
+                        <StyledTableCell></StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {/* user */}
+                      {filteredEvents
+                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                        .map((event, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell>
+                              WIL{event.referenceNo.toUpperCase()}
+                            </StyledTableCell>
+                            <StyledTableCell component="th" scope="row">
+                              {event?.description}
+                            </StyledTableCell>
+                            <StyledTableCell>{event?.date}</StyledTableCell>
+                            <StyledTableCell>
+                              {event?.startTime}
+                            </StyledTableCell>
+                            <StyledTableCell>{event?.endTime}</StyledTableCell>
+                            <StyledTableCell>{event?.venue}</StyledTableCell>
                             <StyledTableCell align="center">
                               <Button
-                                sx={ButtonStyle2}
+                                sx={ButtonStyle1}
                                 onClick={() => {
-                                  setEditModal(true);
-                                  setTempId(event.id);
-                                  //alert(event.id);
+                                  handleView(event.id);
+                                  // axios
+                                  //   .get(
+                                  //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                  //   )
+                                  //   .then((res) => {
+                                  //     setRefresh(!refresh);
+                                  //     setAttendeeList(res.data);
+                                  //   });
                                 }}
+                                p={200}
                               >
-                                Edit
+                                View
                               </Button>
                             </StyledTableCell>
-                          ) : (
-                            // <StyledTableCell align="center">
-                            //    <Button
-                            //     sx={{
-                            //       ...ButtonStyle1,
-                            //       backgroundColor: "#ff595e",
-                            //     }}
-                            //   >
-                            //     Review
-                            //   </Button>
-                            //   </StyledTableCell>
-                            <div></div>
-                          )}
-                        </StyledTableRow>
-                      ))}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  component="div"
-                  count={filteredEvents.length}
-                  page={page}
-                  onPageChange={handlePageChange}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  labelRowsPerPage=""
-                />
-              </TableContainer>
+
+                            {timeSelected === "Upcoming" ? (
+                              <StyledTableCell align="center">
+                                <Button
+                                  sx={ButtonStyle2}
+                                  onClick={() => {
+                                    // axios
+                                    //   .get(
+                                    //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                    //   )
+                                    //   .then((res) => {
+                                    //     setAttendeeList(res.data);
+                                    //   });
+                                    handleEdit(event.id);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                              </StyledTableCell>
+                            ) : (
+                              // <StyledTableCell align="right">
+                              //   <Button sx={{...ButtonStyle2, marginLeft: "5px"}}>Review</Button>
+                              // </StyledTableCell>
+                              <div></div>
+                            )}
+                          </StyledTableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    component="div"
+                    count={filteredEvents.length}
+                    page={page}
+                    onPageChange={handlePageChange}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    labelRowsPerPage=""
+                  />
+                </TableContainer>
+              </Box>
             </Box>
-          </Box>
-        </DashBoardTemplate>
-      )}
-
-      <Modal
-        disableAutoFocus={true}
-        open={viewModal}
-        onClose={() => setViewModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        style={{ width: "100%", overflow: "auto" }}
-      >
-        <Box sx={modalStyle}>
-          <Box sx={modalHeaderStyle}>
-            <Typography
-              sx={{ fontWeight: "bold" }}
-              id="modal-modal-title"
-              variant="h5"
-              component="h2"
-              fontFamily="Poppins"
-              color="white"
+          </DashBoardTemplate>
+        ) : (
+          <DashBoardTemplate title="Manage Reservations">
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+                fontFamily: "Poppins",
+              }}
+            ></div>
+            <br></br>
+            <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
             >
-              Booking Details
-            </Typography>
-          </Box>
-
-          <Box p={4}>
-            {viewDetails.status === "Cancelled" ? (
-              <>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Title:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.description}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Reference No:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.referenceNo}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Computers:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.computers}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Start Time:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.startTime}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    End Time:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.endTime}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Status:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.status}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Venue:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.venue}
-                  </Typography>
-                </Box>
-                <br></br>
-                <Typography
-                  fontWeight="bold"
-                  marginTop="0px"
-                  fontFamily="Oswald"
-                  backgroundColor="black"
-                  sx={{ float: "left", transform: "rotate(-5deg)" }}
-                  p="5px 10px 5px 10px"
-                  color="white"
-                >
-                  Attendees
-                </Typography>
-                <List
-                  className="userList"
-                  dense={true}
-                  style={{
-                    maxHeight: "150px",
-                    width: "100%",
-                    overflow: "auto",
-                  }}
-                >
-                  {attendeeList.map((item, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem m={0} key={index}>
-                        <ListItemText
-                          fontSize="12px"
-                          primary={item.name}
-                          // secondary={secondary ? 'Secondary text' : null}
-                        />
-                      </ListItem>
-                      <Divider />
-                    </React.Fragment>
-                  ))}
-                </List>
-                <Box
-                  sx={{
-                    margin: "10px 15px 15px 10px",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                ></Box>
-              </>
-            ) : (
-              <>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Title:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.description}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Reference No:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.referenceNo}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Computers:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.computers}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Start Time:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.startTime}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    End Time:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.endTime}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Status:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.status}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    Venue:
-                  </Typography>
-                  <Typography
-                    fontWeight="bold"
-                    marginBottom="5px"
-                    fontFamily="Roboto Slab"
-                  >
-                    {viewDetails.venue}
-                  </Typography>
-                </Box>
-                <br></br>
-                <Typography
-                  fontWeight="bold"
-                  marginTop="0px"
-                  fontFamily="Oswald"
-                  backgroundColor="black"
-                  sx={{ float: "left", transform: "rotate(-5deg)" }}
-                  p="5px 10px 5px 10px"
-                  color="white"
-                >
-                  Attendees
-                </Typography>
-                <List
-                  className="userList"
-                  dense={true}
-                  style={{
-                    maxHeight: "150px",
-                    width: "100%",
-                    overflow: "auto",
-                  }}
-                >
-                  {attendeeList.map((item, index) => (
-                    <React.Fragment key={index}>
-                      <ListItem m={0} key={index}>
-                        <ListItemText
-                          fontSize="12px"
-                          primary={item.name}
-                          // secondary={secondary ? 'Secondary text' : null}
-                        />
-                      </ListItem>
-                      <Divider />
-                    </React.Fragment>
-                  ))}
-                </List>
-                <Typography
-                  sx={{ paddingLeft: 2, color: "darkred" }}
-                  fontFamily="Poppins"
-                >
-                  Note: 30% of cost as cancellation fee
-                </Typography>
-                <Box
-                  sx={{
-                    margin: "10px 15px 15px 10px",
-                    display: "flex",
-                    justifyContent: "flex-end",
-                  }}
-                >
-                  <Button
-                    sx={ButtonStyle1}
-                    variant="contained"
-                    onClick={() => {
-                      setCancelModal(true);
-                      setViewModal(false);
+              <Box
+                sx={{
+                  p: "0px 0px 0px 0px",
+                }}
+                maxWidth="90%"
+              >
+                <div>
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      border: "3px solid rgba(0, 0, 0, 0.05)",
+                      marginLeft: "745px",
+                      alignItems: "center",
+                      paddingLeft: 2,
+                      backgroundColor: "white",
                     }}
                   >
-                    Cancel Booking
-                  </Button>
-                </Box>
-              </>
-            )}
-          </Box>
-        </Box>
-      </Modal>
+                    <SearchIconWrapper>
+                      <SearchIcon />
+                    </SearchIconWrapper>
+                    <StyledInputBase
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={handleSearchTextChange}
+                      inputProps={{ "aria-label": "search" }}
+                    />
+                  </Box>
+                </div>
+                <div style={{ display: "flex", marginBottom: "20px" }}>
+                  <ButtonGroup>
+                    <Button
+                      sx={
+                        statusSelected === "Cancelled"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => setStatusSelected("Cancelled")}
+                    >
+                      CANCELLED
+                    </Button>
+                    <Button
+                      sx={
+                        statusSelected === "No Show"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => setStatusSelected("No Show")}
+                    >
+                      NO SHOW
+                    </Button>
+                    <Button
+                      sx={
+                        statusSelected === "All"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => setStatusSelected("All")}
+                    >
+                      ALL
+                    </Button>
+                  </ButtonGroup>
+                </div>
 
-      {/* Are you sure you want to cancel */}
-      <Modal
-        disableAutoFocus={true}
-        open={cancelModal}
-        onEn
-        onClose={() => setCancelModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        style={{ width: "100%", overflow: "auto" }}
-      >
-        <Box sx={modalStyle}>
-          <Box sx={modalHeaderStyle}>
-            <Typography
-              sx={{ fontWeight: "bold" }}
-              id="modal-modal-title"
-              variant="h5"
-              component="h2"
-              fontFamily="Poppins"
-              color="white"
-            >
-              Are you sure you want to cancel?
-            </Typography>
-          </Box>
-          <Box p={4}>
-            {role === "user" ? (
-              <Box>
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <ButtonGroup>
+                    <Button
+                      sx={
+                        venueSelected === "Coworking Space"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => {
+                        setVenueSelected("Coworking Space");
+                        setVenueId(1);
+                      }}
+                    >
+                      CO-WORKING SPACE
+                    </Button>
+                    <Button
+                      sx={
+                        venueSelected === "Conference Room A"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => {
+                        setVenueSelected("Conference Room A");
+                        setVenueId(2);
+                      }}
+                    >
+                      CONFERENCE A
+                    </Button>
+                    <Button
+                      sx={
+                        venueSelected === "Conference Room B"
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => {
+                        setVenueSelected("Conference Room B");
+                        setVenueId(3);
+                      }}
+                    >
+                      CONFERENCE B
+                    </Button>
+                  </ButtonGroup>
+                </div>
+                <TableContainer>
+                  <Table
+                    style={{
+                      width: 1000,
+                      textAlign: "center",
+                      fontFamily: "Poppins",
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <StyledTableCell align="center">
+                          Reference No.
+                        </StyledTableCell>
+                        <StyledTableCell>Title</StyledTableCell>
+                        <StyledTableCell>Date</StyledTableCell>
+                        <StyledTableCell>Start</StyledTableCell>
+                        <StyledTableCell>End</StyledTableCell>
+                        <StyledTableCell>Venue</StyledTableCell>
+                        <StyledTableCell></StyledTableCell>
+                        <StyledTableCell></StyledTableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {/* admin*/}
+                      {filteredEvents
+                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                        .map((event, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell>
+                              WIL{event.referenceNo.toUpperCase()}
+                            </StyledTableCell>
+                            <StyledTableCell component="th" scope="row">
+                              {event.description}
+                            </StyledTableCell>
+                            <StyledTableCell>{event.date}</StyledTableCell>
+                            <StyledTableCell>{event.startTime}</StyledTableCell>
+                            <StyledTableCell>{event.endTime}</StyledTableCell>
+                            <StyledTableCell>{event.venue}</StyledTableCell>
+                            <StyledTableCell>
+                              <Button
+                                sx={ButtonStyle1}
+                                onClick={() => {
+                                  handleView(event.id);
+                                  // axios
+                                  //   .get(
+                                  //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                  //   )
+                                  //   .then((res) => {
+                                  //     setRefresh(!refresh);
+                                  //     setAttendeeList(res.data);
+                                  //   });
+                                }}
+                              >
+                                View
+                              </Button>
+                            </StyledTableCell>
+                            {statusSelected === "All" ? (
+                              <StyledTableCell align="center">
+                                <Button
+                                  sx={ButtonStyle2}
+                                  onClick={() => {
+                                    setEditModal(true);
+                                    setTempId(event.id);
+                                    //alert(event.id);
+                                  }}
+                                >
+                                  Edit
+                                </Button>
+                              </StyledTableCell>
+                            ) : (
+                              // <StyledTableCell align="center">
+                              //    <Button
+                              //     sx={{
+                              //       ...ButtonStyle1,
+                              //       backgroundColor: "#ff595e",
+                              //     }}
+                              //   >
+                              //     Review
+                              //   </Button>
+                              //   </StyledTableCell>
+                              <div></div>
+                            )}
+                          </StyledTableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    component="div"
+                    count={filteredEvents.length}
+                    page={page}
+                    onPageChange={handlePageChange}
+                    rowsPerPage={rowsPerPage}
+                    onRowsPerPageChange={handleRowsPerPageChange}
+                    labelRowsPerPage=""
+                  />
+                </TableContainer>
+              </Box>
+            </Box>
+          </DashBoardTemplate>
+        )}
+
+        <Modal
+          disableAutoFocus={true}
+          open={viewModal}
+          onClose={() => setViewModal(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          style={{ width: "100%", overflow: "auto" }}
+        >
+          <Box sx={modalStyle}>
+            <Box sx={modalHeaderStyle}>
+              <Typography
+                sx={{ fontWeight: "bold" }}
+                id="modal-modal-title"
+                variant="h5"
+                component="h2"
+                fontFamily="Poppins"
+                color="white"
+              >
+                Booking Details
+              </Typography>
+            </Box>
+
+            <Box p={4}>
+              {viewDetails.status === "Cancelled" ? (
+                <>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Title:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.description}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Reference No:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.referenceNo}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Computers:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.computers}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Start Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.startTime}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      End Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.endTime}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Status:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.status}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Venue:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.venue}
+                    </Typography>
+                  </Box>
+                  <br></br>
                   <Typography
                     fontWeight="bold"
-                    marginBottom="5px"
+                    marginTop="0px"
+                    fontFamily="Oswald"
+                    backgroundColor="black"
+                    sx={{ float: "left", transform: "rotate(-5deg)" }}
+                    p="5px 10px 5px 10px"
+                    color="white"
+                  >
+                    Attendees
+                  </Typography>
+                  <List
+                    className="userList"
+                    dense={true}
+                    style={{
+                      maxHeight: "150px",
+                      width: "100%",
+                      overflow: "auto",
+                    }}
+                  >
+                    {attendeeList.map((item, index) => (
+                      <React.Fragment key={index}>
+                        <ListItem m={0} key={index}>
+                          <ListItemText
+                            fontSize="12px"
+                            primary={item.name}
+                            // secondary={secondary ? 'Secondary text' : null}
+                          />
+                        </ListItem>
+                        <Divider />
+                      </React.Fragment>
+                    ))}
+                  </List>
+                  <Box
+                    sx={{
+                      margin: "10px 15px 15px 10px",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  ></Box>
+                </>
+              ) : (
+                <>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Title:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.description}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Reference No:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.referenceNo}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Computers:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.computers}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Start Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.startTime}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      End Time:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.endTime}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Status:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.status}
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      Venue:
+                    </Typography>
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Roboto Slab"
+                    >
+                      {viewDetails.venue}
+                    </Typography>
+                  </Box>
+                  <br></br>
+                  <Typography
+                    fontWeight="bold"
+                    marginTop="0px"
+                    fontFamily="Oswald"
+                    backgroundColor="black"
+                    sx={{ float: "left", transform: "rotate(-5deg)" }}
+                    p="5px 10px 5px 10px"
+                    color="white"
+                  >
+                    Attendees
+                  </Typography>
+                  <List
+                    className="userList"
+                    dense={true}
+                    style={{
+                      maxHeight: "150px",
+                      width: "100%",
+                      overflow: "auto",
+                    }}
+                  >
+                    {attendeeList.map((item, index) => (
+                      <React.Fragment key={index}>
+                        <ListItem m={0} key={index}>
+                          <ListItemText
+                            fontSize="12px"
+                            primary={item.name}
+                            // secondary={secondary ? 'Secondary text' : null}
+                          />
+                        </ListItem>
+                        <Divider />
+                      </React.Fragment>
+                    ))}
+                  </List>
+                  <Typography
+                    sx={{ paddingLeft: 2, color: "darkred" }}
                     fontFamily="Poppins"
                   >
-                    Cost of Cancellation: 10
+                    Note: 30% of cost as cancellation fee
                   </Typography>
+                  <Box
+                    sx={{
+                      margin: "10px 15px 15px 10px",
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <Button
+                      sx={ButtonStyle1}
+                      variant="contained"
+                      onClick={() => {
+                        setCancelModal(true);
+                        setViewModal(false);
+                      }}
+                    >
+                      Cancel Booking
+                    </Button>
+                  </Box>
+                </>
+              )}
+            </Box>
+          </Box>
+        </Modal>
+
+        {/* Are you sure you want to cancel */}
+        <Modal
+          disableAutoFocus={true}
+          open={cancelModal}
+          onEn
+          onClose={() => setCancelModal(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          style={{ width: "100%", overflow: "auto" }}
+        >
+          <Box sx={modalStyle}>
+            <Box sx={modalHeaderStyle}>
+              <Typography
+                sx={{ fontWeight: "bold" }}
+                id="modal-modal-title"
+                variant="h5"
+                component="h2"
+                fontFamily="Poppins"
+                color="white"
+              >
+                Are you sure you want to cancel?
+              </Typography>
+            </Box>
+            <Box p={4}>
+              {user?.role === "user" ? (
+                <Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Typography
+                      fontWeight="bold"
+                      marginBottom="5px"
+                      fontFamily="Poppins"
+                    >
+                      Cost of Cancellation: 10
+                    </Typography>
+                  </Box>
+                  <Box
+                    sx={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={() => cancelBooking(tempId)}
+                    >
+                      Yes{" "}
+                    </Button>
+                    <Button variant="contained">Pay</Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => {
+                        setViewModal(true);
+                        setViewModal(false);
+                        setCancelModal(false);
+                      }}
+                    >
+                      No
+                    </Button>
+                  </Box>
                 </Box>
+              ) : (
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button
                     variant="contained"
                     onClick={() => cancelBooking(tempId)}
                   >
-                    Yes{" "}
+                    Yes
                   </Button>
-                  <Button variant="contained">Pay</Button>
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setViewModal(true);
                       setViewModal(false);
                       setCancelModal(false);
                     }}
@@ -1206,99 +1246,80 @@ export default function MyReservations(props) {
                     No
                   </Button>
                 </Box>
-              </Box>
-            ) : (
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Button
-                  variant="contained"
-                  onClick={() => cancelBooking(tempId)}
-                >
-                  Yes
-                </Button>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setViewModal(false);
-                    setCancelModal(false);
-                  }}
-                >
-                  No
-                </Button>
-              </Box>
-            )}
+              )}
+            </Box>
           </Box>
-        </Box>
-      </Modal>
+        </Modal>
 
-      {/*Edit Modal */}
-      <Modal
-        disableAutoFocus={true}
-        open={editModal}
-        onClose={() => setEditModal(false)}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-        style={{ width: "100%", overflow: "auto" }}
-      >
-        <Box sx={modalStyle}>
-          <Box sx={modalHeaderStyle}>
-            <Typography
-              sx={{ fontWeight: "bold" }}
-              id="modal-modal-title"
-              variant="h5"
-              component="h2"
-              fontFamily="Poppins"
-              color="white"
-            >
-              Edit Booking Details
-            </Typography>
-          </Box>
-          <Box p={4}>
-            <TextField
-              name="title"
-              value={booking.current.title}
-              onChange={(e) => handleChange(e)}
-              sx={{ width: "100%" }}
-              id="outlined-basic"
-              label="Title"
-              variant="standard"
-              inputProps={{ maxLength: 50 }}
-            />
-            <FormControl variant="standard" sx={{ minWidth: "100%" }}>
-              <InputLabel id="demo-simple-select-filled-label">
-                Purpose
-              </InputLabel>
-              <Select
-                value={booking.current.purpose}
-                onChange={props.handleChange}
-                labelId="demo-simple-select-standard-label"
-                id="demo-simple-select-standard"
-                label="Purpose"
-                name="purpose"
+        {/*Edit Modal */}
+        <Modal
+          disableAutoFocus={true}
+          open={editModal}
+          onClose={() => setEditModal(false)}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+          style={{ width: "100%", overflow: "auto" }}
+        >
+          <Box sx={modalStyle}>
+            <Box sx={modalHeaderStyle}>
+              <Typography
+                sx={{ fontWeight: "bold" }}
+                id="modal-modal-title"
+                variant="h5"
+                component="h2"
+                fontFamily="Poppins"
+                color="white"
               >
-                {/* <MenuItem value="Purpose">
+                Edit Booking Details
+              </Typography>
+            </Box>
+            <Box p={4}>
+              <TextField
+                name="title"
+                value={booking.current.title}
+                onChange={(e) => handleChange(e)}
+                sx={{ width: "100%" }}
+                id="outlined-basic"
+                label="Title"
+                variant="standard"
+                inputProps={{ maxLength: 50 }}
+              />
+              <FormControl variant="standard" sx={{ minWidth: "100%" }}>
+                <InputLabel id="demo-simple-select-filled-label">
+                  Purpose
+                </InputLabel>
+                <Select
+                  value={booking.current.purpose}
+                  onChange={props.handleChange}
+                  labelId="demo-simple-select-standard-label"
+                  id="demo-simple-select-standard"
+                  label="Purpose"
+                  name="purpose"
+                >
+                  {/* <MenuItem value="Purpose">
               <em>None</em>
              </MenuItem> */}
-                <MenuItem value={"Studying"}>Studying</MenuItem>
-                <MenuItem value={"Playing"}>Playing</MenuItem>
-                <MenuItem value={"Meeting"}>Meeting</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
-              </Select>
-            </FormControl>
+                  <MenuItem value={"Studying"}>Studying</MenuItem>
+                  <MenuItem value={"Playing"}>Playing</MenuItem>
+                  <MenuItem value={"Meeting"}>Meeting</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                  <MenuItem value={"Other"}>Other</MenuItem>
+                </Select>
+              </FormControl>
 
-            <TextField
+              {/* <TextField
               name="officeName"
               sx={{ width: "100%" }}
               id="outlined-basic"
               label="Office Name"
               variant="standard"
               inputProps={{ maxLength: 20 }}
-            />
-            {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
+            /> */}
+              {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
               <TextField
                 name="computers"
                 type="number"
@@ -1317,25 +1338,25 @@ export default function MyReservations(props) {
                 autoFocus={false}
               />
             </Box> */}
-            <Button
-              variant="contained"
-              onClick={() => {
-                // if()
-                setViewModal(false);
-                setCancelModal(false);
-                setAttendeesModal(true);
-                editBooking(tempId);
-              }}
-              sx={{ ...ButtonStyle1, marginLeft: "260px", marginTop: "20px" }}
-            >
-              Save
-            </Button>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  // if()
+                  setViewModal(false);
+                  setCancelModal(false);
+                  setAttendeesModal(true);
+                  editBooking(tempId);
+                }}
+                sx={{ ...ButtonStyle1, marginLeft: "260px", marginTop: "20px" }}
+              >
+                Save
+              </Button>
+            </Box>
           </Box>
-        </Box>
-      </Modal>
+        </Modal>
 
-      {/*Attendees Edit*/}
-      {/* <Modal
+        {/*Attendees Edit*/}
+        {/* <Modal
         disableAutoFocus={true}
         open={attendeesModal}
         onClose={() => setAttendeesModal(false)}
@@ -1358,7 +1379,7 @@ export default function MyReservations(props) {
           </Box>
           <Box p={4}>
             <Box sx={{ display: "flex", marginTop: "20px" }}> */}
-              {/* <TextField
+        {/* <TextField
                 sx={{ width: "100%", marginRight: "20px" }}
                 id="outlined-basic"
                 placeholder="Enter Name or Id"
@@ -1464,12 +1485,12 @@ export default function MyReservations(props) {
                       </IconButton>
                     }
                   > */}
-                    {/* <ListItemAvatar>
+        {/* <ListItemAvatar>
                   <Avatar>
                     <PersonIcon></PersonIcon>
                   </Avatar>
                 </ListItemAvatar> */}
-                    {/* <ListItemText
+        {/* <ListItemText
                       primary={item.name}
                       secondary={
                         item.existing === true ? (
@@ -1502,6 +1523,7 @@ export default function MyReservations(props) {
           </Box>
         </Box>
       </Modal> */}
-    </div>
-  );
+      </div>
+    );
+  }
 }
