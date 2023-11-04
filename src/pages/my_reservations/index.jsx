@@ -137,7 +137,7 @@ export default function MyReservations(props) {
     booking.current = tempBooking;
     setRefresh(!refresh);
   };
-
+  
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
@@ -216,7 +216,19 @@ export default function MyReservations(props) {
     setSearchText(searchText);
     if (searchText === "") {
       // if empty dipslay all events
-      setFilteredEvents(events);
+      const filtered = events.filter((item) => {
+        return (
+          (item.venue === venueId &&
+            item.description
+              .toLowerCase()
+              .includes(searchText.toLowerCase())) ||
+          (item.venue === venueId &&
+            item.date.toString().includes(searchText)) ||
+          (item.venue === venueId &&
+            item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+        );
+      });
+      setFilteredEvents(filtered);
     } else {
       const filtered = events.filter((item) => {
         return (
@@ -274,22 +286,22 @@ export default function MyReservations(props) {
         });
     }
     if (timeSelected === "Upcoming" && user?.role === "user") {
-      axios
-        .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.id}`)
-        .then((response) => {
-          setEvents(response.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching no show bookings:", error);
-        });
+      axios.
+      get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.id}/`)
+      .then((response) => {
+        setEvents(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching upcoming bookings:", error);
+      });
     } else if (timeSelected === "History" && user?.role === "user") {
       axios
-        .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.id}`)
+        .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.id}/`)
         .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
-          console.error("Error fetching no show bookings:", error);
+          console.error("Error fetching history bookings:", error);
         });
     }
   }, [statusSelected, timeSelected]);
