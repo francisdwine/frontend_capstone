@@ -140,36 +140,36 @@ export default function MyReservations(props) {
 
   //display bookings
   const [events, setEvents] = useState([]);
-  React.useEffect(() => {
-    if (user?.role === "admin") {
-      axios.get(`${BASE_URL}/api/getAllBookings/`).then((res) => {
-        setEventData(res.data);
-        setEvents(res.data);
-        // ...
-      });
-      // } else if (role === "user") {
-      //   setUser({id:1,
-      //             username: "francis",})
-      //   axios
-      //     .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
-      //     .then((res) => {
-      //       setEventData(res.data);
-      //       setEvents(
-      //         // res?.data.map((item) => {
-      //         //   return {
-      //         //     id: item?.id,
-      //         //     title: item?.description,
-      //         //     date: item?.date,
-      //         //     start: item?.startTime,
-      //         //     end: item?.endTime,
-      //         //     venue: item?.venue,
-      //         //   };
-      //         // })
-      //         res.data
-      //       );
-      //     });
-    }
-  }, [bookingsRefresher]);
+  // React.useEffect(() => {
+  //   if (user?.role === "admin") {
+  //     axios.get(`${BASE_URL}/api/getAllBookings/`).then((res) => {
+  //       setEventData(res.data);
+  //       setEvents(res.data);
+  //       // ...
+  //     });
+  //     // } else if (role === "user") {
+  //     //   setUser({id:1,
+  //     //             username: "francis",})
+  //     //   axios
+  //     //     .get(`http://localhost:8000/api/getAllUserBooking/${user.id}`)
+  //     //     .then((res) => {
+  //     //       setEventData(res.data);
+  //     //       setEvents(
+  //     //         // res?.data.map((item) => {
+  //     //         //   return {
+  //     //         //     id: item?.id,
+  //     //         //     title: item?.description,
+  //     //         //     date: item?.date,
+  //     //         //     start: item?.startTime,
+  //     //         //     end: item?.endTime,
+  //     //         //     venue: item?.venue,
+  //     //         //   };
+  //     //         // })
+  //     //         res.data
+  //     //       );
+  //     //     });
+  //   }
+  // }, [bookingsRefresher]);
 
   const cancelBooking = () => {
     axios
@@ -206,8 +206,14 @@ export default function MyReservations(props) {
   ]);
 
   useEffect(() => {
+    
     const filtered = events.filter((item) => item.venue === venueId);
-    setFilteredEvents(filtered);
+    
+      setFilteredEvents(filtered);
+    
+   
+    
+    
   }, [venueId, events]);
 
     //searchbar
@@ -246,6 +252,8 @@ export default function MyReservations(props) {
   // );
 
   useEffect(() => {
+   
+  
     if (statusSelected === "Cancelled" && user?.role === "admin") {
       axios
         .get(`${BASE_URL}/api/getAllCancelledBookings/`)
@@ -275,9 +283,10 @@ export default function MyReservations(props) {
         });
     }
     if (timeSelected === "Upcoming" && user?.role === "user") {
+     
       axios
-        .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.id}`)
-        .then((response) => {
+        .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.user_id}/`)
+        .then((response) => {          
           setEvents(response.data);
         })
         .catch((error) => {
@@ -285,15 +294,17 @@ export default function MyReservations(props) {
         });
     } else if (timeSelected === "History" && user?.role === "user") {
       axios
-        .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.id}`)
+        .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.user_id}/`)
         .then((response) => {
+          
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching no show bookings:", error);
         });
     }
-  }, [statusSelected, timeSelected]);
+    
+  }, [statusSelected, timeSelected,bookingsRefresher]);
   const addAttendee = () => {
     let isExisting = false;
     let id = null;

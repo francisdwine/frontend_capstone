@@ -64,7 +64,7 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 
 const maxComputers = 10;
 export default function Calendar(props) {
-  let { user, setUser,authenticated } = useContext(AuthContext);
+  let { user, setUser, authenticated } = useContext(AuthContext);
 
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
@@ -74,12 +74,17 @@ export default function Calendar(props) {
   const [info, setInfo] = useState({});
 
   const submitBooking = () => {
-    setAttendeeList([
-      ...attendeeList,
-      { user_id: user?.id, name: user?.username },
-    ]);
+    // setAttendeeList(attendeeList=>[
+    //   ...attendeeList,
+    //   { user_id: 1, name: "wind"}
+    // ]);
+    if(booking.current.officeName===""||booking.current.officeName===" "||booking.current.officeName===null){
+      booking.current.officeName="none"
+    }
+    console.log(booking.current);
     axios
       .post("http://localhost:8000/api/createBooking/", {
+        officeName: booking.current.officeName,
         purpose: booking.current.purpose,
         description: booking.current.description,
         venue: venueId,
@@ -89,14 +94,18 @@ export default function Calendar(props) {
         computers: booking.current.computers,
         coins: booking.current.coins,
         points: booking.current.points,
-        user: user?.username,
-        officeName: booking.current.officeName,
-        user_id: user?.id,
-        attendees: [...attendeeList, { user_id: user?.id, name: user?.username }],
+        user: user.username,
+
+        user_id: user.user_id,
+        attendees: [
+          ...attendeeList,
+          { name: user.username, user_id: user.user_id },
+        ],
       })
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         alert("booking created");
+        setAttendeeList([]);
       });
   };
   //data to send
@@ -130,7 +139,6 @@ export default function Calendar(props) {
 
   //init page
   React.useEffect(() => {
-    
     axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
       setFakeUserDb(res?.data);
     });
@@ -216,8 +224,8 @@ export default function Calendar(props) {
     computers: 0,
     coins: 0,
     points: 0,
-    user_id: user?.id,
-    officeName: "",
+    user_id: user?.user_id,
+    officeName: " ",
     attendees: [],
   });
 
@@ -238,7 +246,7 @@ export default function Calendar(props) {
     ]);
   };
   //to handle security
-  if (user===null) {
+  if (user === null) {
     navigate("/login");
   } else {
     return (
@@ -336,13 +344,49 @@ export default function Calendar(props) {
                     var startTime = dateSplitted[1].split("+")[0];
                     var dateSplitted2 = info.endStr.split("T");
                     var endTime = dateSplitted2[1].split("+")[0];
-                    var tempBooking = booking.current;
-                    tempBooking.startTime = startTime;
-                    tempBooking.endTime = endTime;
-                    tempBooking.date = startDate;
-                    tempBooking.venue = venueSelected;
-                    booking.current = tempBooking;
-                    setOpenModal1(true);
+                    //kwaon duration sa booking
+                    var startTimeSeconds = startTime
+                      .split(":")
+                      .reduce((acc, time) => 60 * acc + +time);
+                    var endTimeSeconds = endTime
+                      .split(":")
+                      .reduce((acc, time) => 60 * acc + +time);
+                    var hoursDuration =
+                      (endTimeSeconds - startTimeSeconds) / (60 * 60);
+                    var totalDuration = 0;
+                    axios
+                      .post(`http://localhost:8000/api/getDurations/`, {
+                        id: user?.user_id,
+                        date: startDate,
+                      })
+                      .then((response) => {
+                        totalDuration = response.data.duration;
+                        var limit = 3 - totalDuration;
+                        console.log("limit "+limit)
+                        console.log(hoursDuration);
+                        if (user?.role === "user") {
+                          if (hoursDuration > limit || limit < 0) {
+                            alert(
+                              "you have exceeded the limit of 3 hours booking per week"
+                            );
+                            return null;
+                          }
+                        }
+
+                        console.log(hoursDuration);
+                        var tempBooking = booking.current;
+                        tempBooking.startTime = startTime;
+                        tempBooking.endTime = endTime;
+                        tempBooking.date = startDate;
+                        tempBooking.venue = venueSelected;
+                        booking.current = tempBooking;
+                        console.log(booking.current);
+                        setOpenModal1(true);
+                      })
+                      .catch((error) => {
+                        console.error("error getting duration:", error);
+                        return null;
+                      });
                   }
                 }}
                 //function para ig click ug usa ka event
@@ -379,7 +423,7 @@ export default function Calendar(props) {
                 allDaySlot={false}
                 initialView="timeGridWeek"
                 aspectRatio={25.0}
-                weekends={true}
+                
                 //events data
 
                 eventContent={renderEventContent}
@@ -391,6 +435,8 @@ export default function Calendar(props) {
                 eventTextColor="black"
                 height="100"
                 contentHeight="auto"
+                weekends={false}
+                
               ></FullCalendar>
             </Box>
 
@@ -881,20 +927,11 @@ export default function Calendar(props) {
                   <Button
                     onClick={() => {
                       setOpenModal3(false);
-                      booking.current = {
-                        purpose: "Studying",
-                        description: "",
-                        startTime: "",
-                        venue: "",
-                        endTime: "",
-                        date: "",
-                        computers: 0,
-                        coins: 0,
-                        points: 0,
-                        user_id: user?.id,
-                        officeName: "",
-                        attendees: [],
-                      };
+                      booking.current.coins = cost;
+                      submitBooking();
+                      booking.current.coins = 0;
+                      booking.current.points = 0;
+                      setCost(0);
                       setAttendeeList([]);
                     }}
                     sx={ButtonStyle1}
@@ -903,8 +940,14 @@ export default function Calendar(props) {
                   </Button>
                   <Button
                     onClick={() => {
+                      booking.current.points = cost;
                       submitBooking();
+                      booking.current.coins = 0;
+                      booking.current.points = 0;
+                      setCost(0);
+
                       setOpenModal3(false);
+                      setAttendeeList([]);
                     }}
                     variant="contained"
                     margin="0px"
@@ -928,7 +971,7 @@ export default function Calendar(props) {
                       computers: 0,
                       coins: 0,
                       points: 0,
-                      user_id: user?.id,
+                      user_id: user?.user_id,
                       officeName: "",
                       attendees: [],
                     };
@@ -1102,7 +1145,7 @@ export default function Calendar(props) {
               ></Typography>
             </Box>
 
-            {user?.role === "user" && user?.id === info.user_id ? (
+            {user?.role === "user" && user?.user_id === info.user_id ? (
               <Box
                 sx={{
                   margin: "10px 15px 15px 10px",
