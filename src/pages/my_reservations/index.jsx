@@ -1158,12 +1158,14 @@ export default function MyReservations(props) {
                       </React.Fragment>
                     ))}
                   </List>
-                  <Typography
-                    sx={{ paddingLeft: 2, color: "darkred" }}
-                    fontFamily="Poppins"
-                  >
-                    Note: 30% of cost as cancellation fee
-                  </Typography>
+                  {timeSelected !== "History" && user?.role == "user" &&(
+                       <Typography
+                       sx={{ paddingLeft: 2, color: "darkred" }}
+                       fontFamily="Poppins"
+                     >
+                       Note: 30% of cost as cancellation fee
+                     </Typography>
+                    )}
                   <Box
                     sx={{
                       margin: "10px 15px 15px 10px",
@@ -1171,16 +1173,18 @@ export default function MyReservations(props) {
                       justifyContent: "flex-end",
                     }}
                   >
-                    <Button
-                      sx={ButtonStyle1}
-                      variant="contained"
-                      onClick={() => {
-                        setCancelModal(true);
-                        setViewModal(false);
-                      }}
-                    >
-                      Cancel Booking
-                    </Button>
+                    {timeSelected !== "History" && (
+                      <Button
+                        sx={ButtonStyle1}
+                        variant="contained"
+                        onClick={() => {
+                          setCancelModal(true);
+                          setViewModal(false);
+                        }}
+                      >
+                        Cancel Booking
+                      </Button>
+                    )}
                   </Box>
                 </>
               )}
@@ -1198,7 +1202,12 @@ export default function MyReservations(props) {
           aria-describedby="modal-modal-description"
           style={{ width: "100%", overflow: "auto" }}
         >
-          <Box sx={modalStyle}>
+          <Box
+            sx={{
+              ...modalStyle,
+              width: { lg: 500, xs: 350, sm: 500, md: 500, xl: 500 },
+            }}
+          >
             <Box sx={modalHeaderStyle}>
               <Typography
                 sx={{ fontWeight: "bold" }}
@@ -1208,20 +1217,25 @@ export default function MyReservations(props) {
                 fontFamily="Poppins"
                 color="white"
               >
-                Are you sure you want to cancel?
+                Cancel Booking
               </Typography>
             </Box>
             <Box p={4}>
               {user?.role === "user" ? (
                 <Box>
                   <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
+                    sx={{ display: "column", justifyContent: "space-between" }}
                   >
                     <Typography
                       fontWeight="bold"
-                      marginBottom="5px"
+                      marginBottom="10px"
                       fontFamily="Poppins"
+                      fontSize="25px"
                     >
+                      Are you sure you want to cancel?
+                    </Typography>
+
+                    <Typography marginBottom="15px" fontFamily="Poppins">
                       Cost of Cancellation: 10
                     </Typography>
                   </Box>
@@ -1229,13 +1243,23 @@ export default function MyReservations(props) {
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
                       variant="contained"
                       onClick={() => cancelBooking(tempId)}
                     >
-                      Yes{" "}
+                      Pay{" "}
                     </Button>
-                    <Button variant="contained">Pay</Button>
+                    {/* <Button variant="contained">Pay</Button> */}
                     <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
                       variant="contained"
                       onClick={() => {
                         setViewModal(true);

@@ -37,7 +37,7 @@ export default function Attendance(props) {
 
   const handleSave = () => {
     const data = { name: name };
-    axios.post(`${BASE_URL}/api/logAttendance/${data}`)
+    axios.post(`${BASE_URL}/api/logAttendance/`, data)
       .then((response) => {
         if (response.data.state === "login") {
           console.log("Data saved successfully", response.data);

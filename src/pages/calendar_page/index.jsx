@@ -165,7 +165,7 @@ export default function Calendar(props) {
   // cancelled bookings
   const cancelBooking = () => {
     axios
-      .get(`${BASE_URL}/api/cancelBooking/${tempId}/`)
+      .get(`${BASE_URL}/api/cancelBooking/${tempId}`)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
         setCancelModal(false);
@@ -188,7 +188,7 @@ export default function Calendar(props) {
     };
 
     axios
-      .post(`${BASE_URL}/api/calculateCost/${costData}/`)
+      .post(`http://localhost:8000/api/calculateCost/`, costData)
       .then((response) => {
         //contain the calculated cost
         const calculatedCost = response.data.cost; // Adjust this based on your server response
@@ -639,11 +639,11 @@ export default function Calendar(props) {
                       secondary={
                         item.existing === true ? (
                           <Typography fontSize={14} color="green">
-                            Existing User:Yes{" "}
+                            {/* Existing User:Yes{" "} */}
                           </Typography>
                         ) : (
                           <Typography fontSize={14} color="#555555">
-                            Existing User:No{" "}
+                            {/* Existing User:No{" "} */}
                           </Typography>
                         )
                       }
@@ -724,14 +724,14 @@ export default function Calendar(props) {
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                   fontSize={15}
                 >
                   Venue:
                 </Typography>
                 <Typography
                   fontWeight="bold"
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                   fontSize={15}
                 >
                   {booking.current.venue}
@@ -742,14 +742,14 @@ export default function Calendar(props) {
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                 >
                   Date:
                 </Typography>
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                 >
                   {moment(booking.current.date).format("MMMM D Y")}
                 </Typography>

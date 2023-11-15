@@ -16,6 +16,7 @@ import Login from './pages/login_page';
 
 function App() {
   //const user = useContext(something);
+  document.title="WILMS BOOKING SYSTEM"
   return (
     <div className="App">
      

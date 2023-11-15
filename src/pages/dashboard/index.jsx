@@ -92,17 +92,17 @@ export default function Tracker(props) {
   const [bookingsThisWeek, setBookingsThisWeek] = useState(0);
   const [cancelledBookings, setCancelledBookings] = useState(0);
 
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/api/getBookingStats/`)
-      .then((response) => {
-        setBookingsThisWeek(response.data.bookings_this_week);
-        setCancelledBookings(response.data.cancelled_bookings);
-      })
-      .catch((error) => {
-        console.error("Error fetching booking stats:", error);
-      });
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get(`${BASE_URL}/api/getBookingStats/`)
+  //     .then((response) => {
+  //       setBookingsThisWeek(response.data.bookings_this_week);
+  //       setCancelledBookings(response.data.cancelled_bookings);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching booking stats:", error);
+  //     });
+  // }, []);
 
   const [containerDetails, setContainerDetails] = useState([
     {
@@ -207,7 +207,7 @@ export default function Tracker(props) {
           alignItems: "center",
         }}
       >
-        <Typography
+        {/* <Typography
           sx={{
             paddingRight: 130,
             color: "lightblack",
@@ -218,10 +218,10 @@ export default function Tracker(props) {
           fontFamily="Poppins"
         >
           Overview
-        </Typography>
+        </Typography> */}
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            {/* <Grid item xs={12} sm={6}>
               <Paper
                 elevation={3}
                 sx={{
@@ -239,8 +239,8 @@ export default function Tracker(props) {
                 <h1>{bookingsThisWeek}</h1>
                 <h3>Bookings this week</h3>
               </Paper>
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Grid> */}
+            {/* <Grid item xs={12} sm={6}>
               <Paper
                 elevation={3}
                 sx={{
@@ -258,7 +258,7 @@ export default function Tracker(props) {
                 <h1>{cancelledBookings}</h1>
                 <h2>Cancelled Bookings</h2>
               </Paper>
-            </Grid>
+            </Grid> */}
             <div
               style={{
                 display: "flex",
@@ -273,7 +273,7 @@ export default function Tracker(props) {
                   fontSize: 30,
                   fontWeight: "bold",
                   paddingRight: 100,
-                  marginTop: 0,
+                  marginTop: 5,
                 }}
                 fontFamily="Poppins"
               >
