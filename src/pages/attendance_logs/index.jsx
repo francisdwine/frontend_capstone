@@ -1,5 +1,6 @@
 import DashBoardTemplate from "../containers/dashboard_template";
 import { useState, useEffect } from "react";
+import { BASE_URL } from "../../links";
 
 import {
   Box,
@@ -35,7 +36,7 @@ export default function Logs(props) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/getAllAttendance/")
+      .get(`${BASE_URL}/api/getAllAttendance/`)
       .then((response) => {
         setEvents(response.data);
         setFilteredEvents(response.data);
@@ -44,8 +45,6 @@ export default function Logs(props) {
         console.error("Error fetching data", error);
       });
   }, []);
-
-  //let filteredEvents = events.filter((item) => item.venue === venueId);
 
   useEffect(() => {
     const filtered = events.filter((item) => item.venueName === venueSelected);
@@ -60,10 +59,12 @@ export default function Logs(props) {
       if (searchText === "") { // if empty dipslay all events
         const filtered = events.filter((item) => {
           return (
-            (item.venueName === venueSelected && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
-            (item.venueName === venueSelected && item.date.toString().includes(searchText))
+            (item.venueId ===venueId && item.name.toLowerCase().includes(searchText.toLowerCase()))
+          ||
+            (item.venueId ===venueId&& item.date.toString().includes(searchText))
           );
         });
+        console.log(filtered)
         setFilteredEvents(filtered);
       } else {
         const filtered = events.filter((item) => {

@@ -1,9 +1,8 @@
 import React from "react";
-import DashboardContainer from "../containers/dashboard_container";
 import TextField from "@mui/material/TextField";
-import { Button, Box, Typography, Card, CardMedia,Snackbar,Alert } from "@mui/material";
+import { Button, Box, Typography,Snackbar,Alert } from "@mui/material";
 import { ButtonStyle1, loginstyle, fields, logo } from "./styles";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Wild from "../../images/wild.png";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
@@ -27,11 +26,11 @@ const Login = () => {
   const navigate=useNavigate()
   const [accounts, setAccount] = useState([]);
   const [accountlogin, setAccountlogin] = useState({
-    email: "",
+    username: "",
     password: "",
   });
 
-  const { email, password } = accountlogin;
+  const { username, password } = accountlogin;
   const onInputChange = (e) => {
     setAccountlogin({ ...accountlogin, [e.target.name]: e.target.value });
   };
@@ -73,9 +72,9 @@ const Login = () => {
         </Typography>
         <br /> <br />
         <TextField
-          label={"Email"}
-          id="email"
-          name="email"
+          label={"Username"}
+          id="username"
+          name="username"
           onChange={(e) => onInputChange(e)}
           style={fields}
         />{" "}
@@ -92,7 +91,7 @@ const Login = () => {
         <br />
         <br />
         <Button variant="contained" color="primary" style={ButtonStyle1} onClick={()=>{
-          loginUser(accountlogin.email,accountlogin.password)
+          loginUser(accountlogin.username,accountlogin.password)
         }}>
           Login
         </Button>

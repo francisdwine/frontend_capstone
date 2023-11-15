@@ -1,4 +1,5 @@
 import DashBoardTemplate from "../containers/dashboard_template";
+import { BASE_URL } from "../../links";
 
 import {
   Box,
@@ -11,6 +12,7 @@ import {
   Container,
   CardContent,
   Paper,
+  Card,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
@@ -22,10 +24,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import axios from "axios";
 import * as React from "react";
+import Chart from "chart.js/auto";
+import "chartjs-adapter-date-fns";
 
-import {
-  StyledTableCell, StyledTableRow,
-} from "./styles";
+import { StyledTableCell, StyledTableRow } from "./styles";
 
 //temp deets
 // const containerDetails = [
@@ -67,7 +69,7 @@ import {
 //   },
 // ];
 // const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
-const colors = ["#fecc00",];
+const colors = ["#fecc00", "white"];
 // for Reviews
 const reviews = [
   { label: "Name", value: "John Doe" },
@@ -87,6 +89,20 @@ export default function Tracker(props) {
     dayjs("2022-04-17"),
     dayjs("2022-04-21"),
   ]);
+  const [bookingsThisWeek, setBookingsThisWeek] = useState(0);
+  const [cancelledBookings, setCancelledBookings] = useState(0);
+
+  // useEffect(() => {
+  //   axios
+  //     .get(`${BASE_URL}/api/getBookingStats/`)
+  //     .then((response) => {
+  //       setBookingsThisWeek(response.data.bookings_this_week);
+  //       setCancelledBookings(response.data.cancelled_bookings);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error fetching booking stats:", error);
+  //     });
+  // }, []);
 
   const [containerDetails, setContainerDetails] = useState([
     {
@@ -125,10 +141,10 @@ export default function Tracker(props) {
   useEffect(() => {
     const fetchData = async () => {
       const endpoints = [
-        "http://127.0.0.1:8000/api/getOngoing/",
-        "http://127.0.0.1:8000/api/getExpected/",
-        "http://127.0.0.1:8000/api/getWaiting/",
-        "http://127.0.0.1:8000/api/getOverstaying/",
+        `${BASE_URL}/api/getOngoing/`,
+        `${BASE_URL}/api/getExpected/`,
+        `${BASE_URL}/api/getWaiting/`,
+        `${BASE_URL}/api/getOverstaying/`,
       ];
 
       const updatedContainerDetails = [...containerDetails];
@@ -166,7 +182,7 @@ export default function Tracker(props) {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/getSignedIn/")
+      .get(`${BASE_URL}/api/getSignedIn/`)
       .then((response) => {
         setData(response.data);
       })
@@ -183,43 +199,100 @@ export default function Tracker(props) {
           flexDirection: "column",
           alignItems: "start",
         }}
+      ></div>
+      <Container
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        <Typography
+        {/* <Typography
           sx={{
-            paddingLeft: 2,
+            paddingRight: 130,
             color: "lightblack",
             fontSize: 30,
             fontWeight: "bold",
-            paddingLeft: 10,
-            marginTop: 4,
+            marginBottom: 2,
           }}
           fontFamily="Poppins"
         >
-          Activity Tracker
-        </Typography>
-      </div>
-
-      <Container
-        sx={{
-          minWidth: 100,
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: 2,
-        }}
-      >
+          Overview
+        </Typography> */}
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
-            {containerDetails.map((card, index) => (
-              <Grid key={index} item xs={4} md={3}>
+            {/* <Grid item xs={12} sm={6}>
               <Paper
                 elevation={3}
                 sx={{
-                  width: 243,
-                  height: 260,
-                  backgroundColor: colors[index % colors.length],
-                  marginBottom: 7, 
+                  width: 500,
+                  height: 150,
+                  background: `linear-gradient(to top, ${colors.join(
+                    ", "
+                  )})`,
+                  marginBottom: 5,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
                 }}
               >
+                <h1>{bookingsThisWeek}</h1>
+                <h3>Bookings this week</h3>
+              </Paper>
+            </Grid> */}
+            {/* <Grid item xs={12} sm={6}>
+              <Paper
+                elevation={3}
+                sx={{
+                  width: 500,
+                  height: 150,
+                  background: `linear-gradient(to top, ${colors.join(
+                    ", "
+                  )})`,
+                  marginBottom: 5,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <h1>{cancelledBookings}</h1>
+                <h2>Cancelled Bookings</h2>
+              </Paper>
+            </Grid> */}
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "start",
+              }}
+            >
+              <Typography
+                sx={{
+                  paddingLeft: -200,
+                  color: "lightblack",
+                  fontSize: 30,
+                  fontWeight: "bold",
+                  paddingRight: 100,
+                  marginTop: 5,
+                }}
+                fontFamily="Poppins"
+              >
+                Activity Tracker
+              </Typography>
+            </div>
+            {containerDetails.map((card, index) => (
+              <Grid key={index} item xs={4} md={3}>
+                <Paper
+                  elevation={3}
+                  sx={{
+                    width: 243,
+                    height: 260,
+                    background: `linear-gradient(to bottom, ${colors.join(
+                      ", "
+                    )})`,
+                    marginBottom: 7,
+                  }}
+                >
                   <CardContent>
                     <Typography
                       sx={{
@@ -270,11 +343,10 @@ export default function Tracker(props) {
       >
         <Typography
           sx={{
-            paddingLeft: 2,
+            paddingLeft: 20,
             color: "lightblack",
             fontSize: 30,
             fontWeight: "bold",
-            paddingLeft: 10,
           }}
           fontFamily="Poppins"
         >
@@ -310,10 +382,16 @@ export default function Tracker(props) {
             <TableBody>
               {data.map((row, index) => (
                 <StyledTableRow key={index}>
-                  <StyledTableCell align="center">{row.booking}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.booking}
+                  </StyledTableCell>
                   <StyledTableCell align="center">{row.name}</StyledTableCell>
-                  <StyledTableCell align="center">{row.venueName}</StyledTableCell>
-                  <StyledTableCell align="center">{row.signInTime}</StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.venueName}
+                  </StyledTableCell>
+                  <StyledTableCell align="center">
+                    {row.signInTime}
+                  </StyledTableCell>
                 </StyledTableRow>
               ))}
             </TableBody>

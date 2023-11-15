@@ -1,5 +1,6 @@
 import * as React from "react";
 import DashBoardTemplate from "../containers/dashboard_template";
+import { BASE_URL } from "../../links";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -83,7 +84,7 @@ export default function Calendar(props) {
     }
     console.log(booking.current);
     axios
-      .post("http://localhost:8000/api/createBooking/", {
+      .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
         purpose: booking.current.purpose,
         description: booking.current.description,
@@ -125,7 +126,7 @@ export default function Calendar(props) {
   const handleView = (id) => {
     setTempId(id);
 
-    axios.get(`http://localhost:8000/api/getAttendees/${id}/`).then((res) => {
+    axios.get(`${BASE_URL}/api/getAttendees/${id}/`).then((res) => {
       setBookingAttendees(res.data);
     });
 
@@ -139,14 +140,14 @@ export default function Calendar(props) {
 
   //init page
   React.useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
+    axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
     });
   }, []);
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
-    axios.get("http://localhost:8000/api/currentBookings/").then((res) => {
+    axios.get(`${BASE_URL}/api/currentBookings/`).then((res) => {
       setEventData(res.data);
       setEvents(
         res?.data.map((item) => {
@@ -164,7 +165,7 @@ export default function Calendar(props) {
   // cancelled bookings
   const cancelBooking = () => {
     axios
-      .get(`http://localhost:8000/api/cancelBooking/${tempId}`)
+      .get(`${BASE_URL}/api/cancelBooking/${tempId}`)
       .then(() => {
         setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
         setCancelModal(false);
@@ -355,7 +356,7 @@ export default function Calendar(props) {
                       (endTimeSeconds - startTimeSeconds) / (60 * 60);
                     var totalDuration = 0;
                     axios
-                      .post(`http://localhost:8000/api/getDurations/`, {
+                      .post(`${BASE_URL}/api/getDurations/`, {
                         id: user?.user_id,
                         date: startDate,
                       })
@@ -638,11 +639,11 @@ export default function Calendar(props) {
                       secondary={
                         item.existing === true ? (
                           <Typography fontSize={14} color="green">
-                            Existing User:Yes{" "}
+                            {/* Existing User:Yes{" "} */}
                           </Typography>
                         ) : (
                           <Typography fontSize={14} color="#555555">
-                            Existing User:No{" "}
+                            {/* Existing User:No{" "} */}
                           </Typography>
                         )
                       }
@@ -723,14 +724,14 @@ export default function Calendar(props) {
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                   fontSize={15}
                 >
                   Venue:
                 </Typography>
                 <Typography
                   fontWeight="bold"
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                   fontSize={15}
                 >
                   {booking.current.venue}
@@ -741,14 +742,14 @@ export default function Calendar(props) {
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                 >
                   Date:
                 </Typography>
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
-                  fontFamily="Poppins"
+                  fontFamily="Roboto Slab"
                 >
                   {moment(booking.current.date).format("MMMM D Y")}
                 </Typography>
