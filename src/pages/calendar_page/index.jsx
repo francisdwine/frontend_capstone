@@ -875,7 +875,7 @@ export default function Calendar(props) {
                   <ListItem m={0}>
                     <ListItemText
                       fontSize="12px"
-                      primary={user?.email}
+                      primary={user?.username}
                       // secondary={secondary ? 'Secondary text' : null}
                     />
                   </ListItem>
