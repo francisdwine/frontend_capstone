@@ -2,12 +2,11 @@ import React, { useState, useEffect } from "react";
 import { BASE_URL } from "../../links";
 import axios from "axios";
 import Modal from "@mui/material/Modal";
-import { Box, Button, TextField, Typography } from "@mui/material";
-import { modalHeaderStyle, ButtonStyle1, ButtonStyle2 } from "./styles";
+import { Box, Button, Typography } from "@mui/material";
+import { modalHeaderStyle, ButtonStyle1 } from "./styles";
 
 export default function Attendance(props) {
   const [attendance, setAttendance] = useState(false);
-  // const [rfid, setRfid] = useState("");
   const [isVenueModalOpen, setVenueModal] = useState(false);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
   const [lastBooking, setLastBooking] = useState(null);
@@ -15,6 +14,7 @@ export default function Attendance(props) {
   const [tapInput, setTapInput] = useState("");
   const [scannedNumber, setScannedNumber] = useState("");
   const [avail, setAvail] = useState(true);
+  const [warningMessage, setWarningMessage] = useState('');
 
   const openAttendanceModal = () => {
     setAttendance(true);
@@ -46,7 +46,7 @@ export default function Attendance(props) {
       //assign interval to a variable to clear it.
       setAvail(true);
     }, 5000);
-    return () => clearInterval(intervalId); //This is important
+    return () => clearInterval(intervalId);
   }, [avail]);
 
   const handleSave = () => {
@@ -62,11 +62,11 @@ export default function Attendance(props) {
             setVenueModal(true);
             closeModal();
           } else if (response.data.state === "noBooking") {
-            alert("You Have No Booking within 30 minutes!");
+            setAvail(false);
+            alert('You Have No Booking within 30 minutes!');
           } else {
             setLoggedOutModal(true);
           }
-          setAvail(false);
         })
         .catch((error) => {
           console.error("Error saving data", error);
@@ -111,7 +111,7 @@ export default function Attendance(props) {
           }}
         >
           <h2 sx={{ modalHeaderStyle }}>Tap Here</h2>
-          <Typography sx={{ fontFamily: "Poppins" }}>
+          <Typography sx={{ fontFamily: "Poppins", fontSize: 30, fontWeight: "bold" }}>
             Please tap your ID:
           </Typography>
           <div style={{ margin: "20px" }}></div>

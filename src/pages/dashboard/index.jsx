@@ -5,27 +5,18 @@ import {
   Box,
   Grid,
   TableContainer,
-  TableCell,
   TableHead,
   TableRow,
   Typography,
   Container,
   CardContent,
   Paper,
-  Card,
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
-import dayjs from "dayjs";
-import { DemoContainer, DemoItem } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DateRangePicker } from "@mui/x-date-pickers-pro/DateRangePicker";
 import axios from "axios";
 import * as React from "react";
-import Chart from "chart.js/auto";
-import "chartjs-adapter-date-fns";
 
 import { StyledTableCell, StyledTableRow } from "./styles";
 
@@ -85,12 +76,6 @@ const reviews = [
 export default function Tracker(props) {
   //const [ratingFilter, setRatingFilter] = useState([0, 5]);
   const [data, setData] = useState([]);
-  const [value, setValue] = React.useState([
-    dayjs("2022-04-17"),
-    dayjs("2022-04-21"),
-  ]);
-  const [bookingsThisWeek, setBookingsThisWeek] = useState(0);
-  const [cancelledBookings, setCancelledBookings] = useState(0);
 
   // useEffect(() => {
   //   axios
@@ -104,82 +89,59 @@ export default function Tracker(props) {
   //     });
   // }, []);
 
-  const [containerDetails, setContainerDetails] = useState([
-    {
-      title: "ONGOING",
-      contents: [
-        { name: "Conference A", length: 0 },
-        { name: "Conference B", length: 0 },
-        { name: "Co-Working Space", length: 0 },
-      ],
-    },
-    {
-      title: "EXPECTED",
-      contents: [
-        { name: "Conference A", length: 0 },
-        { name: "Conference B", length: 0 },
-        { name: "Co-Working Space", length: 0 },
-      ],
-    },
-    {
-      title: "WAITING",
-      contents: [
-        { name: "Conference A", length: 0 },
-        { name: "Conference B", length: 0 },
-        { name: "Co-Working Space", length: 0 },
-      ],
-    },
-    {
-      title: "OVERSTAYING",
-      contents: [
-        { name: "Conference A", length: 0 },
-        { name: "Conference B", length: 0 },
-        { name: "Co-Working Space", length: 0 },
-      ],
-    },
-  ]);
-  useEffect(() => {
-    const fetchData = async () => {
-      const endpoints = [
-        `${BASE_URL}/api/getOngoing/`,
-        `${BASE_URL}/api/getExpected/`,
-        `${BASE_URL}/api/getWaiting/`,
-        `${BASE_URL}/api/getOverstaying/`,
-      ];
+const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
 
-      const updatedContainerDetails = [...containerDetails];
+const [containerDetails, setContainerDetails] = useState(
+  title.map((title) => ({
+    title,
+    contents: [
+      { name: "Conference A", count: 0 },
+      { name: "Conference B", count: 0 },
+      { name: "Co-Working Space", count: 0 },
+    ],
+  }))
+);
 
-      try {
-        for (let i = 0; i < endpoints.length; i++) {
-          const response = await axios.get(endpoints[i]);
-          if (response.status === 200) {
-            const data = response.data;
-            // Check if data contains the expected keys
-            if (
-              "conferenceRoomA" in data &&
-              "conferenceRoomB" in data &&
-              "coworkingSpace" in data
-            ) {
-              updatedContainerDetails[i].contents[0].length =data.conferenceRoomA;
-              updatedContainerDetails[i].contents[1].length =data.conferenceRoomB;
-              updatedContainerDetails[i].contents[2].length =data.coworkingSpace;
-            } else {
-              console.error(`Invalid data format for ${endpoints[i]}`);
-            }
+useEffect(() => {
+  const fetchData = async () => {
+    const endpoints = [
+      `${BASE_URL}/api/getOngoing/`,
+      `${BASE_URL}/api/getExpected/`,
+      `${BASE_URL}/api/getWaiting/`,
+      `${BASE_URL}/api/getOverstaying/`,
+    ];
+
+    const updatedContainerDetails = [...containerDetails];
+
+    try {
+      for (let i = 0; i < endpoints.length; i++) {
+        const response = await axios.get(endpoints[i]);
+        if (response.status === 200) {
+          const data = response.data;
+
+          if (Array.isArray(data)) {
+
+            updatedContainerDetails[i].contents = data.map((facility) => ({
+              name: facility.facility_name,
+              count: facility.count,
+            }));
           } else {
-            console.error(`Failed to fetch data from ${endpoints[i]}`);
+            console.error(`Invalid data format for ${endpoints[i]}`);
           }
+        } else {
+          console.error(`Failed to fetch data from ${endpoints[i]}`);
         }
-
-        setContainerDetails(updatedContainerDetails);
-      } catch (error) {
-        console.error("Error fetching data:", error);
       }
-    };
 
-    fetchData();
-  }, []);
+      setContainerDetails(updatedContainerDetails);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
+  fetchData();
+}, []);
+  
   useEffect(() => {
     axios
       .get(`${BASE_URL}/api/getSignedIn/`)
@@ -200,6 +162,7 @@ export default function Tracker(props) {
           alignItems: "start",
         }}
       ></div>
+      <div>
       <Container
         sx={{
           display: "flex",
@@ -207,58 +170,9 @@ export default function Tracker(props) {
           alignItems: "center",
         }}
       >
-        {/* <Typography
-          sx={{
-            paddingRight: 130,
-            color: "lightblack",
-            fontSize: 30,
-            fontWeight: "bold",
-            marginBottom: 2,
-          }}
-          fontFamily="Poppins"
-        >
-          Overview
-        </Typography> */}
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
-            {/* <Grid item xs={12} sm={6}>
-              <Paper
-                elevation={3}
-                sx={{
-                  width: 500,
-                  height: 150,
-                  background: `linear-gradient(to top, ${colors.join(
-                    ", "
-                  )})`,
-                  marginBottom: 5,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <h1>{bookingsThisWeek}</h1>
-                <h3>Bookings this week</h3>
-              </Paper>
-            </Grid> */}
-            {/* <Grid item xs={12} sm={6}>
-              <Paper
-                elevation={3}
-                sx={{
-                  width: 500,
-                  height: 150,
-                  background: `linear-gradient(to top, ${colors.join(
-                    ", "
-                  )})`,
-                  marginBottom: 5,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                }}
-              >
-                <h1>{cancelledBookings}</h1>
-                <h2>Cancelled Bookings</h2>
-              </Paper>
-            </Grid> */}
+            
             <div
               style={{
                 display: "flex",
@@ -273,6 +187,7 @@ export default function Tracker(props) {
                   fontSize: 30,
                   fontWeight: "bold",
                   paddingRight: 100,
+                  paddingTop: 5,
                   marginTop: 5,
                 }}
                 fontFamily="Poppins"
@@ -318,7 +233,7 @@ export default function Tracker(props) {
                         >
                           <div style={{ flex: 1 }}>{content.name}</div>
                           <div style={{ width: "25px", marginLeft: "8px" }}>
-                            [{content.length}]
+                            [{content.count}]
                           </div>
                           <br />
                           <br />
@@ -398,6 +313,7 @@ export default function Tracker(props) {
           </Table>
         </TableContainer>
       </Container>
+      </div>
 
       {/* CUSTOMER SATISFACTION & REVIEWS
       <Container

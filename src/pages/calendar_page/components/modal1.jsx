@@ -3,14 +3,10 @@ import * as React from "react";
 import {
   Box,
   Button,
-  
   FormControl,
-
   InputLabel,
- 
   TextField,
   Typography,
- 
 } from "@mui/material";
 
 import Modal from "@mui/material/Modal";
@@ -21,13 +17,9 @@ import moment from "moment/moment";
 
 import {
   ButtonStyle1,
-  
   modalHeaderStyle,
   modalStyle,
- 
 } from "../styles";
-
-
 
 export default function ModalOne(props) {
 

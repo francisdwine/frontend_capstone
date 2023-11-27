@@ -94,8 +94,7 @@ export default function DashboardContainer(props) {
             <MenuIcon />
           </IconButton>
           <Typography color='white' fontWeight='bold' variant="h4" p={1} noWrap component="div">
-            
-            
+
           </Typography>
           
         </Toolbar>

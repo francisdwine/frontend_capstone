@@ -43,7 +43,7 @@ const Login = () => {
     }
   }, [loginError]);
   if(user!==null){
-    navigate("/calendar")
+    navigate("/api/calendar")
   }
   else{
   return (
