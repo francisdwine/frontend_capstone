@@ -24,8 +24,9 @@ import Wild from "../../images/wild.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import { useContext } from "react";
+import { useState } from "react";
 
-const drawerWidth = 200;
+const drawerWidth = 268;
 
 // interface Props {
 //   /**
@@ -40,27 +41,34 @@ export default function DashBoardTemplate(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const {logoutUser}=React.useContext(AuthContext)
-  const testUserType = "admin";
+  const [role, setRole] = useState("admin"); //default role
   const navigate = useNavigate();
 
-  // const handleNavItemClick = (item) => {
-  //   navigate(item.link);
+  // admin appbar navigate to other apps
+  const mainNavItems = [
+    { name: "Home", path: "/home"},
+    { name: "Facility" , path: "/facility"},
+    { name: "Booking", path: "/api/calendar"},
+    { name: "Wallet", path: "/wallet/dashboard/"},
+    { name: "Crowd Control", path: "/crowdcontrol"},
+  ]
 
   //admin sidenav
   const adminNavItems = [
     // { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "Tracker", icon: DashboardIcon, path: "/tracker" },
-    { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
-    { name: "Logs", icon: BookIcon, path: "/logs" },
-    { name: "Bookings", icon: ListIcon, path: "/bookings",},
+    { name: "Tracker", icon: DashboardIcon, path: "/api/tracker" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/api/calendar" },
+    { name: "Logs", icon: BookIcon, path: "/api/logs" },
+    { name: "Bookings", icon: ListIcon, path: "/api/bookings",},
   ];
 
   //user sidenav
   const userNavItems = [
     // { name: "Home", icon: HomeIcon, path: "/home" },
-    { name: "Calendar", icon: CalendarMonthIcon, path: "/calendar" },
-    { name: "Bookings", icon: ListIcon, path: "/bookings" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/api/calendar" },
+    { name: "Bookings", icon: ListIcon, path: "/api/bookings" },
   ];
+  
   const NavItems = user?.role === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -69,11 +77,13 @@ export default function DashBoardTemplate(props) {
   const selectedStyle = {
     backgroundColor: "#fecc00",
     fontFamily: "Poppins",
-    borderRadius: "0px",
+    borderRadius: "5px",
     color: "black",
+    fontSize: "30px",
+    fontWeight: "bold",
   };
   const unselectedStyle = {
-    backgroundColor: "#black",
+    backgroundColor: 'transparent',
     fontFamily: "Poppins",
     transition: "background 0.7s, color 0.7s",
     ":hover": {
@@ -82,17 +92,54 @@ export default function DashBoardTemplate(props) {
       fontFamily: "Poppins",
     },
   };
+
   const location = useLocation();
+
+ // to other apps {facility, booking, wallet, crowd control}
+ const Navigation = () => {
+  if (user?.role !== "admin") {
+    return null;
+  }
+  return (
+      <List sx={{ marginLeft: 'auto' }}>
+        {mainNavItems.map((item, index) => (
+          <Button
+            key={index}
+            className="adminapps"
+            sx={{
+              ...(item.path === location.pathname ? selectedStyle : unselectedStyle),
+              '&:hover': {
+                ...unselectedStyle,
+                color: 'white',
+              },
+            }}
+          >
+            <ListItemButton onClick={() => navigate(item.path)}>
+              <ListItemText
+                sx={{
+                  color: "black",
+                  fontWeight: "strong",
+                  fontFamily: "Poppins",
+                }}
+                fontWeight="bold"
+                primary={item.name}
+              />
+            </ListItemButton>
+          </Button>
+        ))}
+      </List>
+  );
+};
 
   const drawer = (
     // sidenav sidenavbar
     <div>
-      <Toolbar sx={{ backgroundColor: "#fecc00" }}>
-        <img src={Wild} alt="logo" width={200} height={50} />
+      <Toolbar sx={{ backgroundColor: "#fecc00", height: "100px", alignItems: "center" }}>
+        <img src={Wild} alt="logo" width={300} height={70} />
       </Toolbar>
       {/* <Divider sx={{ backgroundColor: "white" }} /> */}
       {/* sidenav color */}
-      <List sx={{ backgroundColor: "black" }}>
+      <List sx={{ backgroundColor: "black", fontSize: "50px", }}>
         {NavItems.map((item, index) => (
           <ListItem
             sx={item.path === location.pathname ? selectedStyle : unselectedStyle}
@@ -100,7 +147,7 @@ export default function DashBoardTemplate(props) {
             disablePadding
           >
             <ListItemButton onClick={() => navigate(item.path)}>
-              <ListItemIcon sx={{ color: "white" }}>
+              <ListItemIcon sx={{ color: "white",  }}>
                 <Icon component={item.icon}></Icon>
               </ListItemIcon>
               <ListItemText
@@ -108,6 +155,7 @@ export default function DashBoardTemplate(props) {
                   color: "white",
                   fontWeight: "bold",
                   fontFamily: "Poppins",
+                  alignItems: "center",
                 }}
                 fontWeight="bold"
                 primary={item.name}
@@ -119,7 +167,7 @@ export default function DashBoardTemplate(props) {
 
         <ListItem
           disablePadding
-          sx={{ display: "flex", justifyContent: "center" }}
+          sx={{ display: "flex", justifyContent: "center", paddingTop: 55 }}
         >
           <Button
             variant="contained"
@@ -160,7 +208,7 @@ export default function DashBoardTemplate(props) {
           ml: { sm: `${drawerWidth}px` },
         }}
       >
-        <Toolbar sx={{ backgroundColor: "#fecc00" }}>
+        <Toolbar sx={{ backgroundColor: "#fecc00", height: "100px"}}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -181,8 +229,10 @@ export default function DashBoardTemplate(props) {
           >
             {props.title}
           </Typography>
+          <Navigation/>
         </Toolbar>
       </AppBar>
+      
       <Box
         component="nav"
         sx={{

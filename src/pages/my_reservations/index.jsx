@@ -19,7 +19,6 @@ import {
   TablePagination,
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
-import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
 import SearchIcon from "@mui/icons-material/Search";
 import TableBody from "@mui/material/TableBody";
@@ -79,7 +78,7 @@ export default function MyReservations(props) {
   const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
-
+  const [facilities,setFacilities]=useState([]);
   const found = (element) => element.name === attendeeName;
   const deleteUser = (index) => {
     setAttendeeList([
@@ -121,11 +120,17 @@ export default function MyReservations(props) {
   };
 
   //init page
-  // React.useEffect(() => {
-  //   axios.get("http://127.0.0.1:8000/api/getUsers/").then((res) => {
-  //     setFakeUserDb(res?.data);
-  //   });
-  // }, []);
+  React.useEffect(() => {
+    axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
+      setFacilities(res?.data);
+      // stroe lng nakog variable ang index 0 pra di sigeg access
+      var indx0=res?.data[0]
+      setVenueSelected(indx0.facility.facility_name);
+      setVenueId(indx0?.facility?.facility_id);
+      // setAttendeLimit(indx0?.main_rules?.num_attendies);
+      // setMaxComputers(indx0?.main_rules?.num_pc);
+    });
+  }, []);
 
   const handleChange = (e) => {
     var tempBooking = booking.current;
@@ -463,7 +468,10 @@ export default function MyReservations(props) {
                           ? selectedStyle
                           : unselectedStyle
                       }
-                      onClick={() => setTimeSelected("Upcoming")}
+                      onClick={() =>{
+                        setTimeSelected("Upcoming")
+                        console.log(events)
+                      } }
                     >
                       Upcoming
                     </Button>
@@ -611,6 +619,7 @@ export default function MyReservations(props) {
                       alignItems: "center",
                       paddingLeft: 2,
                       backgroundColor: "white",
+                      marginTop: 5,
                     }}
                   >
                     <SearchIconWrapper>
@@ -661,7 +670,26 @@ export default function MyReservations(props) {
 
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                   <ButtonGroup>
-                    <Button
+                    {
+                      facilities.map((item, index) => (
+                        <Button
+                          sx={
+                            venueSelected === item?.facility?.facility_name
+                              ? selectedStyle
+                              : unselectedStyle
+                          }
+                          onClick={() => {
+                            
+                            setVenueSelected(item?.facility?.facility_name);
+                            setVenueId(item?.facility?.facility_id);  
+                            
+                          }}
+                        >
+                         {item?.facility?.facility_name}
+                        </Button>
+                      ))
+                    }
+                    {/* <Button
                       sx={
                         venueSelected === "Coworking Space"
                           ? selectedStyle
@@ -699,7 +727,7 @@ export default function MyReservations(props) {
                       }}
                     >
                       CONFERENCE B
-                    </Button>
+                    </Button> */}
                   </ButtonGroup>
                 </div>
                 <TableContainer>
@@ -719,7 +747,7 @@ export default function MyReservations(props) {
                         <StyledTableCell>Date</StyledTableCell>
                         <StyledTableCell>Start</StyledTableCell>
                         <StyledTableCell>End</StyledTableCell>
-                        <StyledTableCell>Venue</StyledTableCell>
+                        {/* <StyledTableCell>Venue</StyledTableCell> */}
                         <StyledTableCell></StyledTableCell>
                         <StyledTableCell></StyledTableCell>
                       </TableRow>
@@ -739,7 +767,7 @@ export default function MyReservations(props) {
                             <StyledTableCell>{event.date}</StyledTableCell>
                             <StyledTableCell>{event.startTime}</StyledTableCell>
                             <StyledTableCell>{event.endTime}</StyledTableCell>
-                            <StyledTableCell>{event.venue}</StyledTableCell>
+                            {/* <StyledTableCell>{event.venue}</StyledTableCell> */}
                             <StyledTableCell>
                               <Button
                                 sx={ButtonStyle1}
@@ -1158,7 +1186,7 @@ export default function MyReservations(props) {
                       </React.Fragment>
                     ))}
                   </List>
-                  {timeSelected !== "History" && user?.role == "user" &&(
+                  {timeSelected !== "History" && user?.role === "user" &&(
                        <Typography
                        sx={{ paddingLeft: 2, color: "darkred" }}
                        fontFamily="Poppins"

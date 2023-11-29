@@ -27,6 +27,7 @@ import {
 
 export default function Logs(props) {
   const [venueSelected, setVenueSelected] = useState("Coworking Space");
+  const [facilities, setFacilities] = useState([]);
   const [venueId, setVenueId] = useState(1);
   const [searchText, setSearchText] = useState("");
   const [filteredEvents, setFilteredEvents] = useState([]);
@@ -47,36 +48,52 @@ export default function Logs(props) {
   }, []);
 
   useEffect(() => {
-    const filtered = events.filter((item) => item.venueName === venueSelected);
+    axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
+      setFacilities(res?.data);
+      // stroe lng nakog variable ang index 0 pra di sigeg access
+      var indx0 = res?.data[0];
+      setVenueSelected(indx0?.facility?.facility_name);
+      setVenueId(indx0?.facility?.facility_id);
+      // setAttendeLimit(indx0?.main_rules?.num_attendies);
+      // setMaxComputers(indx0?.main_rules?.num_pc);
+    });
+  }, []);
+
+  useEffect(() => {
+    const filtered = events.filter((item) => item.venueId === venueId);
     setFilteredEvents(filtered);
   }, [venueSelected, events]);
 
-    //searchbar
-    const handleSearchTextChange = (e) => {
-      const searchText = e.target.value;
-      setSearchText(searchText);
-    
-      if (searchText === "") { // if empty dipslay all events
-        const filtered = events.filter((item) => {
-          return (
-            (item.venueId ===venueId && item.name.toLowerCase().includes(searchText.toLowerCase()))
-          ||
-            (item.venueId ===venueId&& item.date.toString().includes(searchText))
-          );
-        });
-        console.log(filtered)
-        setFilteredEvents(filtered);
-      } else {
-        const filtered = events.filter((item) => {
-          return (
-            (item.venueName === venueSelected && item.name.toLowerCase().includes(searchText.toLowerCase())) ||
-            (item.venueName === venueSelected && item.date.toString().includes(searchText))
-          );
-        });
-        console.log(filtered)
-        setFilteredEvents(filtered);
-      }
-    };
+  //searchbar
+  const handleSearchTextChange = (e) => {
+    const searchText = e.target.value;
+    setSearchText(searchText);
+
+    if (searchText === "") {
+      // if empty dipslay all events
+      const filtered = events.filter((item) => {
+        return (
+          (item.venueId === venueId &&
+            item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+          (item.venueId === venueId &&
+            item.date.toString().includes(searchText))
+        );
+      });
+      console.log(filtered);
+      setFilteredEvents(filtered);
+    } else {
+      const filtered = events.filter((item) => {
+        return (
+          (item.venueId === venueId &&
+            item.name.toLowerCase().includes(searchText.toLowerCase())) ||
+          (item.venueId === venueId &&
+            item.date.toString().includes(searchText))
+        );
+      });
+      console.log(filtered);
+      setFilteredEvents(filtered);
+    }
+  };
 
   //pagination
   const handlePageChange = (event, newPage) => {
@@ -87,8 +104,7 @@ export default function Logs(props) {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0); //reset to first page
   };
-  
-  
+
   return (
     <div>
       <DashBoardTemplate title="Attendance Logs">
@@ -98,6 +114,7 @@ export default function Logs(props) {
             flexDirection: "column",
             alignItems: "start",
             fontFamily: "Poppins",
+            paddingTop: "30px",
           }}
         ></div>
         <br></br>
@@ -130,7 +147,7 @@ export default function Logs(props) {
               />
             </Box>
           </div>
-  
+
           <Box
             sx={{
               p: "0px 0px 0px 0px",
@@ -138,8 +155,23 @@ export default function Logs(props) {
             maxWidth="90%"
           >
             <div style={{ display: "flex", justifyContent: "flex-start" }}>
-            <ButtonGroup>
+              <ButtonGroup>
+                {facilities.map((item, index) => (
                   <Button
+                    sx={
+                      venueSelected === item?.facility?.facility_name
+                        ? selectedStyle
+                        : unselectedStyle
+                    }
+                    onClick={() => {
+                      setVenueSelected(item?.facility?.facility_name);
+                      setVenueId(item?.facility?.facility_id);
+                    }}
+                  >
+                    {item?.facility?.facility_name}
+                  </Button>
+                ))}
+                {/* <Button
                     sx={
                       venueSelected === "Coworking Space"
                         ? selectedStyle
@@ -177,8 +209,8 @@ export default function Logs(props) {
                     }}
                   >
                     CONFERENCE B
-                  </Button>
-                </ButtonGroup>
+                  </Button> */}
+              </ButtonGroup>
             </div>
             <TableContainer>
               <Table
@@ -203,43 +235,45 @@ export default function Logs(props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                {filteredEvents.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((event, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell
-                        component="th"
-                        scope="row"
-                        align="center"
-                      >
-                        {event.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {event.isSignedIn === true ? "Yes" : "No"}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {event.isOverstaying === true ? "Yes" : "No"}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {event.date}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {event.signInTime}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {event.signOutTime}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
+                  {filteredEvents
+                    .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                    .map((event, index) => (
+                      <StyledTableRow key={index}>
+                        <StyledTableCell
+                          component="th"
+                          scope="row"
+                          align="center"
+                        >
+                          {event.name}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {event.isSignedIn === true ? "Yes" : "No"}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {event.isOverstaying === true ? "Yes" : "No"}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {event.date}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {event.signInTime}
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          {event.signOutTime}
+                        </StyledTableCell>
+                      </StyledTableRow>
+                    ))}
                 </TableBody>
               </Table>
               <TablePagination
-                  component="div"
-                  count={filteredEvents.length}
-                  page={page}
-                  onPageChange={handlePageChange}
-                  rowsPerPage={rowsPerPage}
-                  onRowsPerPageChange={handleRowsPerPageChange}
-                  labelRowsPerPage=""
-                />
+                component="div"
+                count={filteredEvents.length}
+                page={page}
+                onPageChange={handlePageChange}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleRowsPerPageChange}
+                labelRowsPerPage=""
+              />
             </TableContainer>
           </Box>
         </Box>
