@@ -19,7 +19,6 @@ import {
   TablePagination,
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
-import ClearIcon from "@mui/icons-material/Clear";
 import Table from "@mui/material/Table";
 import SearchIcon from "@mui/icons-material/Search";
 import TableBody from "@mui/material/TableBody";
@@ -1187,7 +1186,7 @@ export default function MyReservations(props) {
                       </React.Fragment>
                     ))}
                   </List>
-                  {timeSelected !== "History" && user?.role == "user" &&(
+                  {timeSelected !== "History" && user?.role === "user" &&(
                        <Typography
                        sx={{ paddingLeft: 2, color: "darkred" }}
                        fontFamily="Poppins"

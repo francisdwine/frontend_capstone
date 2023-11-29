@@ -95,19 +95,22 @@ export default function Calendar(props) {
         computers: booking.current.computers,
         coins: booking.current.coins,
         points: booking.current.points,
-        user: user.email,
-
+        user: user.user_id,
+        
         user_id: user.user_id,
         attendees: [
           ...attendeeList,
           { name: user.username, user_id: user.user_id },
         ],
       })
-      .then(() => {
+      .then((res) => {
+        if(res.data.error){
+          alert(res.data.error)
+        }else {
         setBookingsRefresher(!bookingsRefresher);
         alert("booking created");
         setAttendeeList([]);
-      });
+      }});
   };
   //data to send
   //new booking
@@ -133,7 +136,7 @@ export default function Calendar(props) {
     const res = eventData.find((item) => {
       return item?.id === parseInt(id);
     });
-    console.log("user called ID:", info.user_id);
+    console.log("user called ID:", res.user_id);
     setInfo(res);
     setOpenInfoModal(true);
   };
@@ -154,22 +157,56 @@ export default function Calendar(props) {
     });
     console.log(facilities)
   }, []);
+  
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
     axios.get(`${BASE_URL}/api/currentBookings/`).then((res) => {
-      setEventData(res.data);
-      setEvents(
-        res?.data.map((item) => {
+      // setEvents(
+      //   res?.data.map((item) => {
+      //     return {
+      //       id: item?.id,
+      //       title: item?.description,
+      //       start: item?.date + "T" + item?.startTime,
+      //       end: item?.date + "T" + item?.endTime,
+      //       venue: item?.venue,
+      //     };
+      //   })
+      // );
+      
+      var bookings=  res?.data.map((item) => {
           return {
             id: item?.id,
             title: item?.description,
             start: item?.date + "T" + item?.startTime,
             end: item?.date + "T" + item?.endTime,
             venue: item?.venue,
+            type:"booking"
           };
         })
-      );
+      
+      axios.get(`${BASE_URL}/api/getEvents/`).then((res) => {
+        // console.log(res.data)
+        var calendarEvents;
+        calendarEvents=res?.data.map((item) => {
+          var dateSplit=item?.date.split("T")
+          return {
+            id: item?.id,
+            title: item?.event_name,
+            start: dateSplit[0] + "T" + item?.start,
+            end: dateSplit[0]  + "T" + item?.end,
+            venue: item?.facility,
+            type:"rule",
+            backgroundColor:"black",
+            textColor:"white"
+          };
+        })
+        bookings=bookings.concat(calendarEvents)
+        console.log(bookings)
+        setEvents(bookings)
+      });
+      setEventData(res.data);
+      
     });
   }, [bookingsRefresher]);
   // cancelled bookings
@@ -425,8 +462,15 @@ export default function Calendar(props) {
                 }}
                 //function para ig click ug usa ka event
                 eventClick={(e) => {
+                  console.log(e);
+                  if(e.event._def.extendedProps.type==="rule"){
+                    alert("Can't Book on this Date, important Event is Scheduled")
+
+                }else if(e.event._def.extendedProps.type==="booking"){
                   handleView(e.event.id);
-                }}
+                }
+              }}
+                
                 unselect={(jsEvent, view) => {}}
                 // dayClick={(date, jsEvent, view) => {}}
                 selectOverlap={(event) => {}}
@@ -615,7 +659,9 @@ export default function Calendar(props) {
                       if (userFound !== undefined) {
                         isExisting = true;
                         id = userFound?.id;
-                      }
+                      } else {alert("User not found")
+                        return;
+                    }
                       const newUser = {
                         name: attendeeName,
                         existing: isExisting,
@@ -1143,7 +1189,7 @@ export default function Calendar(props) {
                   marginBottom="5px"
                   fontFamily="Roboto Slab"
                 >
-                  {venueArray[info?.venue]}
+                  {booking.current.venue}
                 </Typography>
               </Box>
 
@@ -1183,7 +1229,7 @@ export default function Calendar(props) {
               ></Typography>
             </Box>
 
-            {user?.role === "user" && user?.user_id === user.user_id ? (
+            {user?.role === "user" && user?.user_id === info.user ? (
               <Box
                 sx={{
                   margin: "10px 15px 15px 10px",

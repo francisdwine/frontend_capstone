@@ -24,7 +24,6 @@ import Wild from "../../images/wild.png";
 import { useNavigate, useLocation } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import { useContext } from "react";
-import { Link } from 'react-router-dom';
 import { useState } from "react";
 
 const drawerWidth = 268;
@@ -49,7 +48,7 @@ export default function DashBoardTemplate(props) {
   const mainNavItems = [
     { name: "Home", path: "/home"},
     { name: "Facility" , path: "/facility"},
-    { name: "Booking", path: "/calendar"},
+    { name: "Booking", path: "/api/calendar"},
     { name: "Wallet", path: "/wallet/dashboard/"},
     { name: "Crowd Control", path: "/crowdcontrol"},
   ]

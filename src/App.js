@@ -3,7 +3,6 @@ import {
   BrowserRouter, Routes,
   Route, Redirect, Link,
 } from 'react-router-dom';
-import { Router } from 'react-router-dom';
 import { useContext } from 'react';
 import {AuthProvider} from './context/AuthContext';
 import Tracker from './pages/dashboard';

@@ -77,27 +77,15 @@ export default function Tracker(props) {
   //const [ratingFilter, setRatingFilter] = useState([0, 5]);
   const [data, setData] = useState([]);
 
-  // useEffect(() => {
-  //   axios
-  //     .get(`${BASE_URL}/api/getBookingStats/`)
-  //     .then((response) => {
-  //       setBookingsThisWeek(response.data.bookings_this_week);
-  //       setCancelledBookings(response.data.cancelled_bookings);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching booking stats:", error);
-  //     });
-  // }, []);
-
 const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
 
 const [containerDetails, setContainerDetails] = useState(
   title.map((title) => ({
     title,
     contents: [
-      { name: "Conference A", count: 0 },
-      { name: "Conference B", count: 0 },
-      { name: "Co-Working Space", count: 0 },
+      // { name: "Conference A", count: 0 },
+      // { name: "Conference B", count: 0 },
+      // { name: "Co-Working Space", count: 0 },
     ],
   }))
 );
@@ -201,7 +189,8 @@ useEffect(() => {
                   elevation={3}
                   sx={{
                     width: 243,
-                    height: 260,
+                    height: 'auto',
+                    display: "relative",
                     background: `linear-gradient(to bottom, ${colors.join(
                       ", "
                     )})`,
@@ -258,7 +247,7 @@ useEffect(() => {
       >
         <Typography
           sx={{
-            paddingLeft: 20,
+            paddingLeft: 15,
             color: "lightblack",
             fontSize: 30,
             fontWeight: "bold",
