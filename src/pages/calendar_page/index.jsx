@@ -235,7 +235,7 @@ export default function Calendar(props) {
     };
 
     axios
-      .post(`http://localhost:8000/api/calculateCost/`, costData)
+      .post(`http://localhost:8000/api/calculateCost/${venueId}`, costData)
       .then((response) => {
         //contain the calculated cost
         const calculatedCost = response.data.cost; // Adjust this based on your server response
@@ -346,8 +346,14 @@ export default function Calendar(props) {
                         setVenueSelected(item?.facility?.facility_name);
                         setVenueId(item?.facility?.facility_id);  
                         setAttendeLimit(item?.main_rules?.num_attendies)
+                        // setMaxComputers(item?.main_rules?.num_pc)
+                        // alert(item?.main_rules?.status)
+                        if(item?.main_rules.status === true){
                         setMaxComputers(item?.main_rules?.num_pc)
-                      }}
+                      } else if(item.main_rules.status === false){
+                        setMaxComputers(0)
+                      }
+                    }}
                     >
                      {item?.facility?.facility_name}
                     </Button>
