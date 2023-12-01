@@ -422,6 +422,7 @@ export default function MyReservations(props) {
                 flexDirection: "column",
                 alignItems: "start",
                 fontFamily: "Poppins",
+                paddingTop: "40px",
               }}
             ></div>
             <br></br>

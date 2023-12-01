@@ -60,7 +60,7 @@ import { StyledTableCell, StyledTableRow } from "./styles";
 //   },
 // ];
 // const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
-const colors = ["#fecc00", "white"];
+const colors = ["#fecc00"];
 // for Reviews
 const reviews = [
   { label: "Name", value: "John Doe" },
@@ -191,9 +191,8 @@ useEffect(() => {
                     width: 243,
                     height: 'auto',
                     display: "relative",
-                    background: `linear-gradient(to bottom, ${colors.join(
-                      ", "
-                    )})`,
+                    background: "#ffe836",
+                    border: "1px solid #fecc00",
                     marginBottom: 7,
                   }}
                 >

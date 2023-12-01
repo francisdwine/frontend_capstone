@@ -3,7 +3,8 @@ import TextField from "@mui/material/TextField";
 import { Button, Box, Typography,Snackbar,Alert } from "@mui/material";
 import { ButtonStyle1, loginstyle, fields, logo } from "./styles";
 import { useState } from "react";
-import Wild from "../../images/wild.png";
+import Wild from "../../images/w4.png";
+import bg from "../../images/basebg.jpg";
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import { useEffect } from "react";
@@ -47,17 +48,35 @@ const Login = () => {
   }
   else{
   return (
-    <div>
-      <img src={Wild} alt="logo" width={200} height={50} style={logo} />
+    <div
+    style={{
+      backgroundImage: `url(${bg})`,
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+      height: "100vh",
+      width: "100vw",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "column",
+    }}>
+
+<img src={Wild} alt="logo" width={300} height={100}
+    style={{
+      position: 'absolute',
+      top: 120,
+      left: 700,
+    }}/>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose} anchorOrigin={{horizontal:'center',vertical:'bottom'}}>
   <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
     {loginError}
   </Alert>
 </Snackbar>
+{/* <img src={Wild} alt="logo" width={200} height={50} style={logo} /> */}
 
       <Box
         style={loginstyle}
-        sx={{ p: 5, width: 300, height: 300, align: "center" }}
+        sx={{ p: 5, width: 300, height: 'auto', align: "center", }}
       >
         <Typography
           sx={{ fontWeight: "bold" }}
@@ -68,11 +87,11 @@ const Login = () => {
           color="black"
         >
           {" "}
-          Log In
+          LOGIN
         </Typography>
         <br /> <br />
         <TextField
-          label={"Username"}
+          label={"Email"}
           id="username"
           name="username"
           onChange={(e) => onInputChange(e)}
