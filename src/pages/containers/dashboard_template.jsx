@@ -68,7 +68,7 @@ export default function DashBoardTemplate(props) {
     { name: "Calendar", icon: CalendarMonthIcon, path: "/api/calendar" },
     { name: "Bookings", icon: ListIcon, path: "/api/bookings" },
   ];
-  
+
   const NavItems = user?.role === "admin" ? adminNavItems : userNavItems;
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -76,21 +76,19 @@ export default function DashBoardTemplate(props) {
 
   const selectedStyle = {
     backgroundColor: "#fecc00",
-    fontFamily: "Poppins",
     borderRadius: "5px",
-    color: "black",
-    fontSize: "30px",
-    fontWeight: "bold",
+    borderBottom: '1px solid black', // adjust thickness and color of underline
+    paddingBottom: '1px', // adjust space between text and underline
+    color:'white',
+    // fontWeight: 700,
+    // fontSize: '1.4rem'
   };
   const unselectedStyle = {
     backgroundColor: 'transparent',
-    fontFamily: "Poppins",
+    color:'black',
     transition: "background 0.7s, color 0.7s",
-    ":hover": {
-      bgcolor: "#9c7b16",
-      color: "white",
-      fontFamily: "Poppins",
-    },
+    // fontWeight: 700,
+    // fontSize: '1.4rem'
   };
 
   const location = useLocation();
@@ -101,33 +99,49 @@ export default function DashBoardTemplate(props) {
     return null;
   }
   return (
-      <List sx={{ marginLeft: 'auto' }}>
-        {mainNavItems.map((item, index) => (
-          <Button
-            key={index}
-            className="adminapps"
-            sx={{
-              ...(item.path === location.pathname ? selectedStyle : unselectedStyle),
-              '&:hover': {
-                ...unselectedStyle,
-                color: 'white',
+
+    <List
+    sx={{
+      marginLeft: 'auto',
+      display: 'flex',
+      fontSize: '1.2rem',
+    }}
+  >
+    {mainNavItems.map((item, index) => (
+      <Button
+        key={index}
+        className="adminapps"
+        sx={{
+          ...(item.path === location.pathname ? selectedStyle : unselectedStyle),
+          '&:hover': {
+            bgcolor: 'transparent',
+            textDecoration: 'none',
+            borderBottom: '1px solid black',
+            paddingBottom: '1px',
+            color: 'white',
+            transition: 'color 0.1s',
+            fontWeight: 770,
+            fontSize: '1.3rem',
+            fontFamily: 'Poppins',
+          },
+        }}
+      >
+        <ListItemButton onClick={() => navigate(item.path)}>
+          <ListItemText
+            primary={item.name}
+            primaryTypographyProps={{
+              style: {
+                fontWeight: 770,
+                fontSize: '1.3rem',
+                fontFamily: 'Poppins',  
               },
             }}
-          >
-            <ListItemButton onClick={() => navigate(item.path)}>
-              <ListItemText
-                sx={{
-                  color: "black",
-                  fontWeight: "strong",
-                  fontFamily: "Poppins",
-                }}
-                fontWeight="bold"
-                primary={item.name}
-              />
-            </ListItemButton>
-          </Button>
-        ))}
-      </List>
+          />
+        </ListItemButton>
+      </Button>
+    ))}
+  </List>
+
   );
 };
 
@@ -209,6 +223,7 @@ export default function DashBoardTemplate(props) {
         }}
       >
         <Toolbar sx={{ backgroundColor: "#fecc00", height: "100px"}}>
+
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -230,9 +245,11 @@ export default function DashBoardTemplate(props) {
             {props.title}
           </Typography>
           <Navigation/>
+
         </Toolbar>
+
       </AppBar>
-      
+
       <Box
         component="nav"
         sx={{

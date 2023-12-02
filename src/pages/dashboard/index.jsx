@@ -18,7 +18,7 @@ import TableBody from "@mui/material/TableBody";
 import axios from "axios";
 import * as React from "react";
 
-import { StyledTableCell, StyledTableRow } from "./styles";
+import { StyledTableCell, StyledTableRow, ResponsiveContainer } from "./styles";
 
 //temp deets
 // const containerDetails = [
@@ -82,11 +82,7 @@ const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
 const [containerDetails, setContainerDetails] = useState(
   title.map((title) => ({
     title,
-    contents: [
-      // { name: "Conference A", count: 0 },
-      // { name: "Conference B", count: 0 },
-      // { name: "Co-Working Space", count: 0 },
-    ],
+    contents: [],
   }))
 );
 

@@ -13,7 +13,6 @@ import Attendance from './pages/attendance';
 import Login from './pages/login_page';
 
 function App() {
-  document.title="WILMS BOOKING"
   return (
     <div className="App">
      
