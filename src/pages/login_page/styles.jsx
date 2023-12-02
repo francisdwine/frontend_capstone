@@ -20,6 +20,7 @@ export const ButtonStyle1 = {
     position: "absolute",
     boxShadow: '1px 2px 9px #C0C0C0',
     borderRadius: "15px",
+    backgroundColor: "white",
     left: 0,
     right: 0,
     marginLeft: "auto",

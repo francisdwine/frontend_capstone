@@ -18,7 +18,7 @@ import TableBody from "@mui/material/TableBody";
 import axios from "axios";
 import * as React from "react";
 
-import { StyledTableCell, StyledTableRow } from "./styles";
+import { StyledTableCell, StyledTableRow, ResponsiveContainer } from "./styles";
 
 //temp deets
 // const containerDetails = [
@@ -60,7 +60,7 @@ import { StyledTableCell, StyledTableRow } from "./styles";
 //   },
 // ];
 // const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
-const colors = ["#fecc00", "white"];
+const colors = ["#fecc00"];
 // for Reviews
 const reviews = [
   { label: "Name", value: "John Doe" },
@@ -82,11 +82,7 @@ const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
 const [containerDetails, setContainerDetails] = useState(
   title.map((title) => ({
     title,
-    contents: [
-      // { name: "Conference A", count: 0 },
-      // { name: "Conference B", count: 0 },
-      // { name: "Co-Working Space", count: 0 },
-    ],
+    contents: [],
   }))
 );
 
@@ -191,9 +187,8 @@ useEffect(() => {
                     width: 243,
                     height: 'auto',
                     display: "relative",
-                    background: `linear-gradient(to bottom, ${colors.join(
-                      ", "
-                    )})`,
+                    background: "#ffe836",
+                    border: "1px solid #fecc00",
                     marginBottom: 7,
                   }}
                 >

@@ -3,7 +3,7 @@ import {
   BrowserRouter, Routes,
   Route, Redirect, Link,
 } from 'react-router-dom';
-import { useContext } from 'react';
+// import wild from "../../images/wil.png";
 import {AuthProvider} from './context/AuthContext';
 import Tracker from './pages/dashboard';
 import Calendar from './pages/calendar_page';
@@ -13,7 +13,6 @@ import Attendance from './pages/attendance';
 import Login from './pages/login_page';
 
 function App() {
-  document.title="WILMS BOOKING SYSTEM"
   return (
     <div className="App">
      
