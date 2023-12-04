@@ -48,7 +48,7 @@ export default function DashBoardTemplate(props) {
   const mainNavItems = [
     { name: "Home", path: "/wallet"},
     { name: "Facility" , path: "/facility/facility"}, 
-    { name: "Booking", path: "/api/calendar"},
+    { name: "Booking", path: "/booking/calendar"},
     { name: "Wallet", path: "/wallet/dashboard/"},
     { name: "Crowd Control", path: "/wiladmin/wiladmin/admindashboard"},
   ]
@@ -56,17 +56,17 @@ export default function DashBoardTemplate(props) {
   //admin sidenav
   const adminNavItems = [
     // { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "Tracker", icon: DashboardIcon, path: "/api/tracker" },
-    { name: "Calendar", icon: CalendarMonthIcon, path: "/api/calendar" },
-    { name: "Logs", icon: BookIcon, path: "/api/logs" },
-    { name: "Bookings", icon: ListIcon, path: "/api/bookings",},
+    { name: "Tracker", icon: DashboardIcon, path: "/booking/tracker" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/booking/calendar" },
+    { name: "Logs", icon: BookIcon, path: "/booking/logs" },
+    { name: "Bookings", icon: ListIcon, path: "/booking/bookings",},
   ];
 
   //user sidenav
   const userNavItems = [
     // { name: "Home", icon: HomeIcon, path: "/home" },
-    { name: "Calendar", icon: CalendarMonthIcon, path: "/api/calendar" },
-    { name: "Bookings", icon: ListIcon, path: "/api/bookings" },
+    { name: "Calendar", icon: CalendarMonthIcon, path: "/booking/calendar" },
+    { name: "Bookings", icon: ListIcon, path: "/booking/bookings" },
   ];
 
   const NavItems = user?.role === "admin" ? adminNavItems : userNavItems;

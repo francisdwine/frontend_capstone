@@ -350,7 +350,7 @@ export default function Calendar(props) {
   };
   //to handle security
   if (user === null) {
-    navigate("/api/login");
+    navigate("/booking/login");
   } else {
     return (
       <div style={{ position: "relative" }}>

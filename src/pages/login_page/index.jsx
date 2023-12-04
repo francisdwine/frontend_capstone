@@ -44,7 +44,7 @@ const Login = () => {
     }
   }, [loginError]);
   if(user!==null){
-    navigate("/api/calendar")
+    navigate("/booking/calendar")
   }
   else{
   return (
