@@ -21,10 +21,10 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BookIcon from "@mui/icons-material/Book";
 import ListIcon from "@mui/icons-material/List";
 import Wild from "../../images/wild.png";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link} from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
-import { useContext } from "react";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { BASE_URL } from "../../links";
 
 const drawerWidth = 268;
 
@@ -46,11 +46,11 @@ export default function DashBoardTemplate(props) {
 
   // admin appbar navigate to other apps
   const mainNavItems = [
-    { name: "Home", path: "/home"},
-    { name: "Facility" , path: "/facility"},
+    { name: "Home", path: "/wallet"},
+    { name: "Facility" , path: "/facility/facility"}, 
     { name: "Booking", path: "/api/calendar"},
     { name: "Wallet", path: "/wallet/dashboard/"},
-    { name: "Crowd Control", path: "/crowdcontrol"},
+    { name: "Crowd Control", path: "/wiladmin/wiladmin/admindashboard"},
   ]
 
   //admin sidenav
@@ -77,9 +77,11 @@ export default function DashBoardTemplate(props) {
   const selectedStyle = {
     backgroundColor: "#fecc00",
     borderRadius: "5px",
-    borderBottom: '1px solid black', // adjust thickness and color of underline
-    paddingBottom: '1px', // adjust space between text and underline
     color:'white',
+    //borderBottom: '1px solid black', 
+    // adjust thickness and color of underline
+    // paddingBottom: '1px', 
+    // adjust space between text and underline
     // fontWeight: 700,
     // fontSize: '1.4rem'
   };
@@ -98,50 +100,51 @@ export default function DashBoardTemplate(props) {
   if (user?.role !== "admin") {
     return null;
   }
+
   return (
-
     <List
-    sx={{
-      marginLeft: 'auto',
-      display: 'flex',
-      fontSize: '1.2rem',
-    }}
-  >
-    {mainNavItems.map((item, index) => (
-      <Button
-        key={index}
-        className="adminapps"
-        sx={{
-          ...(item.path === location.pathname ? selectedStyle : unselectedStyle),
-          '&:hover': {
-            bgcolor: 'transparent',
-            textDecoration: 'none',
-            borderBottom: '1px solid black',
-            paddingBottom: '1px',
-            color: 'white',
-            transition: 'color 0.1s',
-            fontWeight: 770,
-            fontSize: '1.3rem',
-            fontFamily: 'Poppins',
-          },
-        }}
-      >
-        <ListItemButton onClick={() => navigate(item.path)}>
-          <ListItemText
-            primary={item.name}
-            primaryTypographyProps={{
-              style: {
-                fontWeight: 770,
-                fontSize: '1.3rem',
-                fontFamily: 'Poppins',  
-              },
-            }}
-          />
-        </ListItemButton>
-      </Button>
-    ))}
-  </List>
-
+      sx={{
+        marginLeft: 'auto',
+        display: 'flex',
+        fontSize: '1.2rem',
+      }}
+    >
+      {mainNavItems.map((item, index) => (
+        <Button
+          key={index}
+          className="adminapps"
+          sx={{
+            ...(item.path === location.pathname ? selectedStyle : unselectedStyle),
+            '&:hover': {
+              bgcolor: 'transparent',
+              textDecoration: 'none',
+              borderBottom: '1px solid black',
+              paddingBottom: '1px',
+              color: 'white',
+              transition: 'color 0.1s',
+              fontWeight: 770,
+              fontSize: '1.3rem',
+              fontFamily: 'Poppins',
+            },
+          }}
+          href={item.path.startsWith('http') || item.name === 'Booking' ? item.path : `${BASE_URL}${item.path}`}
+          target="_blank" //opens in a new tab
+        >
+          <ListItemButton>
+            <ListItemText
+              primary={item.name}
+              primaryTypographyProps={{
+                style: {
+                  fontWeight: 770,
+                  fontSize: '1.3rem',
+                  fontFamily: 'Poppins',
+                },
+              }}
+            />
+          </ListItemButton>
+        </Button>
+      ))}
+    </List>
   );
 };
 
