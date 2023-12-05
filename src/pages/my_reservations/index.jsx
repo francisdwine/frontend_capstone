@@ -99,6 +99,15 @@ export default function MyReservations(props) {
     let a = events.find((item) => {
       return item.id === id;
     });
+    var cancelCost=0
+    
+    if(a.points===0&&a.coins>0){
+      cancelCost=a.coins*0.3
+    }
+    else if(a.coins===0&&a.points>0){
+      cancelCost=a.points*0.3
+    }
+    a={...a,cancelCost:cancelCost}
     axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
@@ -1265,7 +1274,7 @@ export default function MyReservations(props) {
                     </Typography>
 
                     <Typography marginBottom="15px" fontFamily="Poppins">
-                      Cost of Cancellation: 10
+                      Cost of Cancellation: {viewDetails.cancelCost}
                     </Typography>
                   </Box>
                   <Box

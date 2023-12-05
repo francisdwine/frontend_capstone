@@ -118,7 +118,7 @@ export default function Calendar(props) {
     ) {
       booking.current.officeName = "none";
     }
-    console.log(booking.current);
+    
     axios
       .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
@@ -172,11 +172,23 @@ export default function Calendar(props) {
       setBookingAttendees(res.data);
     });
 
-    const res = eventData.find((item) => {
+    var res = eventData.find((item) => {
       return item?.id === parseInt(id);
     });
-    console.log("user called ID:", res.user_id);
+    
+    var cancelCost=0
+    
+    if(res.points===0&&res.coins>0){
+      cancelCost=res.coins*0.3
+    }
+    else if(res.coins===0&&res.points>0){
+      cancelCost=res.points*0.3
+    }
+    console.log(cancelCost)
+    res={...res,cancelCost:cancelCost}
+    // console.log("user called ID:", res.user_id);
     setInfo(res);
+    
     setOpenInfoModal(true);
   };
 
@@ -194,7 +206,7 @@ export default function Calendar(props) {
         setMaxComputers(indx0?.main_rules?.num_pc);
       });
     });
-    console.log(facilities);
+   
   }, []);
 
   //display bookings
@@ -225,7 +237,7 @@ export default function Calendar(props) {
       });
 
       axios.get(`${BASE_URL}/api/getEvents/`).then((res) => {
-        // console.log(res.data)
+        
         var calendarEvents;
         calendarEvents = res?.data.map((item) => {
           var dateSplit = item?.date.split("T");
@@ -241,7 +253,7 @@ export default function Calendar(props) {
           };
         });
         bookings = bookings.concat(calendarEvents);
-        console.log(bookings);
+       
         setEvents(bookings);
       });
       setEventData(res.data);
@@ -249,6 +261,7 @@ export default function Calendar(props) {
   }, [bookingsRefresher]);
   // cancelled bookings
   const cancelBooking = () => {
+    
     axios
       .get(`${BASE_URL}/api/cancelBooking/${tempId}`)
       .then(() => {
@@ -493,8 +506,7 @@ export default function Calendar(props) {
                       .then((response) => {
                         totalDuration = response.data.duration;
                         var limit = 3 - totalDuration;
-                        console.log("limit " + limit);
-                        console.log(hoursDuration);
+                        
                         if (user?.role === "user") {
                           if (hoursDuration > limit || limit < 0) {
                             setAlertMessage("You have exceeded the limit of 3 hours booking per week");
@@ -511,14 +523,14 @@ export default function Calendar(props) {
                           }
                         }
 
-                        console.log(hoursDuration);
+                       
                         var tempBooking = booking.current;
                         tempBooking.startTime = startTime;
                         tempBooking.endTime = endTime;
                         tempBooking.date = startDate;
                         tempBooking.venue = venueSelected;
                         booking.current = tempBooking;
-                        console.log(booking.current);
+                        // console.log(booking.current);
                         setOpenModal1(true);
                       })
                       .catch((error) => {
@@ -529,7 +541,7 @@ export default function Calendar(props) {
                 }}
                 //function para ig click ug usa ka event
                 eventClick={(e) => {
-                  console.log(e);
+                  // console.log(e);
                   if (e.event._def.extendedProps.type === "rule") {
                     setAlertMessage(
                       "Booking not available at this time due to a scheduled important event."
@@ -705,7 +717,7 @@ export default function Calendar(props) {
                 />
                 <Button
                   onClick={(e) => {
-                    console.log(attendLimit);
+                    // console.log(attendLimit);
                     if (attendeeList.length >= attendLimit) {
                       // alert("Limit Exceeded for This Venue");
                       setAlertInfo({
@@ -860,7 +872,7 @@ export default function Calendar(props) {
                             "You can't borrow computers more than the number of attendees",
                         });
                       } else {
-                        console.log(attendeeList.length);
+                        // console.log(attendeeList.length);
                         calculateCost();
                         setOpenModal3(true);
                         setOpenModal2(false);
@@ -1352,6 +1364,7 @@ export default function Calendar(props) {
                   sx={ButtonStyle1}
                   variant="contained"
                   onClick={() => {
+                    console.log(info.cancelCost)
                     setCancelModal(true);
                     setOpenInfoModal(false);
                   }}
@@ -1415,7 +1428,7 @@ export default function Calendar(props) {
                       marginBottom="5px"
                       fontFamily="Poppins"
                     >
-                      Cost of Cancellation: 10
+                      Cost of Cancellation:{info?.cancelCost}
                     </Typography>
                   </Box>
                   <Box
