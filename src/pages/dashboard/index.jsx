@@ -190,7 +190,7 @@ export default function Tracker(props) {
                       elevation={3}
                       sx={{
                         width: 243,
-                        height: "auto",
+                        minHeight: 300,
                         display: "relative",
                         background: "#ffe836",
                         border: "1px solid #fecc00",

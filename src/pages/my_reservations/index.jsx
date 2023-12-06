@@ -78,7 +78,7 @@ export default function MyReservations(props) {
   const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
-  const [facilities,setFacilities]=useState([]);
+  const [facilities, setFacilities] = useState([]);
   const found = (element) => element.name === attendeeName;
   const deleteUser = (index) => {
     setAttendeeList([
@@ -99,15 +99,14 @@ export default function MyReservations(props) {
     let a = events.find((item) => {
       return item.id === id;
     });
-    var cancelCost=0
-    
-    if(a.points===0&&a.coins>0){
-      cancelCost=a.coins*0.3
+    var cancelCost = 0;
+
+    if (a.points === 0 && a.coins > 0) {
+      cancelCost = a.coins * 0.3;
+    } else if (a.coins === 0 && a.points > 0) {
+      cancelCost = a.points * 0.3;
     }
-    else if(a.coins===0&&a.points>0){
-      cancelCost=a.points*0.3
-    }
-    a={...a,cancelCost:cancelCost}
+    a = { ...a, cancelCost: cancelCost };
     axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
@@ -133,7 +132,7 @@ export default function MyReservations(props) {
     axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       // stroe lng nakog variable ang index 0 pra di sigeg access
-      var indx0=res?.data[0]
+      var indx0 = res?.data[0];
       setVenueSelected(indx0.facility.facility_name);
       setVenueId(indx0?.facility?.facility_id);
       // setAttendeLimit(indx0?.main_rules?.num_attendies);
@@ -151,7 +150,7 @@ export default function MyReservations(props) {
     booking.current = tempBooking;
     setRefresh(!refresh);
   };
-  
+
   //display bookings
   const [events, setEvents] = useState([]);
   // React.useEffect(() => {
@@ -213,6 +212,7 @@ export default function MyReservations(props) {
   const [openInfoModal, setOpenInfoModal] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
+  const [isEventToday, setIsEventToday] = useState(false);
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
@@ -220,10 +220,8 @@ export default function MyReservations(props) {
   ]);
 
   useEffect(() => {
-    
     const filtered = events.filter((item) => item.venue === venueId);
-      setFilteredEvents(filtered);
-    
+    setFilteredEvents(filtered);
   }, [venueId, events]);
 
   //searchbar
@@ -273,8 +271,6 @@ export default function MyReservations(props) {
   // );
 
   useEffect(() => {
-   
-  
     if (statusSelected === "Cancelled" && user?.role === "admin") {
       axios
         .get(`${BASE_URL}/api/getAllCancelledBookings/`)
@@ -304,10 +300,9 @@ export default function MyReservations(props) {
         });
     }
     if (timeSelected === "Upcoming" && user?.role === "user") {
-     
       axios
         .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.user_id}/`)
-        .then((response) => {          
+        .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
@@ -317,15 +312,13 @@ export default function MyReservations(props) {
       axios
         .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.user_id}/`)
         .then((response) => {
-          
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching history bookings:", error);
         });
     }
-    
-  }, [statusSelected, timeSelected,bookingsRefresher]);
+  }, [statusSelected, timeSelected, bookingsRefresher]);
   const addAttendee = () => {
     let isExisting = false;
     let id = null;
@@ -478,12 +471,12 @@ export default function MyReservations(props) {
                           ? selectedStyle
                           : unselectedStyle
                       }
-                      onClick={() =>{
-                        setTimeSelected("Upcoming")
-                        console.log(events)
-                      } }
+                      onClick={() => {
+                        setTimeSelected("Upcoming");
+                        console.log(events);
+                      }}
                     >
-                      Upcoming
+                      Today & Upcoming
                     </Button>
                     <Button
                       sx={
@@ -540,6 +533,11 @@ export default function MyReservations(props) {
                                 sx={ButtonStyle1}
                                 onClick={() => {
                                   handleView(event.id);
+                                  const selectedEventDate = new Date(event.date); // event.date, date from the table 
+                                  const today = new Date();
+                                  const isToday = selectedEventDate.toDateString() === today.toDateString();
+                                  // update 
+                                  setIsEventToday(isToday);
                                   // axios
                                   //   .get(
                                   //     `http://localhost:8000/api/getAttendees/${tempId}/`
@@ -680,25 +678,21 @@ export default function MyReservations(props) {
 
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                   <ButtonGroup>
-                    {
-                      facilities.map((item, index) => (
-                        <Button
-                          sx={
-                            venueSelected === item?.facility?.facility_name
-                              ? selectedStyle
-                              : unselectedStyle
-                          }
-                          onClick={() => {
-                            
-                            setVenueSelected(item?.facility?.facility_name);
-                            setVenueId(item?.facility?.facility_id);  
-                            
-                          }}
-                        >
-                         {item?.facility?.facility_name}
-                        </Button>
-                      ))
-                    }
+                    {facilities.map((item, index) => (
+                      <Button
+                        sx={
+                          venueSelected === item?.facility?.facility_name
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => {
+                          setVenueSelected(item?.facility?.facility_name);
+                          setVenueId(item?.facility?.facility_id);
+                        }}
+                      >
+                        {item?.facility?.facility_name}
+                      </Button>
+                    ))}
                     {/* <Button
                       sx={
                         venueSelected === "Coworking Space"
@@ -1196,14 +1190,14 @@ export default function MyReservations(props) {
                       </React.Fragment>
                     ))}
                   </List>
-                  {timeSelected !== "History" && user?.role === "user" &&(
-                       <Typography
-                       sx={{ paddingLeft: 2, color: "darkred" }}
-                       fontFamily="Poppins"
-                     >
-                       Note: 30% of cost as cancellation fee
-                     </Typography>
-                    )}
+                  {timeSelected !== "History" && user?.role === "user" && (
+                    <Typography
+                      sx={{ paddingLeft: 2, color: "darkred" }}
+                      fontFamily="Poppins"
+                    >
+                      Note: 30% of cost as cancellation fee
+                    </Typography>
+                  )}
                   <Box
                     sx={{
                       margin: "10px 15px 15px 10px",
@@ -1216,9 +1210,18 @@ export default function MyReservations(props) {
                         sx={ButtonStyle1}
                         variant="contained"
                         onClick={() => {
-                          setCancelModal(true);
-                          setViewModal(false);
+                          if (isEventToday) {
+                            console.log(
+                              "Cannot cancel booking for events happening today"
+                            );
+                          } else {
+                            console.log(viewDetails.cancelCost);
+                            setCancelModal(true);
+                            setOpenInfoModal(false);
+                          }
                         }}
+                        // disable if the event is today
+                        disabled={isEventToday}
                       >
                         Cancel Booking
                       </Button>
@@ -1273,7 +1276,11 @@ export default function MyReservations(props) {
                       Are you sure you want to cancel?
                     </Typography>
 
-                    <Typography marginBottom="15px" fontFamily="Poppins">
+                    <Typography
+                      marginBottom="15px"
+                      fontFamily="Poppins"
+                      textAlign="center"
+                    >
                       Cost of Cancellation: {viewDetails.cancelCost}
                     </Typography>
                   </Box>

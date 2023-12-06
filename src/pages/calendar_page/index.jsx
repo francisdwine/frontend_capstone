@@ -284,7 +284,6 @@ export default function Calendar(props) {
       startTime: booking.current.startTime,
       endTime: booking.current.endTime,
       numOfStudents: attendeeList.length + 1,
-      // Add any other necessary data here
     };
 
     axios
@@ -345,6 +344,7 @@ export default function Calendar(props) {
   const navigate = useNavigate();
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [alertInfo, setAlertInfo] = useState({
     visible: false,
     variant: "info",
@@ -506,10 +506,12 @@ export default function Calendar(props) {
                       .then((response) => {
                         totalDuration = response.data.duration;
                         var limit = 3 - totalDuration;
-                        
+
                         if (user?.role === "user") {
                           if (hoursDuration > limit || limit < 0) {
-                            setAlertMessage("You have exceeded the limit of 3 hours booking per week");
+                            setAlertMessage(
+                              "You have exceeded the limit of 3 hours booking per week"
+                            );
                             setAlertOpen(true);
                             setAlertSuccess(false);
                             // alert("You have exceeded the limit of 3 hours booking per week")
@@ -523,7 +525,6 @@ export default function Calendar(props) {
                           }
                         }
 
-                       
                         var tempBooking = booking.current;
                         tempBooking.startTime = startTime;
                         tempBooking.endTime = endTime;
@@ -541,6 +542,7 @@ export default function Calendar(props) {
                 }}
                 //function para ig click ug usa ka event
                 eventClick={(e) => {
+                  setSelectedEvent(e.event);
                   // console.log(e);
                   if (e.event._def.extendedProps.type === "rule") {
                     setAlertMessage(
@@ -723,8 +725,7 @@ export default function Calendar(props) {
                       setAlertInfo({
                         visible: true,
                         variant: "info",
-                        message:
-                          "Limit Exceeded for This Venue.",
+                        message: "Limit Exceeded for This Venue.",
                       });
                       return;
                     }
@@ -733,8 +734,7 @@ export default function Calendar(props) {
                       setAlertInfo({
                         visible: true,
                         variant: "info",
-                        message:
-                          "Please Enter Attendee name.",
+                        message: "Please Enter Attendee name.",
                       });
                       return;
                     }
@@ -759,8 +759,7 @@ export default function Calendar(props) {
                         setAlertInfo({
                           visible: true,
                           variant: "info",
-                          message:
-                            "User not found",
+                          message: "User not found",
                         });
                         return;
                       }
@@ -1364,10 +1363,21 @@ export default function Calendar(props) {
                   sx={ButtonStyle1}
                   variant="contained"
                   onClick={() => {
-                    console.log(info.cancelCost)
-                    setCancelModal(true);
-                    setOpenInfoModal(false);
+                    const isEventToday = selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString();
+
+                    if (isEventToday) {
+                      // if event is today
+                      console.log("Cannot cancel booking for events happening today");
+                    } else {
+                      // if event is not today
+                      console.log(info.cancelCost);
+                      setCancelModal(true);
+                      setOpenInfoModal(false);
+                    }
                   }}
+                  // disable button
+                  disabled={selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString()
+                  }
                 >
                   Cancel Booking
                 </Button>
@@ -1404,7 +1414,12 @@ export default function Calendar(props) {
           aria-describedby="modal-modal-description"
           style={{ width: "100%", overflow: "auto" }}
         >
-          <Box sx={modalStyle}>
+          <Box
+            sx={{
+              ...modalStyle,
+              width: { lg: 500, xs: 350, sm: 500, md: 500, xl: 500 },
+            }}
+          >
             <Box sx={modalHeaderStyle}>
               <Typography
                 sx={{ fontWeight: "bold" }}
@@ -1414,32 +1429,53 @@ export default function Calendar(props) {
                 fontFamily="Poppins"
                 color="white"
               >
-                Are you sure you want to cancel?
+                Cancel Booking
               </Typography>
             </Box>
             <Box p={4}>
               {user?.role === "user" ? (
                 <Box>
                   <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
+                    sx={{ display: "column", justifyContent: "space-between" }}
                   >
                     <Typography
                       fontWeight="bold"
-                      marginBottom="5px"
+                      marginBottom="10px"
                       fontFamily="Poppins"
+                      fontSize="25px"
                     >
-                      Cost of Cancellation:{info?.cancelCost}
+                      Are you sure you want to cancel?
+                    </Typography>
+
+                    <Typography marginBottom="15px" fontFamily="Poppins" textAlign="center">
+                      Cost of Cancellation: {info.cancelCost}
                     </Typography>
                   </Box>
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Button variant="contained">Pay</Button>
                     <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
+                      variant="contained"
+                      onClick={() => cancelBooking(tempId)}
+                    >
+                      Pay{" "}
+                    </Button>
+                    {/* <Button variant="contained">Pay</Button> */}
+                    <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
                       variant="contained"
                       onClick={() => {
-                        // submitBooking();
                         setViewModal(true);
+                        setViewModal(false);
                         setCancelModal(false);
                       }}
                     >
@@ -1458,7 +1494,7 @@ export default function Calendar(props) {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setViewModal(true);
+                      setViewModal(false);
                       setCancelModal(false);
                     }}
                   >
