@@ -4,6 +4,7 @@ import axios from "axios";
 import Modal from "@mui/material/Modal";
 import { Box, Button, Typography } from "@mui/material";
 import { modalHeaderStyle, ButtonStyle1 } from "./styles";
+import { CustomAlert } from "../calendar_page";
 
 export default function Attendance(props) {
   const [attendance, setAttendance] = useState(false);
@@ -14,7 +15,12 @@ export default function Attendance(props) {
   const [tapInput, setTapInput] = useState("");
   const [scannedNumber, setScannedNumber] = useState("");
   const [avail, setAvail] = useState(true);
-  const [warningMessage, setWarningMessage] = useState('');
+  const [warningMessage, setWarningMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
 
   const openAttendanceModal = () => {
     setAttendance(true);
@@ -63,7 +69,8 @@ export default function Attendance(props) {
             closeModal();
           } else if (response.data.state === "noBooking") {
             setAvail(false);
-            alert('You Have No Booking within 30 minutes!');
+            // alert("You Have No Booking within 30 minutes!");
+            setAlertOpen(true);
           } else {
             setLoggedOutModal(true);
           }
@@ -89,6 +96,13 @@ export default function Attendance(props) {
 
   return (
     <div>
+      {alertOpen && (
+        <CustomAlert
+          open={alertOpen}
+          onClose={handleAlertClose}
+          message="You Have No Booking within 30 minutes!"
+        />
+      )}
       <div style={{ margin: "80px" }}></div>
       <Modal
         open={true}
@@ -111,7 +125,9 @@ export default function Attendance(props) {
           }}
         >
           <h2 sx={{ modalHeaderStyle }}>Tap Here</h2>
-          <Typography sx={{ fontFamily: "Poppins", fontSize: 30, fontWeight: "bold" }}>
+          <Typography
+            sx={{ fontFamily: "Poppins", fontSize: 30, fontWeight: "bold" }}
+          >
             Please tap your ID:
           </Typography>
           <div style={{ margin: "20px" }}></div>

@@ -40,6 +40,8 @@ import {
 } from "./styles";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { CustomAlert } from "../calendar_page";
+import FilledAlerts from "../../alerts";
 
 // const events = [
 //   {
@@ -80,6 +82,12 @@ export default function MyReservations(props) {
   const [viewDetails, setViewDetails] = useState({});
   const [facilities, setFacilities] = useState([]);
   const found = (element) => element.name === attendeeName;
+  const [alertOpen, setAlertOpen] = useState(false);
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
+
   const deleteUser = (index) => {
     setAttendeeList([
       ...attendeeList.slice(0, index),
@@ -190,7 +198,9 @@ export default function MyReservations(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
-        alert("Booking cancelled successfully");
+        setAlertMessage("Booking cancelled successfully!");
+        setAlertOpen(true);
+        setAlertSuccess(true);
       })
       .catch((error) => {
         console.error("Error cancelling booking:", error);
@@ -213,12 +223,19 @@ export default function MyReservations(props) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
   const [isEventToday, setIsEventToday] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({
+    visible: false,
+    variant: "info",
+    message: "",
+  });
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
     { name: "Celine", id: 4 },
   ]);
-
+//to filter by venue id
   useEffect(() => {
     const filtered = events.filter((item) => item.venue === venueId);
     setFilteredEvents(filtered);
@@ -325,7 +342,13 @@ export default function MyReservations(props) {
     let userFound = null;
     // Add attendee to the booking using the 'addAttendee' API
     if (attendeeName === "") {
-      alert("Please Enter Attendee name");
+     // alert("Please Enter Attendee name");
+     setAlertInfo({
+      visible: true,
+      variant: "info",
+      message:
+        "Please Enter Attendee name",
+    });
       return;
     }
     {
@@ -348,12 +371,24 @@ export default function MyReservations(props) {
         axios.get(`${BASE_URL}/api/getAttendees/${tempId}/`).then((res) => {
           setAttendeeList(res.data);
         });
-        alert("Attendee added to the booking.");
+        //alert("Attendee added to the booking.");
+        setAlertInfo({
+          visible: true,
+          variant: "info",
+          message:
+            "Attendee added to the booking.",
+        });
       })
       .catch((error) => {
         console.error("Error adding attendee to the booking:", error);
       });
   };
+  {alertInfo.visible && (
+    <FilledAlerts
+      variant={alertInfo.variant}
+      message={alertInfo.message}
+    />
+  )}
 
   const deleteAttendee = (id) => {
     axios
@@ -380,7 +415,10 @@ export default function MyReservations(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
-        alert("Booking updated successfully");
+        //alert("Booking updated successfully");
+        setAlertMessage("Booking updated successfully!");
+        setAlertOpen(true);
+        setAlertSuccess(true);
       })
       .catch((error) => {
         console.error("Error updating booking:", error);
@@ -416,6 +454,11 @@ export default function MyReservations(props) {
   } else {
     return (
       <div>
+        <CustomAlert
+          open={alertOpen}
+          onClose={handleAlertClose}
+          message={alertMessage}
+        />;
         {user?.role === "user" ? (
           <DashBoardTemplate title="My Reservations">
             <div
@@ -512,7 +555,7 @@ export default function MyReservations(props) {
                     </TableHead>
                     <TableBody>
                       {/* user */}
-                      {filteredEvents
+                      {events
                         .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                         .map((event, index) => (
                           <StyledTableRow key={index}>
@@ -533,10 +576,14 @@ export default function MyReservations(props) {
                                 sx={ButtonStyle1}
                                 onClick={() => {
                                   handleView(event.id);
-                                  const selectedEventDate = new Date(event.date); // event.date, date from the table 
+                                  const selectedEventDate = new Date(
+                                    event.date
+                                  ); // event.date, date from the table
                                   const today = new Date();
-                                  const isToday = selectedEventDate.toDateString() === today.toDateString();
-                                  // update 
+                                  const isToday =
+                                    selectedEventDate.toDateString() ===
+                                    today.toDateString();
+                                  // update
                                   setIsEventToday(isToday);
                                   // axios
                                   //   .get(
@@ -834,7 +881,6 @@ export default function MyReservations(props) {
             </Box>
           </DashBoardTemplate>
         )}
-
         <Modal
           disableAutoFocus={true}
           open={viewModal}
@@ -1232,7 +1278,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/* Are you sure you want to cancel */}
         <Modal
           disableAutoFocus={true}
@@ -1338,7 +1383,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/*Edit Modal */}
         <Modal
           disableAutoFocus={true}
@@ -1442,7 +1486,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/*Attendees Edit*/}
         {/* <Modal
         disableAutoFocus={true}

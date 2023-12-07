@@ -24,7 +24,7 @@ import {
   Typography,
   Autocomplete,
 } from "@mui/material";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Modal from "@mui/material/Modal";
 import CloseIcon from "@mui/icons-material/Close";
 // import MenuItem from "@mui/material/MenuItem";
@@ -68,6 +68,51 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
+export function CustomAlert({ open, onClose, title, message, success }){
+  const defaultBackgroundColor = success ? "#5bb450" : "#e74c3c";
+  console.log(success);
+  const defaultTextColor = "white";
+
+  const dialogStyle = {
+    "& .MuiPaper-root": {
+      backgroundColor: defaultBackgroundColor,
+      maxWidth: "900px",
+      width: "480px",
+      color: defaultTextColor,
+      position: "absolute",
+      top: "0",
+      left: "50%",
+      transform: "translate(-50%, 0)",
+      borderRadius: "10px",
+      height: "100px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    },
+    "& .MuiButton-root": {
+      color: defaultTextColor,
+    },
+  };
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [open, onClose]);
+
+  return (
+    <Dialog open={open} onClose={onClose} sx={dialogStyle}>
+      <DialogTitle closeButton>{title}</DialogTitle>
+      <DialogContent sx={{ justifyContent: "center" }}>{message}</DialogContent>
+      <DialogActions></DialogActions>
+    </Dialog>
+  );
+};
+
 export default function Calendar(props) {
   let { user, setUser, authenticated } = useContext(AuthContext);
 
@@ -77,34 +122,8 @@ export default function Calendar(props) {
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState("admin"); //default role
   const [info, setInfo] = useState({});
-  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(true);
 
-  const CustomAlert = ({ open, onClose, title, message, success }) => {
-    const defaultBackgroundColor = success ? '#5bb450' : '#e74c3c';
-    const defaultTextColor = 'white';
-  
-    const dialogStyle = {
-      "& .MuiPaper-root": {
-        backgroundColor: defaultBackgroundColor,
-        maxWidth: "400px",
-        width: "100%",
-        color: defaultTextColor,
-      },
-      "& .MuiButton-root": {
-        color: defaultTextColor,
-      },
-    };
-  
-    return (
-      <Dialog open={open} onClose={onClose} sx={dialogStyle}>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent>{message}</DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
 
   const submitBooking = () => {
     // setAttendeeList(attendeeList=>[
@@ -118,7 +137,7 @@ export default function Calendar(props) {
     ) {
       booking.current.officeName = "none";
     }
-    
+
     axios
       .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
@@ -141,7 +160,9 @@ export default function Calendar(props) {
       })
       .then((res) => {
         if (res.data.error) {
-          alert(res.data.error);
+          setAlertMessage(res.data.error);
+          setAlertOpen(true);
+          setAlertSuccess(false);
         } else {
           setBookingsRefresher(!bookingsRefresher);
           setAlertMessage("Booking created successfully!");
@@ -175,20 +196,18 @@ export default function Calendar(props) {
     var res = eventData.find((item) => {
       return item?.id === parseInt(id);
     });
-    
-    var cancelCost=0
-    
-    if(res.points===0&&res.coins>0){
-      cancelCost=res.coins*0.3
+
+    var cancelCost = 0;
+
+    if (res.points === 0 && res.coins > 0) {
+      cancelCost = res.coins * 0.3;
+    } else if (res.coins === 0 && res.points > 0) {
+      cancelCost = res.points * 0.3;
     }
-    else if(res.coins===0&&res.points>0){
-      cancelCost=res.points*0.3
-    }
-    console.log(cancelCost)
-    res={...res,cancelCost:cancelCost}
+    console.log(cancelCost);
+    res = { ...res, cancelCost: cancelCost };
     // console.log("user called ID:", res.user_id);
     setInfo(res);
-    
     setOpenInfoModal(true);
   };
 
@@ -206,7 +225,6 @@ export default function Calendar(props) {
         setMaxComputers(indx0?.main_rules?.num_pc);
       });
     });
-   
   }, []);
 
   //display bookings
@@ -237,7 +255,6 @@ export default function Calendar(props) {
       });
 
       axios.get(`${BASE_URL}/api/getEvents/`).then((res) => {
-        
         var calendarEvents;
         calendarEvents = res?.data.map((item) => {
           var dateSplit = item?.date.split("T");
@@ -253,7 +270,7 @@ export default function Calendar(props) {
           };
         });
         bookings = bookings.concat(calendarEvents);
-       
+
         setEvents(bookings);
       });
       setEventData(res.data);
@@ -261,7 +278,6 @@ export default function Calendar(props) {
   }, [bookingsRefresher]);
   // cancelled bookings
   const cancelBooking = () => {
-    
     axios
       .get(`${BASE_URL}/api/cancelBooking/${tempId}`)
       .then(() => {
@@ -432,7 +448,7 @@ export default function Calendar(props) {
                     onClick={() => {
                       setVenueSelected("Coworking Space");
                       setVenueId(1);
-                      
+
                     }}
                   >
                     Co-working Space
@@ -1447,7 +1463,11 @@ export default function Calendar(props) {
                       Are you sure you want to cancel?
                     </Typography>
 
-                    <Typography marginBottom="15px" fontFamily="Poppins" textAlign="center">
+                    <Typography
+                      marginBottom="15px"
+                      fontFamily="Poppins"
+                      textAlign="center"
+                    >
                       Cost of Cancellation: {info.cancelCost}
                     </Typography>
                   </Box>

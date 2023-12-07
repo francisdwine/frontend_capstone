@@ -158,6 +158,8 @@ export default function Tracker(props) {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
+              maxWidth: "100%",
+
             }}
           >
             <Box sx={{ flexGrow: 1 }}>
@@ -191,6 +193,7 @@ export default function Tracker(props) {
                       sx={{
                         width: 243,
                         minHeight: 300,
+                        height: 'auto',
                         display: "relative",
                         background: "#ffe836",
                         border: "1px solid #fecc00",

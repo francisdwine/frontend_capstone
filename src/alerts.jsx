@@ -12,6 +12,8 @@ const alertStyles = {
 };
 
 export default function FilledAlerts({ variant, message }) {
+  const [showAlert, setShowAlert] = React.useState(true);
+
   const renderAlert = () => {
     switch (variant) {
       case 'info':
@@ -32,5 +34,13 @@ export default function FilledAlerts({ variant, message }) {
     }
   };
 
-  return <div style={alertStyles}>{renderAlert()}</div>;
+  // React.useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setShowAlert(false);
+  //   }, 1000);
+
+  //   return () => clearTimeout(timer);
+  // }, []);
+
+  return <div style={alertStyles}>{showAlert && renderAlert()}</div>;
 }
