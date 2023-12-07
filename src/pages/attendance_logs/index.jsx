@@ -24,6 +24,9 @@ import {
   StyledInputBase,
   Search,
 } from "./styles";
+import { useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import AuthContext from "../../context/AuthContext";
 
 export default function Logs(props) {
   const [venueSelected, setVenueSelected] = useState("Coworking Space");
@@ -34,6 +37,8 @@ export default function Logs(props) {
   const [events, setEvents] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
+  const navigate = useNavigate();
+  let { user, setUser, authenticated } = useContext(AuthContext);
 
   useEffect(() => {
     axios
@@ -105,73 +110,78 @@ export default function Logs(props) {
     setPage(0); //reset to first page
   };
 
-  return (
-    <div>
-      <DashBoardTemplate title="Attendance Logs">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-            fontFamily: "Poppins",
-            paddingTop: "30px",
-          }}
-        ></div>
-        <br></br>
-        <Box
-          backgroundColor="white"
-          display="flex"
-          alignItems="center"
-          flexDirection="column"
-        >
-          <div>
+  if (user === null && user.role !== "admin") {
+    navigate("/booking/login");
+  } else if (user.role === "user") {
+    navigate("/booking/calendar");
+  } else if (user.role === "admin") {
+    return (
+      <div>
+        <DashBoardTemplate title="Attendance Logs">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "start",
+              fontFamily: "Poppins",
+              paddingTop: "30px",
+            }}
+          ></div>
+          <br></br>
+          <Box
+            backgroundColor="white"
+            display="flex"
+            alignItems="center"
+            flexDirection="column"
+          >
+            <div>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  display: "flex",
+                  border: "3px solid rgba(0, 0, 0, 0.05)",
+                  marginLeft: "745px",
+                  alignItems: "center",
+                  paddingLeft: 2,
+                  backgroundColor: "white",
+                }}
+              >
+                <SearchIconWrapper>
+                  <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                  placeholder="Search..."
+                  value={searchText}
+                  onChange={handleSearchTextChange}
+                  inputProps={{ "aria-label": "search" }}
+                />
+              </Box>
+            </div>
+
             <Box
               sx={{
-                flexGrow: 1,
-                display: "flex",
-                border: "3px solid rgba(0, 0, 0, 0.05)",
-                marginLeft: "745px",
-                alignItems: "center",
-                paddingLeft: 2,
-                backgroundColor: "white",
+                p: "0px 0px 0px 0px",
               }}
+              maxWidth="90%"
             >
-              <SearchIconWrapper>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                placeholder="Search..."
-                value={searchText}
-                onChange={handleSearchTextChange}
-                inputProps={{ "aria-label": "search" }}
-              />
-            </Box>
-          </div>
-
-          <Box
-            sx={{
-              p: "0px 0px 0px 0px",
-            }}
-            maxWidth="90%"
-          >
-            <div style={{ display: "flex", justifyContent: "flex-start" }}>
-              <ButtonGroup>
-                {facilities.map((item, index) => (
-                  <Button
-                    sx={
-                      venueSelected === item?.facility?.facility_name
-                        ? selectedStyle
-                        : unselectedStyle
-                    }
-                    onClick={() => {
-                      setVenueSelected(item?.facility?.facility_name);
-                      setVenueId(item?.facility?.facility_id);
-                    }}
-                  >
-                    {item?.facility?.facility_name}
-                  </Button>
-                ))}
-                {/* <Button
+              <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                <ButtonGroup>
+                  {facilities.map((item, index) => (
+                    <Button
+                      sx={
+                        venueSelected === item?.facility?.facility_name
+                          ? selectedStyle
+                          : unselectedStyle
+                      }
+                      onClick={() => {
+                        setVenueSelected(item?.facility?.facility_name);
+                        setVenueId(item?.facility?.facility_id);
+                      }}
+                    >
+                      {item?.facility?.facility_name}
+                    </Button>
+                  ))}
+                  {/* <Button
                     sx={
                       venueSelected === "Coworking Space"
                         ? selectedStyle
@@ -210,74 +220,79 @@ export default function Logs(props) {
                   >
                     CONFERENCE B
                   </Button> */}
-              </ButtonGroup>
-            </div>
-            <TableContainer>
-              <Table
-                style={{
-                  width: 1000,
-                  textAlign: "center",
-                  fontFamily: "Oswald",
-                }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <StyledTableCell align="center">Name</StyledTableCell>
-                    <StyledTableCell align="center">isLoggedin</StyledTableCell>
-                    <StyledTableCell align="center">
-                      isOverstaying
-                    </StyledTableCell>
-                    <StyledTableCell align="center">Date</StyledTableCell>
-                    <StyledTableCell align="center">Login Time</StyledTableCell>
-                    <StyledTableCell align="center">
-                      Logout Time
-                    </StyledTableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredEvents
-                    .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                    .map((event, index) => (
-                      <StyledTableRow key={index}>
-                        <StyledTableCell
-                          component="th"
-                          scope="row"
-                          align="center"
-                        >
-                          {event.name}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.isSignedIn === true ? "Yes" : "No"}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.isOverstaying === true ? "Yes" : "No"}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.date}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.signInTime}
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          {event.signOutTime}
-                        </StyledTableCell>
-                      </StyledTableRow>
-                    ))}
-                </TableBody>
-              </Table>
-              <TablePagination
-                component="div"
-                count={filteredEvents.length}
-                page={page}
-                onPageChange={handlePageChange}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleRowsPerPageChange}
-                labelRowsPerPage=""
-              />
-            </TableContainer>
+                </ButtonGroup>
+              </div>
+              <TableContainer>
+                <Table
+                  style={{
+                    width: 1000,
+                    textAlign: "center",
+                    fontFamily: "Oswald",
+                  }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <StyledTableCell align="center">Name</StyledTableCell>
+                      <StyledTableCell align="center">
+                        isLoggedin
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        isOverstaying
+                      </StyledTableCell>
+                      <StyledTableCell align="center">Date</StyledTableCell>
+                      <StyledTableCell align="center">
+                        Login Time
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        Logout Time
+                      </StyledTableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {filteredEvents
+                      .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                      .map((event, index) => (
+                        <StyledTableRow key={index}>
+                          <StyledTableCell
+                            component="th"
+                            scope="row"
+                            align="center"
+                          >
+                            {event.name}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.isSignedIn === true ? "Yes" : "No"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.isOverstaying === true ? "Yes" : "No"}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.date}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.signInTime}
+                          </StyledTableCell>
+                          <StyledTableCell align="center">
+                            {event.signOutTime}
+                          </StyledTableCell>
+                        </StyledTableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  component="div"
+                  count={filteredEvents.length}
+                  page={page}
+                  onPageChange={handlePageChange}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleRowsPerPageChange}
+                  labelRowsPerPage=""
+                />
+              </TableContainer>
+            </Box>
           </Box>
-        </Box>
-      </DashBoardTemplate>
-    </div>
-  );
+        </DashBoardTemplate>
+      </div>
+    );
+  }
 }

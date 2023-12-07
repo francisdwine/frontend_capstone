@@ -40,6 +40,8 @@ import {
 } from "./styles";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { CustomAlert } from "../calendar_page";
+import FilledAlerts from "../../alerts";
 
 // const events = [
 //   {
@@ -78,8 +80,14 @@ export default function MyReservations(props) {
   const [role, setRole] = useState("admin"); //default role
   const [attendeesModal, setAttendeesModal] = useState(false);
   const [viewDetails, setViewDetails] = useState({});
-  const [facilities,setFacilities]=useState([]);
+  const [facilities, setFacilities] = useState([]);
   const found = (element) => element.name === attendeeName;
+  const [alertOpen, setAlertOpen] = useState(false);
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+  };
+
   const deleteUser = (index) => {
     setAttendeeList([
       ...attendeeList.slice(0, index),
@@ -99,6 +107,14 @@ export default function MyReservations(props) {
     let a = events.find((item) => {
       return item.id === id;
     });
+    var cancelCost = 0;
+
+    if (a.points === 0 && a.coins > 0) {
+      cancelCost = a.coins * 0.3;
+    } else if (a.coins === 0 && a.points > 0) {
+      cancelCost = a.points * 0.3;
+    }
+    a = { ...a, cancelCost: cancelCost };
     axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
@@ -124,7 +140,7 @@ export default function MyReservations(props) {
     axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       // stroe lng nakog variable ang index 0 pra di sigeg access
-      var indx0=res?.data[0]
+      var indx0 = res?.data[0];
       setVenueSelected(indx0.facility.facility_name);
       setVenueId(indx0?.facility?.facility_id);
       // setAttendeLimit(indx0?.main_rules?.num_attendies);
@@ -142,7 +158,7 @@ export default function MyReservations(props) {
     booking.current = tempBooking;
     setRefresh(!refresh);
   };
-  
+
   //display bookings
   const [events, setEvents] = useState([]);
   // React.useEffect(() => {
@@ -182,7 +198,9 @@ export default function MyReservations(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
-        alert("Booking cancelled successfully");
+        setAlertMessage("Booking cancelled successfully!");
+        setAlertOpen(true);
+        setAlertSuccess(true);
       })
       .catch((error) => {
         console.error("Error cancelling booking:", error);
@@ -204,17 +222,23 @@ export default function MyReservations(props) {
   const [openInfoModal, setOpenInfoModal] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
+  const [isEventToday, setIsEventToday] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertInfo, setAlertInfo] = useState({
+    visible: false,
+    variant: "info",
+    message: "",
+  });
   const [attendeeList, setAttendeeList] = useState([
     { name: "127-2242-290", id: 2 },
     { name: "225-5224-280", id: 3 },
     { name: "Celine", id: 4 },
   ]);
-
+//to filter by venue id
   useEffect(() => {
-    
     const filtered = events.filter((item) => item.venue === venueId);
-      setFilteredEvents(filtered);
-    
+    setFilteredEvents(filtered);
   }, [venueId, events]);
 
   //searchbar
@@ -264,8 +288,6 @@ export default function MyReservations(props) {
   // );
 
   useEffect(() => {
-   
-  
     if (statusSelected === "Cancelled" && user?.role === "admin") {
       axios
         .get(`${BASE_URL}/api/getAllCancelledBookings/`)
@@ -295,10 +317,9 @@ export default function MyReservations(props) {
         });
     }
     if (timeSelected === "Upcoming" && user?.role === "user") {
-     
       axios
         .get(`${BASE_URL}/api/getUpcomingUserBookings/${user?.user_id}/`)
-        .then((response) => {          
+        .then((response) => {
           setEvents(response.data);
         })
         .catch((error) => {
@@ -308,22 +329,26 @@ export default function MyReservations(props) {
       axios
         .get(`${BASE_URL}/api/getHistoryUserBookings/${user?.user_id}/`)
         .then((response) => {
-          
           setEvents(response.data);
         })
         .catch((error) => {
           console.error("Error fetching history bookings:", error);
         });
     }
-    
-  }, [statusSelected, timeSelected,bookingsRefresher]);
+  }, [statusSelected, timeSelected, bookingsRefresher]);
   const addAttendee = () => {
     let isExisting = false;
     let id = null;
     let userFound = null;
     // Add attendee to the booking using the 'addAttendee' API
     if (attendeeName === "") {
-      alert("Please Enter Attendee name");
+     // alert("Please Enter Attendee name");
+     setAlertInfo({
+      visible: true,
+      variant: "info",
+      message:
+        "Please Enter Attendee name",
+    });
       return;
     }
     {
@@ -346,12 +371,24 @@ export default function MyReservations(props) {
         axios.get(`${BASE_URL}/api/getAttendees/${tempId}/`).then((res) => {
           setAttendeeList(res.data);
         });
-        alert("Attendee added to the booking.");
+        //alert("Attendee added to the booking.");
+        setAlertInfo({
+          visible: true,
+          variant: "info",
+          message:
+            "Attendee added to the booking.",
+        });
       })
       .catch((error) => {
         console.error("Error adding attendee to the booking:", error);
       });
   };
+  {alertInfo.visible && (
+    <FilledAlerts
+      variant={alertInfo.variant}
+      message={alertInfo.message}
+    />
+  )}
 
   const deleteAttendee = (id) => {
     axios
@@ -378,7 +415,10 @@ export default function MyReservations(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher);
         setCancelModal(false);
-        alert("Booking updated successfully");
+        //alert("Booking updated successfully");
+        setAlertMessage("Booking updated successfully!");
+        setAlertOpen(true);
+        setAlertSuccess(true);
       })
       .catch((error) => {
         console.error("Error updating booking:", error);
@@ -414,6 +454,11 @@ export default function MyReservations(props) {
   } else {
     return (
       <div>
+        <CustomAlert
+          open={alertOpen}
+          onClose={handleAlertClose}
+          message={alertMessage}
+        />;
         {user?.role === "user" ? (
           <DashBoardTemplate title="My Reservations">
             <div
@@ -469,12 +514,12 @@ export default function MyReservations(props) {
                           ? selectedStyle
                           : unselectedStyle
                       }
-                      onClick={() =>{
-                        setTimeSelected("Upcoming")
-                        console.log(events)
-                      } }
+                      onClick={() => {
+                        setTimeSelected("Upcoming");
+                        console.log(events);
+                      }}
                     >
-                      Upcoming
+                      Today & Upcoming
                     </Button>
                     <Button
                       sx={
@@ -510,7 +555,7 @@ export default function MyReservations(props) {
                     </TableHead>
                     <TableBody>
                       {/* user */}
-                      {filteredEvents
+                      {events
                         .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                         .map((event, index) => (
                           <StyledTableRow key={index}>
@@ -531,6 +576,15 @@ export default function MyReservations(props) {
                                 sx={ButtonStyle1}
                                 onClick={() => {
                                   handleView(event.id);
+                                  const selectedEventDate = new Date(
+                                    event.date
+                                  ); // event.date, date from the table
+                                  const today = new Date();
+                                  const isToday =
+                                    selectedEventDate.toDateString() ===
+                                    today.toDateString();
+                                  // update
+                                  setIsEventToday(isToday);
                                   // axios
                                   //   .get(
                                   //     `http://localhost:8000/api/getAttendees/${tempId}/`
@@ -671,25 +725,21 @@ export default function MyReservations(props) {
 
                 <div style={{ display: "flex", justifyContent: "flex-start" }}>
                   <ButtonGroup>
-                    {
-                      facilities.map((item, index) => (
-                        <Button
-                          sx={
-                            venueSelected === item?.facility?.facility_name
-                              ? selectedStyle
-                              : unselectedStyle
-                          }
-                          onClick={() => {
-                            
-                            setVenueSelected(item?.facility?.facility_name);
-                            setVenueId(item?.facility?.facility_id);  
-                            
-                          }}
-                        >
-                         {item?.facility?.facility_name}
-                        </Button>
-                      ))
-                    }
+                    {facilities.map((item, index) => (
+                      <Button
+                        sx={
+                          venueSelected === item?.facility?.facility_name
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => {
+                          setVenueSelected(item?.facility?.facility_name);
+                          setVenueId(item?.facility?.facility_id);
+                        }}
+                      >
+                        {item?.facility?.facility_name}
+                      </Button>
+                    ))}
                     {/* <Button
                       sx={
                         venueSelected === "Coworking Space"
@@ -831,7 +881,6 @@ export default function MyReservations(props) {
             </Box>
           </DashBoardTemplate>
         )}
-
         <Modal
           disableAutoFocus={true}
           open={viewModal}
@@ -1187,14 +1236,14 @@ export default function MyReservations(props) {
                       </React.Fragment>
                     ))}
                   </List>
-                  {timeSelected !== "History" && user?.role === "user" &&(
-                       <Typography
-                       sx={{ paddingLeft: 2, color: "darkred" }}
-                       fontFamily="Poppins"
-                     >
-                       Note: 30% of cost as cancellation fee
-                     </Typography>
-                    )}
+                  {timeSelected !== "History" && user?.role === "user" && (
+                    <Typography
+                      sx={{ paddingLeft: 2, color: "darkred" }}
+                      fontFamily="Poppins"
+                    >
+                      Note: 30% of cost as cancellation fee
+                    </Typography>
+                  )}
                   <Box
                     sx={{
                       margin: "10px 15px 15px 10px",
@@ -1207,9 +1256,18 @@ export default function MyReservations(props) {
                         sx={ButtonStyle1}
                         variant="contained"
                         onClick={() => {
-                          setCancelModal(true);
-                          setViewModal(false);
+                          if (isEventToday) {
+                            console.log(
+                              "Cannot cancel booking for events happening today"
+                            );
+                          } else {
+                            console.log(viewDetails.cancelCost);
+                            setCancelModal(true);
+                            setOpenInfoModal(false);
+                          }
                         }}
+                        // disable if the event is today
+                        disabled={isEventToday}
                       >
                         Cancel Booking
                       </Button>
@@ -1220,7 +1278,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/* Are you sure you want to cancel */}
         <Modal
           disableAutoFocus={true}
@@ -1264,8 +1321,12 @@ export default function MyReservations(props) {
                       Are you sure you want to cancel?
                     </Typography>
 
-                    <Typography marginBottom="15px" fontFamily="Poppins">
-                      Cost of Cancellation: 10
+                    <Typography
+                      marginBottom="15px"
+                      fontFamily="Poppins"
+                      textAlign="center"
+                    >
+                      Cost of Cancellation: {viewDetails.cancelCost}
                     </Typography>
                   </Box>
                   <Box
@@ -1322,7 +1383,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/*Edit Modal */}
         <Modal
           disableAutoFocus={true}
@@ -1426,7 +1486,6 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Modal>
-
         {/*Attendees Edit*/}
         {/* <Modal
         disableAutoFocus={true}

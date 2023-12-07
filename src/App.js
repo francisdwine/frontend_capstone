@@ -19,14 +19,14 @@ function App() {
         <BrowserRouter>
         <AuthProvider>
           <Routes>
-            <Route exact path="/api/login" element={<Login />} />
+            <Route exact path="/booking/login" element={<Login />} />
             {/* <Route exact path="/" element={<Login />} /> */}
-            <Route exact path="/api/tracker" element={<Tracker />} />
-            <Route exact path="/api/calendar" element={<Calendar />} />
-            <Route exact path="/api/logs" element={<AttendanceLogs />} />
-            <Route exact path="/api/bookings" element={<MyReservations />} />
+            <Route exact path="/booking/tracker" element={<Tracker />} />
+            <Route exact path="/booking/calendar" element={<Calendar />} />
+            <Route exact path="/booking/logs" element={<AttendanceLogs />} />
+            <Route exact path="/booking/bookings" element={<MyReservations />} />
             <Route exact path="/attendance" element={<Attendance />} />
-            <Route exact path="/api/attendance" element={<Attendance />} />
+            <Route exact path="/booking/attendance" element={<Attendance />} />
           </Routes>
           </AuthProvider>
         </BrowserRouter>

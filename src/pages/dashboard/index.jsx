@@ -12,12 +12,13 @@ import {
   CardContent,
   Paper,
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import axios from "axios";
 import * as React from "react";
-
+import AuthContext from "../../context/AuthContext";
 import { StyledTableCell, StyledTableRow, ResponsiveContainer } from "./styles";
 
 //temp deets
@@ -76,56 +77,56 @@ const reviews = [
 export default function Tracker(props) {
   //const [ratingFilter, setRatingFilter] = useState([0, 5]);
   const [data, setData] = useState([]);
+  let { user, setUser, authenticated } = useContext(AuthContext);
+  const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
+  const navigate = useNavigate();
 
-const title = ["ONGOING", "EXPECTED", "WAITING", "OVERSTAYING"];
+  const [containerDetails, setContainerDetails] = useState(
+    title.map((title) => ({
+      title,
+      contents: [],
+    }))
+  );
 
-const [containerDetails, setContainerDetails] = useState(
-  title.map((title) => ({
-    title,
-    contents: [],
-  }))
-);
+  useEffect(() => {
+    const fetchData = async () => {
+      const endpoints = [
+        `${BASE_URL}/api/getOngoing/`,
+        `${BASE_URL}/api/getExpected/`,
+        `${BASE_URL}/api/getWaiting/`,
+        `${BASE_URL}/api/getOverstaying/`,
+      ];
 
-useEffect(() => {
-  const fetchData = async () => {
-    const endpoints = [
-      `${BASE_URL}/api/getOngoing/`,
-      `${BASE_URL}/api/getExpected/`,
-      `${BASE_URL}/api/getWaiting/`,
-      `${BASE_URL}/api/getOverstaying/`,
-    ];
+      const updatedContainerDetails = [...containerDetails];
 
-    const updatedContainerDetails = [...containerDetails];
+      try {
+        for (let i = 0; i < endpoints.length; i++) {
+          const response = await axios.get(endpoints[i]);
+          if (response.status === 200) {
+            const data = response.data;
 
-    try {
-      for (let i = 0; i < endpoints.length; i++) {
-        const response = await axios.get(endpoints[i]);
-        if (response.status === 200) {
-          const data = response.data;
-
-          if (Array.isArray(data)) {
-
-            updatedContainerDetails[i].contents = data.map((facility) => ({
-              name: facility.facility_name,
-              count: facility.count,
-            }));
+            if (Array.isArray(data)) {
+              updatedContainerDetails[i].contents = data.map((facility) => ({
+                name: facility.facility_name,
+                count: facility.count,
+              }));
+            } else {
+              console.error(`Invalid data format for ${endpoints[i]}`);
+            }
           } else {
-            console.error(`Invalid data format for ${endpoints[i]}`);
+            console.error(`Failed to fetch data from ${endpoints[i]}`);
           }
-        } else {
-          console.error(`Failed to fetch data from ${endpoints[i]}`);
         }
+
+        setContainerDetails(updatedContainerDetails);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
+    };
 
-      setContainerDetails(updatedContainerDetails);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+    fetchData();
+  }, []);
 
-  fetchData();
-}, []);
-  
   useEffect(() => {
     axios
       .get(`${BASE_URL}/api/getSignedIn/`)
@@ -137,169 +138,180 @@ useEffect(() => {
       });
   }, []);
 
-  return (
-    <DashBoardTemplate title="Tracker">
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "start",
-        }}
-      ></div>
-      <div>
-      <Container
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-        }}
-      >
-        <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
-            
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-              }}
-            >
-              <Typography
-                sx={{
-                  paddingLeft: -200,
-                  color: "lightblack",
-                  fontSize: 30,
-                  fontWeight: "bold",
-                  paddingRight: 100,
-                  paddingTop: 5,
-                  marginTop: 5,
-                }}
-                fontFamily="Poppins"
-              >
-                Activity Tracker
-              </Typography>
-            </div>
-            {containerDetails.map((card, index) => (
-              <Grid key={index} item xs={4} md={3}>
-                <Paper
-                  elevation={3}
-                  sx={{
-                    width: 243,
-                    height: 'auto',
-                    display: "relative",
-                    background: "#ffe836",
-                    border: "1px solid #fecc00",
-                    marginBottom: 7,
+  if (user === null && user.role !== "admin") {
+    navigate("/booking/login");
+  } else if (user.role === "user"){
+    navigate("/booking/calendar");
+  } else if (user.role === "admin"){
+    return (
+      <DashBoardTemplate title="Tracker">
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "start",
+          }}
+        ></div>
+        <div>
+          <Container
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              maxWidth: "100%",
+
+            }}
+          >
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={2}>
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
                   }}
                 >
-                  <CardContent>
-                    <Typography
+                  <Typography
+                    sx={{
+                      paddingLeft: -200,
+                      color: "lightblack",
+                      fontSize: 30,
+                      fontWeight: "bold",
+                      paddingRight: 100,
+                      paddingTop: 5,
+                      marginTop: 5,
+                    }}
+                    fontFamily="Poppins"
+                  >
+                    Activity Tracker
+                  </Typography>
+                </div>
+                {containerDetails.map((card, index) => (
+                  <Grid key={index} item xs={4} md={3}>
+                    <Paper
+                      elevation={3}
                       sx={{
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        fontFamily: "Poppins",
+                        width: 243,
+                        minHeight: 300,
+                        height: 'auto',
+                        display: "relative",
+                        background: "#ffe836",
+                        border: "1px solid #fecc00",
+                        marginBottom: 7,
                       }}
-                      color="text.primary"
                     >
-                      {card.title}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      color="text.primary"
-                      textAlign="left"
-                      fontFamily="Poppins"
-                      fontSize={17}
-                    >
-                      {card.contents.map((content, i) => (
-                        <div
-                          key={i}
-                          style={{ display: "flex", alignItems: "center" }}
+                      <CardContent>
+                        <Typography
+                          sx={{
+                            fontSize: 20,
+                            fontWeight: "bold",
+                            fontFamily: "Poppins",
+                          }}
+                          color="text.primary"
                         >
-                          <div style={{ flex: 1 }}>{content.name}</div>
-                          <div style={{ width: "25px", marginLeft: "8px" }}>
-                            [{content.count}]
-                          </div>
-                          <br />
-                          <br />
-                          {/* {i < card.contents.length - 1 && <br />} */}
-                        </div>
-                      ))}
-                    </Typography>
-                  </CardContent>
-                </Paper>
+                          {card.title}
+                        </Typography>
+                        <Typography
+                          variant="body2"
+                          color="text.primary"
+                          textAlign="left"
+                          fontFamily="Poppins"
+                          fontSize={17}
+                        >
+                          {card.contents.map((content, i) => (
+                            <div
+                              key={i}
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <div style={{ flex: 1 }}>{content.name}</div>
+                              <div style={{ width: "25px", marginLeft: "8px" }}>
+                                [{content.count}]
+                              </div>
+                              <br />
+                              <br />
+                              {/* {i < card.contents.length - 1 && <br />} */}
+                            </div>
+                          ))}
+                        </Typography>
+                      </CardContent>
+                    </Paper>
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-        </Box>
-      </Container>
-      {/* Logged in USERS */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "start",
-        }}
-      >
-        <Typography
-          sx={{
-            paddingLeft: 15,
-            color: "lightblack",
-            fontSize: 30,
-            fontWeight: "bold",
-          }}
-          fontFamily="Poppins"
-        >
-          Currently Logged in users
-        </Typography>
-      </div>
-      <Container
-        sx={{
-          marginBottom: 5,
-          backgroundColor: "f5fffa",
-          borderRadius: 3,
-          width: 1163,
-        }}
-      >
-        <TableContainer
-          sx={{
-            minWidth: 50,
-            display: "flex",
-            justifyContent: "center",
-            borderStyle: "groove",
-            borderRadius: 2,
-          }}
-        >
-          <Table>
-            <TableHead>
-              <StyledTableRow>
-                <StyledTableCell align="center">Booking ID</StyledTableCell>
-                <StyledTableCell align="center">Name</StyledTableCell>
-                <StyledTableCell align="center">Venue</StyledTableCell>
-                <StyledTableCell align="center">Time Signed in</StyledTableCell>
-              </StyledTableRow>
-            </TableHead>
-            <TableBody>
-              {data.map((row, index) => (
-                <StyledTableRow key={index}>
-                  <StyledTableCell align="center">
-                    {row.booking}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">{row.name}</StyledTableCell>
-                  <StyledTableCell align="center">
-                    {row.venueName}
-                  </StyledTableCell>
-                  <StyledTableCell align="center">
-                    {row.signInTime}
-                  </StyledTableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Container>
-      </div>
+            </Box>
+          </Container>
+          {/* Logged in USERS */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "start",
+            }}
+          >
+            <Typography
+              sx={{
+                paddingLeft: 15,
+                color: "lightblack",
+                fontSize: 30,
+                fontWeight: "bold",
+              }}
+              fontFamily="Poppins"
+            >
+              Currently Logged in users
+            </Typography>
+          </div>
+          <Container
+            sx={{
+              marginBottom: 5,
+              backgroundColor: "f5fffa",
+              borderRadius: 3,
+              width: 1163,
+            }}
+          >
+            <TableContainer
+              sx={{
+                minWidth: 50,
+                display: "flex",
+                justifyContent: "center",
+                borderStyle: "groove",
+                borderRadius: 2,
+              }}
+            >
+              <Table>
+                <TableHead>
+                  <StyledTableRow>
+                    <StyledTableCell align="center">Booking ID</StyledTableCell>
+                    <StyledTableCell align="center">Name</StyledTableCell>
+                    <StyledTableCell align="center">Venue</StyledTableCell>
+                    <StyledTableCell align="center">
+                      Time Signed in
+                    </StyledTableCell>
+                  </StyledTableRow>
+                </TableHead>
+                <TableBody>
+                  {data.map((row, index) => (
+                    <StyledTableRow key={index}>
+                      <StyledTableCell align="center">
+                        {row.booking}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row.name}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row.venueName}
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        {row.signInTime}
+                      </StyledTableCell>
+                    </StyledTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Container>
+        </div>
 
-      {/* CUSTOMER SATISFACTION & REVIEWS
+        {/* CUSTOMER SATISFACTION & REVIEWS
       <Container
         sx={{
           display: "flex",
@@ -348,7 +360,7 @@ useEffect(() => {
         </Container>
 
         // {/* TEMP COMMENTS */}
-      {/* <Container
+        {/* <Container
           sx={{ display: "flex", justifyContent: "flex-end", height: "100%" }}
         >
           <Paper
@@ -362,7 +374,7 @@ useEffect(() => {
               // alignItems: "center",
             }}
           > */}
-      {/* <TableContainer>
+        {/* <TableContainer>
               <Table>
                 <TableRow>
                   {reviews.map((item, index) => (
@@ -386,6 +398,7 @@ useEffect(() => {
           </Paper>
         </Container>
       </Container> */}
-    </DashBoardTemplate>
-  );
+      </DashBoardTemplate>
+    );
+  }
 }

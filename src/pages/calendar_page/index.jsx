@@ -24,7 +24,7 @@ import {
   Typography,
   Autocomplete,
 } from "@mui/material";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Modal from "@mui/material/Modal";
 import CloseIcon from "@mui/icons-material/Close";
 // import MenuItem from "@mui/material/MenuItem";
@@ -68,6 +68,51 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
+export function CustomAlert({ open, onClose, title, message, success }){
+  const defaultBackgroundColor = success ? "#5bb450" : "#e74c3c";
+  console.log(success);
+  const defaultTextColor = "white";
+
+  const dialogStyle = {
+    "& .MuiPaper-root": {
+      backgroundColor: defaultBackgroundColor,
+      maxWidth: "900px",
+      width: "480px",
+      color: defaultTextColor,
+      position: "absolute",
+      top: "0",
+      left: "50%",
+      transform: "translate(-50%, 0)",
+      borderRadius: "10px",
+      height: "100px",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    },
+    "& .MuiButton-root": {
+      color: defaultTextColor,
+    },
+  };
+
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [open, onClose]);
+
+  return (
+    <Dialog open={open} onClose={onClose} sx={dialogStyle}>
+      <DialogTitle closeButton>{title}</DialogTitle>
+      <DialogContent sx={{ justifyContent: "center" }}>{message}</DialogContent>
+      <DialogActions></DialogActions>
+    </Dialog>
+  );
+};
+
 export default function Calendar(props) {
   let { user, setUser, authenticated } = useContext(AuthContext);
 
@@ -77,34 +122,8 @@ export default function Calendar(props) {
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState("admin"); //default role
   const [info, setInfo] = useState({});
-  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(true);
 
-  const CustomAlert = ({ open, onClose, title, message, success }) => {
-    const defaultBackgroundColor = success ? '#5bb450' : '#e74c3c';
-    const defaultTextColor = 'white';
-  
-    const dialogStyle = {
-      "& .MuiPaper-root": {
-        backgroundColor: defaultBackgroundColor,
-        maxWidth: "400px",
-        width: "100%",
-        color: defaultTextColor,
-      },
-      "& .MuiButton-root": {
-        color: defaultTextColor,
-      },
-    };
-  
-    return (
-      <Dialog open={open} onClose={onClose} sx={dialogStyle}>
-        <DialogTitle>{title}</DialogTitle>
-        <DialogContent>{message}</DialogContent>
-        <DialogActions>
-          <Button onClick={onClose}>Close</Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
 
   const submitBooking = () => {
     // setAttendeeList(attendeeList=>[
@@ -118,7 +137,7 @@ export default function Calendar(props) {
     ) {
       booking.current.officeName = "none";
     }
-    console.log(booking.current);
+
     axios
       .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
@@ -141,7 +160,9 @@ export default function Calendar(props) {
       })
       .then((res) => {
         if (res.data.error) {
-          alert(res.data.error);
+          setAlertMessage(res.data.error);
+          setAlertOpen(true);
+          setAlertSuccess(false);
         } else {
           setBookingsRefresher(!bookingsRefresher);
           setAlertMessage("Booking created successfully!");
@@ -172,10 +193,20 @@ export default function Calendar(props) {
       setBookingAttendees(res.data);
     });
 
-    const res = eventData.find((item) => {
+    var res = eventData.find((item) => {
       return item?.id === parseInt(id);
     });
-    console.log("user called ID:", res.user_id);
+
+    var cancelCost = 0;
+
+    if (res.points === 0 && res.coins > 0) {
+      cancelCost = res.coins * 0.3;
+    } else if (res.coins === 0 && res.points > 0) {
+      cancelCost = res.points * 0.3;
+    }
+    console.log(cancelCost);
+    res = { ...res, cancelCost: cancelCost };
+    // console.log("user called ID:", res.user_id);
     setInfo(res);
     setOpenInfoModal(true);
   };
@@ -194,7 +225,6 @@ export default function Calendar(props) {
         setMaxComputers(indx0?.main_rules?.num_pc);
       });
     });
-    console.log(facilities);
   }, []);
 
   //display bookings
@@ -225,7 +255,6 @@ export default function Calendar(props) {
       });
 
       axios.get(`${BASE_URL}/api/getEvents/`).then((res) => {
-        // console.log(res.data)
         var calendarEvents;
         calendarEvents = res?.data.map((item) => {
           var dateSplit = item?.date.split("T");
@@ -241,7 +270,7 @@ export default function Calendar(props) {
           };
         });
         bookings = bookings.concat(calendarEvents);
-        console.log(bookings);
+
         setEvents(bookings);
       });
       setEventData(res.data);
@@ -271,7 +300,6 @@ export default function Calendar(props) {
       startTime: booking.current.startTime,
       endTime: booking.current.endTime,
       numOfStudents: attendeeList.length + 1,
-      // Add any other necessary data here
     };
 
     axios
@@ -332,6 +360,7 @@ export default function Calendar(props) {
   const navigate = useNavigate();
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const [alertInfo, setAlertInfo] = useState({
     visible: false,
     variant: "info",
@@ -350,7 +379,7 @@ export default function Calendar(props) {
   };
   //to handle security
   if (user === null) {
-    navigate("/api/login");
+    navigate("/booking/login");
   } else {
     return (
       <div style={{ position: "relative" }}>
@@ -419,7 +448,7 @@ export default function Calendar(props) {
                     onClick={() => {
                       setVenueSelected("Coworking Space");
                       setVenueId(1);
-                      
+
                     }}
                   >
                     Co-working Space
@@ -493,11 +522,12 @@ export default function Calendar(props) {
                       .then((response) => {
                         totalDuration = response.data.duration;
                         var limit = 3 - totalDuration;
-                        console.log("limit " + limit);
-                        console.log(hoursDuration);
+
                         if (user?.role === "user") {
                           if (hoursDuration > limit || limit < 0) {
-                            setAlertMessage("You have exceeded the limit of 3 hours booking per week");
+                            setAlertMessage(
+                              "You have exceeded the limit of 3 hours booking per week"
+                            );
                             setAlertOpen(true);
                             setAlertSuccess(false);
                             // alert("You have exceeded the limit of 3 hours booking per week")
@@ -511,14 +541,13 @@ export default function Calendar(props) {
                           }
                         }
 
-                        console.log(hoursDuration);
                         var tempBooking = booking.current;
                         tempBooking.startTime = startTime;
                         tempBooking.endTime = endTime;
                         tempBooking.date = startDate;
                         tempBooking.venue = venueSelected;
                         booking.current = tempBooking;
-                        console.log(booking.current);
+                        // console.log(booking.current);
                         setOpenModal1(true);
                       })
                       .catch((error) => {
@@ -529,7 +558,8 @@ export default function Calendar(props) {
                 }}
                 //function para ig click ug usa ka event
                 eventClick={(e) => {
-                  console.log(e);
+                  setSelectedEvent(e.event);
+                  // console.log(e);
                   if (e.event._def.extendedProps.type === "rule") {
                     setAlertMessage(
                       "Booking not available at this time due to a scheduled important event."
@@ -705,14 +735,13 @@ export default function Calendar(props) {
                 />
                 <Button
                   onClick={(e) => {
-                    console.log(attendLimit);
+                    // console.log(attendLimit);
                     if (attendeeList.length >= attendLimit) {
                       // alert("Limit Exceeded for This Venue");
                       setAlertInfo({
                         visible: true,
                         variant: "info",
-                        message:
-                          "Limit Exceeded for This Venue.",
+                        message: "Limit Exceeded for This Venue.",
                       });
                       return;
                     }
@@ -721,8 +750,7 @@ export default function Calendar(props) {
                       setAlertInfo({
                         visible: true,
                         variant: "info",
-                        message:
-                          "Please Enter Attendee name.",
+                        message: "Please Enter Attendee name.",
                       });
                       return;
                     }
@@ -747,8 +775,7 @@ export default function Calendar(props) {
                         setAlertInfo({
                           visible: true,
                           variant: "info",
-                          message:
-                            "User not found",
+                          message: "User not found",
                         });
                         return;
                       }
@@ -860,7 +887,7 @@ export default function Calendar(props) {
                             "You can't borrow computers more than the number of attendees",
                         });
                       } else {
-                        console.log(attendeeList.length);
+                        // console.log(attendeeList.length);
                         calculateCost();
                         setOpenModal3(true);
                         setOpenModal2(false);
@@ -1352,9 +1379,21 @@ export default function Calendar(props) {
                   sx={ButtonStyle1}
                   variant="contained"
                   onClick={() => {
-                    setCancelModal(true);
-                    setOpenInfoModal(false);
+                    const isEventToday = selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString();
+
+                    if (isEventToday) {
+                      // if event is today
+                      console.log("Cannot cancel booking for events happening today");
+                    } else {
+                      // if event is not today
+                      console.log(info.cancelCost);
+                      setCancelModal(true);
+                      setOpenInfoModal(false);
+                    }
                   }}
+                  // disable button
+                  disabled={selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString()
+                  }
                 >
                   Cancel Booking
                 </Button>
@@ -1391,7 +1430,12 @@ export default function Calendar(props) {
           aria-describedby="modal-modal-description"
           style={{ width: "100%", overflow: "auto" }}
         >
-          <Box sx={modalStyle}>
+          <Box
+            sx={{
+              ...modalStyle,
+              width: { lg: 500, xs: 350, sm: 500, md: 500, xl: 500 },
+            }}
+          >
             <Box sx={modalHeaderStyle}>
               <Typography
                 sx={{ fontWeight: "bold" }}
@@ -1401,32 +1445,57 @@ export default function Calendar(props) {
                 fontFamily="Poppins"
                 color="white"
               >
-                Are you sure you want to cancel?
+                Cancel Booking
               </Typography>
             </Box>
             <Box p={4}>
               {user?.role === "user" ? (
                 <Box>
                   <Box
-                    sx={{ display: "flex", justifyContent: "space-between" }}
+                    sx={{ display: "column", justifyContent: "space-between" }}
                   >
                     <Typography
                       fontWeight="bold"
-                      marginBottom="5px"
+                      marginBottom="10px"
                       fontFamily="Poppins"
+                      fontSize="25px"
                     >
-                      Cost of Cancellation: 10
+                      Are you sure you want to cancel?
+                    </Typography>
+
+                    <Typography
+                      marginBottom="15px"
+                      fontFamily="Poppins"
+                      textAlign="center"
+                    >
+                      Cost of Cancellation: {info.cancelCost}
                     </Typography>
                   </Box>
                   <Box
                     sx={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <Button variant="contained">Pay</Button>
                     <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
+                      variant="contained"
+                      onClick={() => cancelBooking(tempId)}
+                    >
+                      Pay{" "}
+                    </Button>
+                    {/* <Button variant="contained">Pay</Button> */}
+                    <Button
+                      sx={{
+                        ...ButtonStyle1,
+                        paddingRight: "30px",
+                        paddingLeft: "30px",
+                      }}
                       variant="contained"
                       onClick={() => {
-                        // submitBooking();
                         setViewModal(true);
+                        setViewModal(false);
                         setCancelModal(false);
                       }}
                     >
@@ -1445,7 +1514,7 @@ export default function Calendar(props) {
                   <Button
                     variant="contained"
                     onClick={() => {
-                      setViewModal(true);
+                      setViewModal(false);
                       setCancelModal(false);
                     }}
                   >
