@@ -92,21 +92,20 @@ export default function Tracker(props) {
   } else if (user.role === "admin"){
     return (
       <div style={{ position: "relative", backgroundColor: "#fff" }}>
-        <DashBoardTemplate title="Tracker">
+        <DashBoardTemplate title="TRACKER">
           <Container sx={{ paddingTop: "50px", width: "100%", }}>
             <Box
               backgroundColor="white"
               display="flex"
               alignItems="center"
+              justifyContent="center" // Center the content horizontally
               flexDirection="column"
               p={2}
-              borderRadius={2}
+              borderRadius={1}
               mt={5}
-              justifyContent="space-between"
               marginTop={15}
               padding={{ xs: 2, md: 2 }}
               width="100%"
-              overflow="auto"
             >
               <div>
                 <Container
@@ -118,8 +117,7 @@ export default function Tracker(props) {
                   }}
                 >
                   <Box sx={{ flexGrow: 1 }}>
-                    <Grid container spacing={2}>
-                      <div
+                  <div
                         style={{
                           display: "flex",
                           flexDirection: "column",
@@ -128,11 +126,12 @@ export default function Tracker(props) {
                       >
                         <Typography
                           sx={{
+                            display:"flex",
                             paddingLeft: -200,
                             color: "lightblack",
                             fontSize: { xs: 18, md: 30 },
                             fontWeight: "bold",
-                            paddingRight: 100,
+                            padding: 'auto',
                             //paddingTop: 5,
                             marginTop: 5,
                           }}
@@ -141,6 +140,8 @@ export default function Tracker(props) {
                           Activity Tracker
                         </Typography>
                       </div>
+                    <Grid container spacing={2}>
+
                       {containerDetails.map((card, index) => (
                         <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
                           <Paper

@@ -107,17 +107,15 @@ export default function Logs(props) {
   } else {
     return (
       <div style={{ position: "relative", backgroundColor: "#fff" }}>
-        <DashBoardTemplate title="Attendance Logs">
-          <Container
-            sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}
-          >
+        <DashBoardTemplate title="ATTENDANCE LOGS">
+          <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
             <Box
               backgroundColor="white"
               display="flex"
               alignItems="center"
               flexDirection="column"
               p={2}
-              borderRadius={2}
+              borderRadius={1}
               mt={5}
               marginTop={15}
               justifyContent="space-between"
@@ -132,28 +130,25 @@ export default function Logs(props) {
               <div>
                 <Box
                   sx={{
-                    width: "100%",
+                    flexGrow: 1,
                     display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-end",
-                    alignItems: "flex-start",
+                    border: "1px solid rgba(0, 0, 0, 0.05)",
+                    marginLeft: "auto",
+                    alignItems: "center",
+                    paddingLeft: 2,
+                    width: "20%",
                     backgroundColor: "white",
-                    marginBottom: 2,
-                    borderRadius: 5,
-                    border: "1px solid #E0E0E0",
-                    padding: "10px",
-                    position: "relative",
                   }}
                 >
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
                   <StyledInputBase
                     placeholder="Search..."
                     value={searchText}
                     onChange={handleSearchTextChange}
                     inputProps={{ "aria-label": "search" }}
                   />
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
                 </Box>
               </div>
 
@@ -191,75 +186,29 @@ export default function Logs(props) {
                 <TableContainer>
                   <Table
                     style={{
+                      backgroundColor: "#fecc00",
                       width: "100%",
                       textAlign: "center",
                       fontFamily: "Oswald",
                       "@media (max-width: 600px)": {
-                        fontSize: "14px", 
+                        fontSize: "14px",
                       },
                       "@media (max-width: 400px)": {
-                        fontSize: "12px", 
+                        fontSize: "12px",
                       },
                     }}
                   >
                     <TableHead>
                       <TableRow>
                         <StyledTableCell align="center">Name</StyledTableCell>
-                        <StyledTableCell align="center">
-                          isLoggedin
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          isOverstaying
-                        </StyledTableCell>
+                        <StyledTableCell align="center">Loggedin</StyledTableCell>
+                        <StyledTableCell align="center">Overstaying</StyledTableCell>
                         <StyledTableCell align="center">Date</StyledTableCell>
-                        <StyledTableCell align="center">
-                          Login Time
-                        </StyledTableCell>
-                        <StyledTableCell align="center">
-                          Logout Time
-                        </StyledTableCell>
+                        <StyledTableCell align="center">Login Time</StyledTableCell>
+                        <StyledTableCell align="center">Logout Time</StyledTableCell>
                       </TableRow>
                     </TableHead>
-                    <TableBody>
-                      {filteredEvents
-                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                        .map((event, index) => (
-                          <StyledTableRow key={index}>
-                            <StyledTableCell
-                              component="th"
-                              scope="row"
-                              align="center"
-                            >
-                              {event.name}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {event.isSignedIn === true ? "Yes" : "No"}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {event.isOverstaying === true ? "Yes" : "No"}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {event.date}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {event.signInTime}
-                            </StyledTableCell>
-                            <StyledTableCell align="center">
-                              {event.signOutTime}
-                            </StyledTableCell>
-                          </StyledTableRow>
-                        ))}
-                    </TableBody>
                   </Table>
-                  <TablePagination
-                    component="div"
-                    count={filteredEvents.length}
-                    page={page}
-                    onPageChange={handlePageChange}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleRowsPerPageChange}
-                    labelRowsPerPage=""
-                  />
                 </TableContainer>
               </Box>
             </Box>

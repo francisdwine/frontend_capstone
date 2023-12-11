@@ -21,7 +21,8 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BookIcon from "@mui/icons-material/Book";
 import ListIcon from "@mui/icons-material/List";
 import Wild from "../../images/wild.png";
-import bgcover from "../../images/reception2.jpg";
+import bgcover from "../../images/basebg.PNG";
+import admin from "../../images/admin3.png";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import { useContext, useState } from "react";
@@ -180,12 +181,15 @@ export default function DashBoardTemplate(props) {
       {/* <Divider sx={{ backgroundColor: "white" }} /> */}
       {/* sidenav color */}
       {user?.role === "admin" ? (
-        <Typography sx={{ fontFamily: "Poppins", color: "white" }}>
-          Admin
-        </Typography>
+        <div> 
+          <img src={admin} alt="Admin" width={92} height={90} style={{marginTop: "20px"}}/>
+          <Typography sx={{ fontFamily: "Poppins", color: "white" }}>
+            Admin
+          </Typography>
+        </div>
       ) : user?.role === "user" ? (
-        <Typography sx={{ fontFamily: "Poppins", color: "white" }}>
-          User
+        <Typography sx={{ fontFamily: "Poppins", color: "white", fontSize: "25px" }}>
+          Booking System
         </Typography>
       ) : null}
       <List
@@ -193,7 +197,7 @@ export default function DashBoardTemplate(props) {
           backgroundColor: "black",
           paddingBottom: "5px",
           display: "column",
-          height: "auto", 
+          height: "auto",
           fontSize: "1.2rem",
         }}
       >
@@ -278,11 +282,17 @@ export default function DashBoardTemplate(props) {
     // main nav
     <Box
       sx={{
-        display: "flex",
-        backgroundImage: `url(${bgcover})`, 
-        backgroundSize: "cover",
-        justifyContent: "center", // Center the content
-        alignItems: "center", // Center the content
+      display:'flex',
+      backgroundImage: `url(${bgcover})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      width:'100%',
+      height: '100%',
+      "@media (max-width: 815px)": {
+                  width:'100vh',
+
+                },
       }}
     >
       <CssBaseline />
@@ -318,35 +328,35 @@ export default function DashBoardTemplate(props) {
 
       <AppBar
         sx={{
-          position: "absolute",
-          display: "flex",
-          borderRadius: { sm: "10px" },
+          position: 'absolute',
           backgroundColor: "#fecc00",
-          marginTop: "150px",
-          paddingTop: "15px",
-          height: "80px",
-          alignItems: "center",
-          justifyContent: "center",
-          marginLeft: "auto", 
-          width: "100%",
-            "@media (max-width: 2560px)": {
-              padding: "10px",
-            },
+          top: "150px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '9vh',
+          width: '68%',
+          borderRadius: '1px',
+          marginLeft: '135px',
+          zIndex: 0,
         }}
       >
         <Typography
-            variant="h4"
-            noWrap
-            component="div"
-            fontFamily="Poppins"
-            color="black"
-            fontWeight="bold"
-            marginLeft="20px"
-          >
-            {props.title}
-          </Typography>
+          variant="h4"
+          noWrap
+          component="div"
+          fontFamily="Poppins"
+          color="black"
+          fontWeight="bold"
+          margin="auto"
+          justifyContent='flex-start'
+          textAlign={{ xs: 'center', sm: 'left' }}
+        >
+          {props.title}
+        </Typography>
       </AppBar>
-
 
       <Box
         component="nav"

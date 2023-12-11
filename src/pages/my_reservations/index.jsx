@@ -18,6 +18,7 @@ import {
   InputLabel,
   Container,
   TablePagination,
+  AppBar,
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import Table from "@mui/material/Table";
@@ -84,7 +85,7 @@ export default function MyReservations(props) {
   const [facilities, setFacilities] = useState([]);
   const found = (element) => element.name === attendeeName;
   const [alertOpen, setAlertOpen] = useState(false);
-
+  const screenwidth = window.innerWidth;
   const handleAlertClose = () => {
     setAlertOpen(false);
   };
@@ -459,269 +460,57 @@ export default function MyReservations(props) {
           open={alertOpen}
           onClose={handleAlertClose}
           message={alertMessage}
-        />;
+        />
+        ;
         {user?.role === "user" ? (
-          <DashBoardTemplate title="My Reservations">
-            <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
-            <Box
-              backgroundColor="white"
-              display="flex"
-              alignItems="center"
-              flexDirection="column"
-              p={2}
-              borderRadius={2}
-              mt={5}
-              marginTop={15}
-              justifyContent="space-between"
-              padding="30px"
-              sx={{
-                width: "100%",
-                "@media (max-width: 2560px)": {
-                  padding: "10px",
-                },
-              }}
+          <DashBoardTemplate title="MY RESERVATION" screen={screenwidth}>
+            <Container
+              sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}
             >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-                fontFamily: "Poppins",
-                paddingTop: "40px",
-              }}
-            ></div>
-            <br></br>
-            {/* <Box
-              backgroundColor="white"
-              display="flex"
-              alignItems="center"
-              flexDirection="column"
-            > */}
-              <div>
-                <Box
-                  sx={{
-                    flexGrow: 1,
+              <Box
+                backgroundColor="white"
+                display="flex"
+                flexDirection="column"
+                p={2}
+                borderRadius={1}
+                mt={5}
+                marginTop={12}
+                justifyContent="space-between"
+                padding="30px"
+                sx={{
+                  width: "100%",
+                  // "@media (max-width: 2560px)": {
+                  //   padding: "10px",
+                  // },
+                }}
+              >
+                <div
+                  style={{
                     display: "flex",
-                    border: "1px solid rgba(0, 0, 0, 0.05)",
-                    marginLeft: "745px",
-                    alignItems: "center",
-                    paddingLeft: 2,
-                    backgroundColor: "white",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    fontFamily: "Poppins",
+                    paddingTop: "40px",
                   }}
-                >
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
-                  <StyledInputBase
-                    placeholder="Search..."
-                    value={searchText}
-                    onChange={handleSearchTextChange}
-                    inputProps={{ "aria-label": "search" }}
-                  />
-                </Box>
-              </div>
-              <Box
-                sx={{
-                  p: "0px 0px 0px 0px",
-                }}
-                maxWidth="90%"
-              >
-                <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <ButtonGroup>
-                    <Button
-                      sx={
-                        timeSelected === "Upcoming"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => {
-                        setTimeSelected("Upcoming");
-                        console.log(events);
-                      }}
-                    >
-                      Today & Upcoming
-                    </Button>
-                    <Button
-                      sx={
-                        timeSelected === "History"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => setTimeSelected("History")}
-                    >
-                      History
-                    </Button>
-                  </ButtonGroup>
-                </div>
-                <TableContainer>
-                <Table
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                      fontFamily: "Poppins",
-                      "@media (max-width: 600px)": {
-                        fontSize: "14px", 
-                      },
-                      "@media (max-width: 400px)": {
-                        fontSize: "12px", 
-                      },
-                    }}
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell>Reference No.</StyledTableCell>
-                        <StyledTableCell>Title</StyledTableCell>
-                        <StyledTableCell>Date</StyledTableCell>
-                        <StyledTableCell>Start</StyledTableCell>
-                        <StyledTableCell>End</StyledTableCell>
-                        <StyledTableCell>Venue</StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {/* user */}
-                      {events
-                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                        .map((event, index) => (
-                          <StyledTableRow key={index}>
-                            <StyledTableCell>
-                              WIL{event.referenceNo.toUpperCase()}
-                            </StyledTableCell>
-                            <StyledTableCell component="th" scope="row">
-                              {event?.description}
-                            </StyledTableCell>
-                            <StyledTableCell>{event?.date}</StyledTableCell>
-                            <StyledTableCell>
-                              {event?.startTime}
-                            </StyledTableCell>
-                            <StyledTableCell>{event?.endTime}</StyledTableCell>
-                            <StyledTableCell>{event?.venue}</StyledTableCell>
-                            <StyledTableCell align="center">
-                              <Button
-                                sx={ButtonStyle1}
-                                onClick={() => {
-                                  handleView(event.id);
-                                  const selectedEventDate = new Date(
-                                    event.date
-                                  ); // event.date, date from the table
-                                  const today = new Date();
-                                  const isToday =
-                                    selectedEventDate.toDateString() ===
-                                    today.toDateString();
-                                  // update
-                                  setIsEventToday(isToday);
-                                  // axios
-                                  //   .get(
-                                  //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                  //   )
-                                  //   .then((res) => {
-                                  //     setRefresh(!refresh);
-                                  //     setAttendeeList(res.data);
-                                  //   });
-                                }}
-                                p={200}
-                              >
-                                View
-                              </Button>
-                            </StyledTableCell>
-
-                            {timeSelected === "Upcoming" ? (
-                              <StyledTableCell align="center">
-                                <Button
-                                  sx={ButtonStyle2}
-                                  onClick={() => {
-                                    // axios
-                                    //   .get(
-                                    //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                    //   )
-                                    //   .then((res) => {
-                                    //     setAttendeeList(res.data);
-                                    //   });
-                                    handleEdit(event.id);
-                                  }}
-                                >
-                                  Edit
-                                </Button>
-                              </StyledTableCell>
-                            ) : (
-                              // <StyledTableCell align="right">
-                              //   <Button sx={{...ButtonStyle2, marginLeft: "5px"}}>Review</Button>
-                              // </StyledTableCell>
-                              <div></div>
-                            )}
-                          </StyledTableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                  <TablePagination
-                    component="div"
-                    count={filteredEvents.length}
-                    page={page}
-                    onPageChange={handlePageChange}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleRowsPerPageChange}
-                    labelRowsPerPage=""
-                  />
-                </TableContainer>
-              </Box>
-            {/* </Box> */}
-            </Box>
-            </Container>
-          </DashBoardTemplate>
-        ) : (
-          <DashBoardTemplate title="Manage Reservations">
-          <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
-            <Box
-              backgroundColor="white"
-              display="flex"
-              alignItems="center"
-              flexDirection="column"
-              p={2}
-              borderRadius={2}
-              mt={5}
-              marginTop={15}
-              justifyContent="space-between"
-              padding="30px"
-              sx={{
-                width: "100%",
-                "@media (max-width: 2560px)": {
-                  padding: "10px",
-                },
-              }}
-            >
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "start",
-                fontFamily: "Poppins",
-              }}
-            ></div>
-            <br></br>
-            {/* <Box
+                ></div>
+                <br></br>
+                {/* <Box
               backgroundColor="white"
               display="flex"
               alignItems="center"
               flexDirection="column"
             > */}
-              <Box
-                sx={{
-                  p: "0px 0px 0px 0px",
-                }}
-                maxWidth="90%"
-              >
                 <div>
                   <Box
                     sx={{
                       flexGrow: 1,
                       display: "flex",
-                      border: "3px solid rgba(0, 0, 0, 0.05)",
-                      marginLeft: "745px",
+                      border: "1px solid rgba(0, 0, 0, 0.05)",
+                      marginLeft: "auto",
                       alignItems: "center",
                       paddingLeft: 2,
+                      width: "20%",
                       backgroundColor: "white",
-                      marginTop: 5,
                     }}
                   >
                     <SearchIconWrapper>
@@ -735,204 +524,402 @@ export default function MyReservations(props) {
                     />
                   </Box>
                 </div>
-                <div style={{ display: "flex", marginBottom: "20px" }}>
-                  <ButtonGroup>
-                    <Button
-                      sx={
-                        statusSelected === "Cancelled"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => setStatusSelected("Cancelled")}
-                    >
-                      CANCELLED
-                    </Button>
-                    <Button
-                      sx={
-                        statusSelected === "No Show"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => setStatusSelected("No Show")}
-                    >
-                      NO SHOW
-                    </Button>
-                    <Button
-                      sx={
-                        statusSelected === "All"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => setStatusSelected("All")}
-                    >
-                      ALL
-                    </Button>
-                  </ButtonGroup>
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <ButtonGroup>
-                    {facilities.map((item, index) => (
+                <Box
+                  sx={{
+                    p: "0px 0px 0px 0px",
+                  }}
+                  maxWidth="90%"
+                >
+                  <div
+                    style={{ display: "flex", justifyContent: "flex-start" }}
+                  >
+                    <ButtonGroup>
                       <Button
                         sx={
-                          venueSelected === item?.facility?.facility_name
+                          timeSelected === "Upcoming"
                             ? selectedStyle
                             : unselectedStyle
                         }
                         onClick={() => {
-                          setVenueSelected(item?.facility?.facility_name);
-                          setVenueId(item?.facility?.facility_id);
+                          setTimeSelected("Upcoming");
+                          console.log(events);
                         }}
                       >
-                        {item?.facility?.facility_name}
+                        Today & Upcoming
                       </Button>
-                    ))}
-                    {/* <Button
-                      sx={
-                        venueSelected === "Coworking Space"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => {
-                        setVenueSelected("Coworking Space");
-                        setVenueId(1);
+                      <Button
+                        sx={
+                          timeSelected === "History"
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => setTimeSelected("History")}
+                      >
+                        History
+                      </Button>
+                    </ButtonGroup>
+                  </div>
+                  <TableContainer sx={{ overflow: "auto" }}>
+                    <Table
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                        fontFamily: "Poppins",
+                        // "@media (max-width: 600px)": {
+                        //   fontSize: "14px",
+                        // },
+                        // "@media (max-width: 400px)": {
+                        //   fontSize: "12px",
+                        // },
                       }}
                     >
-                      CO-WORKING SPACE
-                    </Button>
-                    <Button
-                      sx={
-                        venueSelected === "Conference Room A"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => {
-                        setVenueSelected("Conference Room A");
-                        setVenueId(2);
-                      }}
-                    >
-                      CONFERENCE A
-                    </Button>
-                    <Button
-                      sx={
-                        venueSelected === "Conference Room B"
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => {
-                        setVenueSelected("Conference Room B");
-                        setVenueId(3);
-                      }}
-                    >
-                      CONFERENCE B
-                    </Button> */}
-                  </ButtonGroup>
-                </div>
-                <TableContainer>
-                <Table
-                    style={{
-                      width: "100%",
-                      textAlign: "center",
-                      fontFamily: "Poppins",
-                      "@media (max-width: 600px)": {
-                        fontSize: "14px", 
-                      },
-                      "@media (max-width: 400px)": {
-                        fontSize: "12px", 
-                      },
-                    }}
-                  >
-                    <TableHead>
-                      <TableRow>
-                        <StyledTableCell align="center">
-                          Reference No.
-                        </StyledTableCell>
-                        <StyledTableCell>Title</StyledTableCell>
-                        <StyledTableCell>Date</StyledTableCell>
-                        <StyledTableCell>Start</StyledTableCell>
-                        <StyledTableCell>End</StyledTableCell>
-                        {/* <StyledTableCell>Venue</StyledTableCell> */}
-                        <StyledTableCell></StyledTableCell>
-                        <StyledTableCell></StyledTableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {/* admin*/}
-                      {filteredEvents
-                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                        .map((event, index) => (
-                          <StyledTableRow key={index}>
-                            <StyledTableCell>
-                              WIL{event.referenceNo.toUpperCase()}
-                            </StyledTableCell>
-                            <StyledTableCell component="th" scope="row">
-                              {event.description}
-                            </StyledTableCell>
-                            <StyledTableCell>{event.date}</StyledTableCell>
-                            <StyledTableCell>{event.startTime}</StyledTableCell>
-                            <StyledTableCell>{event.endTime}</StyledTableCell>
-                            {/* <StyledTableCell>{event.venue}</StyledTableCell> */}
-                            <StyledTableCell>
-                              <Button
-                                sx={ButtonStyle1}
-                                onClick={() => {
-                                  handleView(event.id);
-                                  // axios
-                                  //   .get(
-                                  //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                  //   )
-                                  //   .then((res) => {
-                                  //     setRefresh(!refresh);
-                                  //     setAttendeeList(res.data);
-                                  //   });
-                                }}
-                              >
-                                View
-                              </Button>
-                            </StyledTableCell>
-                            {statusSelected === "All" ? (
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell>Reference No.</StyledTableCell>
+                          <StyledTableCell>Title</StyledTableCell>
+                          <StyledTableCell>Date</StyledTableCell>
+                          <StyledTableCell>Start</StyledTableCell>
+                          <StyledTableCell>End</StyledTableCell>
+                          <StyledTableCell>Venue</StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {/* user */}
+                        {events
+                          .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                          .map((event, index) => (
+                            <StyledTableRow key={index}>
+                              <StyledTableCell>
+                                WIL{event.referenceNo.toUpperCase()}
+                              </StyledTableCell>
+                              <StyledTableCell component="th" scope="row">
+                                {event?.description}
+                              </StyledTableCell>
+                              <StyledTableCell>{event?.date}</StyledTableCell>
+                              <StyledTableCell>
+                                {event?.startTime}
+                              </StyledTableCell>
+                              <StyledTableCell>
+                                {event?.endTime}
+                              </StyledTableCell>
+                              <StyledTableCell>{event?.venue}</StyledTableCell>
                               <StyledTableCell align="center">
                                 <Button
-                                  sx={ButtonStyle2}
+                                  sx={ButtonStyle1}
                                   onClick={() => {
-                                    setEditModal(true);
-                                    setTempId(event.id);
-                                    //alert(event.id);
+                                    handleView(event.id);
+                                    const selectedEventDate = new Date(
+                                      event.date
+                                    ); // event.date, date from the table
+                                    const today = new Date();
+                                    const isToday =
+                                      selectedEventDate.toDateString() ===
+                                      today.toDateString();
+                                    // update
+                                    setIsEventToday(isToday);
+                                    // axios
+                                    //   .get(
+                                    //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                    //   )
+                                    //   .then((res) => {
+                                    //     setRefresh(!refresh);
+                                    //     setAttendeeList(res.data);
+                                    //   });
                                   }}
+                                  p={200}
                                 >
-                                  Edit
+                                  View
                                 </Button>
                               </StyledTableCell>
-                            ) : (
-                              // <StyledTableCell align="center">
-                              //    <Button
-                              //     sx={{
-                              //       ...ButtonStyle1,
-                              //       backgroundColor: "#ff595e",
-                              //     }}
-                              //   >
-                              //     Review
-                              //   </Button>
-                              //   </StyledTableCell>
-                              <div></div>
-                            )}
-                          </StyledTableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                  <TablePagination
-                    component="div"
-                    count={filteredEvents.length}
-                    page={page}
-                    onPageChange={handlePageChange}
-                    rowsPerPage={rowsPerPage}
-                    onRowsPerPageChange={handleRowsPerPageChange}
-                    labelRowsPerPage=""
-                  />
-                </TableContainer>
+
+                              {timeSelected === "Upcoming" ? (
+                                <StyledTableCell align="center">
+                                  <Button
+                                    sx={ButtonStyle2}
+                                    onClick={() => {
+                                      // axios
+                                      //   .get(
+                                      //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                      //   )
+                                      //   .then((res) => {
+                                      //     setAttendeeList(res.data);
+                                      //   });
+                                      handleEdit(event.id);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                </StyledTableCell>
+                              ) : (
+                                // <StyledTableCell align="right">
+                                //   <Button sx={{...ButtonStyle2, marginLeft: "5px"}}>Review</Button>
+                                // </StyledTableCell>
+                                <div></div>
+                              )}
+                            </StyledTableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      component="div"
+                      count={filteredEvents.length}
+                      page={page}
+                      onPageChange={handlePageChange}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={handleRowsPerPageChange}
+                      labelRowsPerPage=""
+                    />
+                  </TableContainer>
+                </Box>
+                {/* </Box> */}
               </Box>
-            </Box>
-            {/* </Box> */}
+            </Container>
+          </DashBoardTemplate>
+        ) : (
+          <DashBoardTemplate title="MANAGE RESERVATION">
+            <Container
+              sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}
+            >
+              <Box
+                backgroundColor="white"
+                display="flex"
+                alignItems="center"
+                flexDirection="column"
+                p={2}
+                borderRadius={1}
+                mt={5}
+                marginTop={12}
+                justifyContent="space-between"
+                padding="30px"
+                sx={{
+                  width: "auto",
+                  // "@media (max-width: 2560px)": {
+                  //   padding: "10px",
+                  // },
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                    fontFamily: "Poppins",
+                  }}
+                ></div>
+                <br></br>
+                {/* <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
+            > */}
+                {/* <Box
+                  sx={{
+                    p: "0px 0px 0px 0px",
+                  }}
+                  maxWidth="90%"
+                > */}
+                  <div>
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      border: "1px solid rgba(0, 0, 0, 0.05)",
+                      marginLeft: "auto",
+                      alignItems: "center",
+                      paddingLeft: 2,
+                      width: "20%",
+                      backgroundColor: "white",
+                    }}
+                  >
+                    <SearchIconWrapper>
+                      <SearchIcon />
+                    </SearchIconWrapper>
+                    <StyledInputBase
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={handleSearchTextChange}
+                      inputProps={{ "aria-label": "search" }}
+                    />
+                  </Box>
+                  </div>
+
+                  <Box 
+                  sx={{
+                    p: "0px 0px 0px 0px",
+                    width: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "flex-start",
+                    minHeight: "500px",
+                    height: "auto",
+                    overflowX: "auto",
+                  }}
+                  >
+                  <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "20px" }}>
+                    <ButtonGroup>
+                      <Button
+                        sx={
+                          statusSelected === "Cancelled"
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => setStatusSelected("Cancelled")}
+                      >
+                        CANCELLED
+                      </Button>
+                      <Button
+                        sx={
+                          statusSelected === "No Show"
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => setStatusSelected("No Show")}
+                      >
+                        NO SHOW
+                      </Button>
+                      <Button
+                        sx={
+                          statusSelected === "All"
+                            ? selectedStyle
+                            : unselectedStyle
+                        }
+                        onClick={() => setStatusSelected("All")}
+                      >
+                        ALL
+                      </Button>
+                    </ButtonGroup>
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                    <ButtonGroup>
+                      {facilities.map((item, index) => (
+                        <Button
+                          sx={
+                            venueSelected === item?.facility?.facility_name
+                              ? selectedStyle
+                              : unselectedStyle
+                          }
+                          onClick={() => {
+                            setVenueSelected(item?.facility?.facility_name);
+                            setVenueId(item?.facility?.facility_id);
+                          }}
+                        >
+                          {item?.facility?.facility_name}
+                        </Button>
+                      ))}
+                    </ButtonGroup>
+                  </div>
+                  <TableContainer sx={{ overflow: "auto" }}>
+                    <Table
+                      style={{
+                        width: "100%",
+                        textAlign: "center",
+                        fontFamily: "Poppins",
+                        // "@media (max-width: 600px)": {
+                        //   fontSize: "14px",
+                        // },
+                        // "@media (max-width: 400px)": {
+                        //   fontSize: "12px",
+                        // },
+                      }}
+                    >
+                      <TableHead>
+                        <TableRow>
+                          <StyledTableCell align="center">
+                            Reference No.
+                          </StyledTableCell>
+                          <StyledTableCell>Title</StyledTableCell>
+                          <StyledTableCell>Date</StyledTableCell>
+                          <StyledTableCell>Start</StyledTableCell>
+                          <StyledTableCell>End</StyledTableCell>
+                          {/* <StyledTableCell>Venue</StyledTableCell> */}
+                          <StyledTableCell></StyledTableCell>
+                          <StyledTableCell></StyledTableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {/* admin*/}
+                        {filteredEvents
+                          .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                          .map((event, index) => (
+                            <StyledTableRow key={index}>
+                              <StyledTableCell>
+                                WIL{event.referenceNo.toUpperCase()}
+                              </StyledTableCell>
+                              <StyledTableCell component="th" scope="row">
+                                {event.description}
+                              </StyledTableCell>
+                              <StyledTableCell>{event.date}</StyledTableCell>
+                              <StyledTableCell>
+                                {event.startTime}
+                              </StyledTableCell>
+                              <StyledTableCell>{event.endTime}</StyledTableCell>
+                              {/* <StyledTableCell>{event.venue}</StyledTableCell> */}
+                              <StyledTableCell>
+                                <Button
+                                  sx={ButtonStyle1}
+                                  onClick={() => {
+                                    handleView(event.id);
+                                    // axios
+                                    //   .get(
+                                    //     `http://localhost:8000/api/getAttendees/${tempId}/`
+                                    //   )
+                                    //   .then((res) => {
+                                    //     setRefresh(!refresh);
+                                    //     setAttendeeList(res.data);
+                                    //   });
+                                  }}
+                                >
+                                  View
+                                </Button>
+                              </StyledTableCell>
+                              {statusSelected === "All" ? (
+                                <StyledTableCell align="center">
+                                  <Button
+                                    sx={ButtonStyle2}
+                                    onClick={() => {
+                                      setEditModal(true);
+                                      setTempId(event.id);
+                                      //alert(event.id);
+                                    }}
+                                  >
+                                    Edit
+                                  </Button>
+                                </StyledTableCell>
+                              ) : (
+                                // <StyledTableCell align="center">
+                                //    <Button
+                                //     sx={{
+                                //       ...ButtonStyle1,
+                                //       backgroundColor: "#ff595e",
+                                //     }}
+                                //   >
+                                //     Review
+                                //   </Button>
+                                //   </StyledTableCell>
+                                <div></div>
+                              )}
+                            </StyledTableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      component="div"
+                      count={filteredEvents.length}
+                      page={page}
+                      onPageChange={handlePageChange}
+                      rowsPerPage={rowsPerPage}
+                      onRowsPerPageChange={handleRowsPerPageChange}
+                      labelRowsPerPage=""
+                    />
+                  </TableContainer>
+                  </Box>
+                </Box>
+              {/* </Box> */}
+              {/* </Box> */}
             </Container>
           </DashBoardTemplate>
         )}

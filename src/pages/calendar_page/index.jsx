@@ -385,7 +385,7 @@ export default function Calendar(props) {
     return (
       <div style={{ position: "relative" }}>
         
-        <DashBoardTemplate title="Calendar">
+        <DashBoardTemplate title="CALENDAR">
           <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
             <Box
               backgroundColor="white"
@@ -393,7 +393,7 @@ export default function Calendar(props) {
               alignItems="center"
               flexDirection="column"
               p={2}
-              borderRadius={2}
+              borderRadius={1}
               mt={5}
               marginTop={15}
               justifyContent="space-between"
