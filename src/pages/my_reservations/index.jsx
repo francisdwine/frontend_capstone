@@ -16,6 +16,7 @@ import {
   FormControl,
   MenuItem,
   InputLabel,
+  Container,
   TablePagination,
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
@@ -461,6 +462,25 @@ export default function MyReservations(props) {
         />;
         {user?.role === "user" ? (
           <DashBoardTemplate title="My Reservations">
+            <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
+            <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
+              p={2}
+              borderRadius={2}
+              mt={5}
+              marginTop={15}
+              justifyContent="space-between"
+              padding="30px"
+              sx={{
+                width: "100%",
+                "@media (max-width: 2560px)": {
+                  padding: "10px",
+                },
+              }}
+            >
             <div
               style={{
                 display: "flex",
@@ -471,18 +491,18 @@ export default function MyReservations(props) {
               }}
             ></div>
             <br></br>
-            <Box
+            {/* <Box
               backgroundColor="white"
               display="flex"
               alignItems="center"
               flexDirection="column"
-            >
+            > */}
               <div>
                 <Box
                   sx={{
                     flexGrow: 1,
                     display: "flex",
-                    border: "3px solid rgba(0, 0, 0, 0.05)",
+                    border: "1px solid rgba(0, 0, 0, 0.05)",
                     marginLeft: "745px",
                     alignItems: "center",
                     paddingLeft: 2,
@@ -534,11 +554,17 @@ export default function MyReservations(props) {
                   </ButtonGroup>
                 </div>
                 <TableContainer>
-                  <Table
+                <Table
                     style={{
-                      width: 1000,
+                      width: "100%",
                       textAlign: "center",
                       fontFamily: "Poppins",
+                      "@media (max-width: 600px)": {
+                        fontSize: "14px", 
+                      },
+                      "@media (max-width: 400px)": {
+                        fontSize: "12px", 
+                      },
                     }}
                   >
                     <TableHead>
@@ -639,10 +665,31 @@ export default function MyReservations(props) {
                   />
                 </TableContainer>
               </Box>
+            {/* </Box> */}
             </Box>
+            </Container>
           </DashBoardTemplate>
         ) : (
           <DashBoardTemplate title="Manage Reservations">
+          <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
+            <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
+              p={2}
+              borderRadius={2}
+              mt={5}
+              marginTop={15}
+              justifyContent="space-between"
+              padding="30px"
+              sx={{
+                width: "100%",
+                "@media (max-width: 2560px)": {
+                  padding: "10px",
+                },
+              }}
+            >
             <div
               style={{
                 display: "flex",
@@ -652,12 +699,12 @@ export default function MyReservations(props) {
               }}
             ></div>
             <br></br>
-            <Box
+            {/* <Box
               backgroundColor="white"
               display="flex"
               alignItems="center"
               flexDirection="column"
-            >
+            > */}
               <Box
                 sx={{
                   p: "0px 0px 0px 0px",
@@ -782,11 +829,17 @@ export default function MyReservations(props) {
                   </ButtonGroup>
                 </div>
                 <TableContainer>
-                  <Table
+                <Table
                     style={{
-                      width: 1000,
+                      width: "100%",
                       textAlign: "center",
                       fontFamily: "Poppins",
+                      "@media (max-width: 600px)": {
+                        fontSize: "14px", 
+                      },
+                      "@media (max-width: 400px)": {
+                        fontSize: "12px", 
+                      },
                     }}
                   >
                     <TableHead>
@@ -879,6 +932,8 @@ export default function MyReservations(props) {
                 </TableContainer>
               </Box>
             </Box>
+            {/* </Box> */}
+            </Container>
           </DashBoardTemplate>
         )}
         <Modal
