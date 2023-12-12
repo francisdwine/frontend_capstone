@@ -21,59 +21,6 @@ import * as React from "react";
 import AuthContext from "../../context/AuthContext";
 import { StyledTableCell, StyledTableRow, ResponsiveContainer } from "./styles";
 
-//temp deets
-// const containerDetails = [
-//   {
-//     title: "ONGOING",
-//     contents: [
-//       { name: 'Co-Working Space', length: 0 },
-//       { name: 'Conference A', length: 0 },
-//       { name: 'Conference B', length: 0 },
-//       { name: 'Joined Conference', length: 0 },
-//     ],
-//   },
-//   {
-//     title: "EXPECTED",
-//     contents: [
-//       { name: 'Co-Working Space', length: 0 },
-//       { name: 'Conference A', length: 0 },
-//       { name: 'Conference B', length: 0 },
-//       { name: 'Joined Conference', length: 0 },
-//     ],
-//   },
-//   {
-//     title: "WAITING",
-//     contents: [
-//       { name: 'Co-Working Space', length: 0 },
-//       { name: 'Conference A', length: 0 },
-//       { name: 'Conference B', length: 0 },
-//       { name: 'Joined Conference', length: 0 },
-//     ],
-//   },
-//   {
-//     title: "OVERSTAYING",
-//     contents: [
-//       { name: 'Co-Working Space', length: 0 },
-//       { name: 'Conference A', length: 0 },
-//       { name: 'Conference B', length: 0 },
-//       { name: 'Joined Conference', length: 0 },
-//     ],
-//   },
-// ];
-// const colors = ["#FFFF8F","#82eedd","#87CEEB","#98FB98","#FFD700","#FFA500",];
-const colors = ["#fecc00"];
-// for Reviews
-const reviews = [
-  { label: "Name", value: "John Doe" },
-  { label: "Date", value: "2023-10-12" },
-  { label: "Rating", value: "4.5" },
-  {
-    label: "Comment",
-    value:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse volutpat.",
-  },
-];
-
 export default function Tracker(props) {
   //const [ratingFilter, setRatingFilter] = useState([0, 5]);
   const [data, setData] = useState([]);
@@ -144,26 +91,121 @@ export default function Tracker(props) {
     navigate("/booking/calendar");
   } else if (user.role === "admin"){
     return (
-      <DashBoardTemplate title="Tracker">
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "start",
-          }}
-        ></div>
-        <div>
-          <Container
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              maxWidth: "100%",
+      <div style={{ position: "relative", backgroundColor: "#fff" }}>
+        <DashBoardTemplate title="TRACKER">
+          <Container sx={{ paddingTop: "50px", width: "100%", }}>
+            <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              justifyContent="center" // Center the content horizontally
+              flexDirection="column"
+              p={2}
+              borderRadius={1}
+              mt={5}
+              marginTop={14}
+              padding={{ xs: 2, md: 2 }}
+              width="100%"
+            >
+              <div>
+                <Container
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    maxWidth: "100%",
+                  }}
+                >
+                  <Box sx={{ flexGrow: 1 }}>
+                  <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "start",
+                        }}
+                      >
+                        <Typography
+                          sx={{
+                            display:"flex",
+                            paddingLeft: -195,
+                            color: "lightblack",
+                            fontSize: { xs: 18, md: 30 },
+                            fontWeight: "bold",
+                            padding: 'auto',
+                            //paddingTop: 5,
+                            marginTop: 5,
+                          }}
+                          fontFamily="Poppins"
+                        >
+                          Activity Tracker
+                        </Typography>
+                      </div>
+                    <Grid container spacing={2}>
 
-            }}
-          >
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={2}>
+                      {containerDetails.map((card, index) => (
+                        <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
+                          <Paper
+                            elevation={3}
+                            sx={{
+                              minWidth: { xs: 100, sm: 150 },
+                              width: "auto",
+                              minHeight: 287,
+                              height: "auto",
+                              display: "relative",
+                              background: "#ffe836",
+                              border: "1px solid #fecc00",
+                              marginBottom: 7,
+                            }}
+                          >
+                            <CardContent>
+                              <Typography
+                                sx={{
+                                  fontSize: { xs: 16, md: 20 },
+                                  fontWeight: "bold",
+                                  fontFamily: "Poppins",
+                                }}
+                                color="text.primary"
+                              >
+                                {card.title}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.primary"
+                                textAlign="left"
+                                fontFamily="Poppins"
+                                fontSize={{ xs: 14, md: 17 }}
+                              >
+                                {card.contents.map((content, i) => (
+                                  <div
+                                    key={i}
+                                    style={{
+                                      display: "flex",
+                                      alignItems: "center",
+                                    }}
+                                  >
+                                    <div style={{ flex: 1 }}>{content.name}</div>
+                                    <div
+                                      style={{
+                                        width: "25px",
+                                        marginLeft: "8px",
+                                      }}
+                                    >
+                                      [{content.count}]
+                                    </div>
+                                    <br />
+                                    <br />
+                                  </div>
+                                ))}
+                              </Typography>
+                            </CardContent>
+                          </Paper>
+                        </Grid>
+                      ))}
+                    </Grid>
+                  </Box>
+                </Container>
+
+                {/* Logged in USERS */}
                 <div
                   style={{
                     display: "flex",
@@ -173,232 +215,61 @@ export default function Tracker(props) {
                 >
                   <Typography
                     sx={{
-                      paddingLeft: -200,
+                      paddingLeft: -195,
                       color: "lightblack",
+                      position: "flex-start",
                       fontSize: 30,
                       fontWeight: "bold",
-                      paddingRight: 100,
-                      paddingTop: 5,
-                      marginTop: 5,
                     }}
                     fontFamily="Poppins"
                   >
-                    Activity Tracker
+                    Currently Logged in users
                   </Typography>
                 </div>
-                {containerDetails.map((card, index) => (
-                  <Grid key={index} item xs={4} md={3}>
-                    <Paper
-                      elevation={3}
-                      sx={{
-                        width: 243,
-                        minHeight: 300,
-                        height: 'auto',
-                        display: "relative",
-                        background: "#ffe836",
-                        border: "1px solid #fecc00",
-                        marginBottom: 7,
-                      }}
-                    >
-                      <CardContent>
-                        <Typography
-                          sx={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            fontFamily: "Poppins",
-                          }}
-                          color="text.primary"
-                        >
-                          {card.title}
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          color="text.primary"
-                          textAlign="left"
-                          fontFamily="Poppins"
-                          fontSize={17}
-                        >
-                          {card.contents.map((content, i) => (
-                            <div
-                              key={i}
-                              style={{ display: "flex", alignItems: "center" }}
-                            >
-                              <div style={{ flex: 1 }}>{content.name}</div>
-                              <div style={{ width: "25px", marginLeft: "8px" }}>
-                                [{content.count}]
-                              </div>
-                              <br />
-                              <br />
-                              {/* {i < card.contents.length - 1 && <br />} */}
-                            </div>
-                          ))}
-                        </Typography>
-                      </CardContent>
-                    </Paper>
-                  </Grid>
-                ))}
-              </Grid>
+                <Container
+                  sx={{
+                    marginBottom: 5,
+                    backgroundColor: "f5fffa",
+                    borderRadius: 3,
+                    width: "100%", // Adjust width as needed
+                  }}
+                >
+                  <TableContainer
+                    sx={{
+                      minWidth: 50,
+                      display: "flex",
+                      justifyContent: "center",
+                      borderStyle: "groove",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <Table>
+                      <TableHead>
+                        <StyledTableRow>
+                          <StyledTableCell align="center">Booking ID</StyledTableCell>
+                          <StyledTableCell align="center">Name</StyledTableCell>
+                          <StyledTableCell align="center">Venue</StyledTableCell>
+                          <StyledTableCell align="center">Time Signed in</StyledTableCell>
+                        </StyledTableRow>
+                      </TableHead>
+                      <TableBody>
+                        {data.map((row, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell align="center">{row.booking}</StyledTableCell>
+                            <StyledTableCell align="center">{row.name}</StyledTableCell>
+                            <StyledTableCell align="center">{row.venueName}</StyledTableCell>
+                            <StyledTableCell align="center">{row.signInTime}</StyledTableCell>
+                          </StyledTableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Container>
+              </div>
             </Box>
           </Container>
-          {/* Logged in USERS */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "start",
-            }}
-          >
-            <Typography
-              sx={{
-                paddingLeft: 15,
-                color: "lightblack",
-                fontSize: 30,
-                fontWeight: "bold",
-              }}
-              fontFamily="Poppins"
-            >
-              Currently Logged in users
-            </Typography>
-          </div>
-          <Container
-            sx={{
-              marginBottom: 5,
-              backgroundColor: "f5fffa",
-              borderRadius: 3,
-              width: 1163,
-            }}
-          >
-            <TableContainer
-              sx={{
-                minWidth: 50,
-                display: "flex",
-                justifyContent: "center",
-                borderStyle: "groove",
-                borderRadius: 2,
-              }}
-            >
-              <Table>
-                <TableHead>
-                  <StyledTableRow>
-                    <StyledTableCell align="center">Booking ID</StyledTableCell>
-                    <StyledTableCell align="center">Name</StyledTableCell>
-                    <StyledTableCell align="center">Venue</StyledTableCell>
-                    <StyledTableCell align="center">
-                      Time Signed in
-                    </StyledTableCell>
-                  </StyledTableRow>
-                </TableHead>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <StyledTableRow key={index}>
-                      <StyledTableCell align="center">
-                        {row.booking}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row.name}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row.venueName}
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        {row.signInTime}
-                      </StyledTableCell>
-                    </StyledTableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Container>
-        </div>
-
-        {/* CUSTOMER SATISFACTION & REVIEWS
-      <Container
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          backgroundColor: "#f5fffa",
-          alignItems: "center",
-        }}
-      >
-        <Container
-          sx={{
-            justifyContent: "right",
-            backgroundColor: "#f0fff",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
-        >
-          <Paper
-            elevation={3}
-            sx={{
-              width: "100%",
-              height: 300,
-              backgroundColor: "#f5fffa",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="h6">CUSTOMER SATISFACTION</Typography>
-            <div style={{ marginTop: "55px" }}></div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer
-                components={["DateRangePicker", "DateRangePicker"]}>
-                <DemoItem label="CHOOSE DATES" component="DateRangePicker">
-                  <DateRangePicker
-                    value={value}
-                    onChange={(newValue) => setValue(newValue)}
-                    startText="From"
-                    endText="To"
-                  />
-                </DemoItem>
-              </DemoContainer>
-            </LocalizationProvider>
-          </Paper>
-        </Container>
-
-        // {/* TEMP COMMENTS */}
-        {/* <Container
-          sx={{ display: "flex", justifyContent: "flex-end", height: "100%" }}
-        >
-          <Paper
-            elevation={3}
-            sx={{
-              width: "100%",
-              height: 300,
-              backgroundColor: "#f5fffa",
-              display: "flex",
-              justifyContent: "center",
-              // alignItems: "center",
-            }}
-          > */}
-        {/* <TableContainer>
-              <Table>
-                <TableRow>
-                  {reviews.map((item, index) => (
-                    <TableCell
-                      key={index}
-                      sx={{ textAlign: "left", margin: 5 }}
-                    >
-                      <Typography variant="h7">{item.label}</Typography>
-                    </TableCell>
-                  ))}
-                </TableRow>
-                <TableRow>
-                  {reviews.map((item, index) => (
-                    <TableCell key={index} sx={{ textAlign: "left" }}>
-                      <span>{item.value}</span>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Container>
-      </Container> */}
-      </DashBoardTemplate>
+        </DashBoardTemplate>
+      </div>
     );
   }
 }

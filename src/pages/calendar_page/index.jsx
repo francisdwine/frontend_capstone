@@ -15,6 +15,7 @@ import {
   ButtonGroup,
   Divider,
   // FormControl,
+  Container,
   IconButton,
   // InputLabel,
   List,
@@ -383,17 +384,39 @@ export default function Calendar(props) {
   } else {
     return (
       <div style={{ position: "relative" }}>
-        <DashBoardTemplate title="Calendar">
+        
+        <DashBoardTemplate title="CALENDAR">
+          <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
+            <Box
+              backgroundColor="white"
+              display="flex"
+              alignItems="center"
+              flexDirection="column"
+              p={2}
+              borderRadius={1}
+              mt={5}
+              marginTop={14}
+              justifyContent="space-between"
+              padding="30px"
+              sx={{
+                width: "100%",
+                "@media (max-width: 2560px)": {
+                  padding: "10px",
+                },
+              }}
+            >
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               alignItems: "start",
               paddingTop: "40px",
+              justifyContent: "flex-start",
+              marginLeft: "0",
             }}
           >
             <Typography
-              sx={{ paddingLeft: 2, color: "darkred" }}
+              sx={{ paddingLeft: 2, color: "darkred", justifyContent: "flex-start" }}
               fontFamily="Poppins"
             >
               *Click and drag on time-slots to start booking
@@ -620,6 +643,8 @@ export default function Calendar(props) {
             </Box>
             <Typography></Typography>
           </Box>
+          </Box>
+          </Container>
         </DashBoardTemplate>
         {/* modal 1 modal1 modal one modalone */}
         <ModalOne
