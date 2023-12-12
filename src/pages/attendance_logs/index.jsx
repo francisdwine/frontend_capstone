@@ -119,12 +119,13 @@ export default function Logs(props) {
               mt={5}
               marginTop={14}
               justifyContent="center"
-              padding="30px"
+              //padding="30px"
               sx={{
                 width: "100%",
                 "@media (max-width: 2560px)": {
                   padding: "10px",
                 },
+
               }}
             >
               <div style={{marginLeft: "auto"}}>
@@ -152,7 +153,7 @@ export default function Logs(props) {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
-                  
+
                 </Box>
               </div>
 
@@ -166,6 +167,7 @@ export default function Logs(props) {
                   minHeight: "500px",
                   height: "auto",
                   overflowX: "auto",
+                  maxWidth:'97%',
                 }}
               >
                 <ButtonGroup sx={{ marginBottom: 2 }}>

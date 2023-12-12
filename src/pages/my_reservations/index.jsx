@@ -525,7 +525,7 @@ export default function MyReservations(props) {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
-                  
+
                 </Box>
               </div>
                 <Box
@@ -750,11 +750,11 @@ export default function MyReservations(props) {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
-                  
+
                 </Box>
               </div>
 
-                  <Box 
+                  <Box
                   sx={{
                     p: "0px 0px 0px 0px",
                     width: "100%",

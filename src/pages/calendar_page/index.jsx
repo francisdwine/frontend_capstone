@@ -384,7 +384,7 @@ export default function Calendar(props) {
   } else {
     return (
       <div style={{ position: "relative" }}>
-        
+
         <DashBoardTemplate title="CALENDAR">
           <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
             <Box
@@ -403,6 +403,7 @@ export default function Calendar(props) {
                 "@media (max-width: 2560px)": {
                   padding: "10px",
                 },
+
               }}
             >
           <div
@@ -413,6 +414,7 @@ export default function Calendar(props) {
               paddingTop: "40px",
               justifyContent: "flex-start",
               marginLeft: "0",
+
             }}
           >
             <Typography
@@ -429,14 +431,16 @@ export default function Calendar(props) {
             display="flex"
             alignItems="center"
             flexDirection="column"
+
           >
             <Box
               sx={{
                 p: "0px 0px 0px 0px",
               }}
-              maxWidth="90%"
+              maxWidth="97%"
+
             >
-              <div style={{ display: "flex", marginBottom: "20px" }}>
+              <div style={{ display: "flex", marginBottom: "20px"}}>
                 <ButtonGroup>
                   {facilities.map((item, index) => (
                     <Button

@@ -93,7 +93,7 @@ export default function Tracker(props) {
     return (
       <div style={{ position: "relative", backgroundColor: "#fff" }}>
         <DashBoardTemplate title="TRACKER">
-          <Container sx={{ paddingTop: "50px", width: "100%", }}>
+          <Container sx={{ paddingTop: "50px", width: "100%",  }}>
             <Box
               backgroundColor="white"
               display="flex"
@@ -106,6 +106,7 @@ export default function Tracker(props) {
               marginTop={14}
               padding={{ xs: 2, md: 2 }}
               width="100%"
+              // sx={{overflow:'auto'}}
             >
               <div>
                 <Container
@@ -118,29 +119,27 @@ export default function Tracker(props) {
                 >
                   <Box sx={{ flexGrow: 1 }}>
                   <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "start",
-                        }}
-                      >
-                        <Typography
-                          sx={{
-                            display:"flex",
-                            paddingLeft: -195,
-                            color: "lightblack",
-                            fontSize: { xs: 18, md: 30 },
-                            fontWeight: "bold",
-                            padding: 'auto',
-                            //paddingTop: 5,
-                            marginTop: 5,
-                          }}
-                          fontFamily="Poppins"
-                        >
-                          Activity Tracker
-                        </Typography>
-                      </div>
-                    <Grid container spacing={2}>
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "start",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      paddingLeft: -195,
+                      color: "lightblack",
+                      position: "flex-start",
+                      fontSize: 30,
+                      fontWeight: "bold",
+                      marginTop: 2,
+                    }}
+                    fontFamily="Poppins"
+                  >
+                    Activity Tracker
+                  </Typography>
+                </div>
+                    <Grid container spacing={2} >
 
                       {containerDetails.map((card, index) => (
                         <Grid key={index} item xs={12} sm={6} md={4} lg={3}>

@@ -119,7 +119,7 @@ export const selectedStyle = {
   export const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
-    position: 'relative', // Change from 'absolute' to 'relative'
+    position: 'relative', 
     pointerEvents: 'none',
     display: 'flex',
     alignItems: 'center',
