@@ -474,7 +474,7 @@ export default function MyReservations(props) {
                 p={2}
                 borderRadius={1}
                 mt={5}
-                marginTop={12}
+                marginTop={11}
                 justifyContent="space-between"
                 padding="30px"
                 sx={{
@@ -500,30 +500,34 @@ export default function MyReservations(props) {
               alignItems="center"
               flexDirection="column"
             > */}
-                <div>
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      display: "flex",
-                      border: "1px solid rgba(0, 0, 0, 0.05)",
-                      marginLeft: "auto",
-                      alignItems: "center",
-                      paddingLeft: 2,
-                      width: "20%",
-                      backgroundColor: "white",
-                    }}
-                  >
-                    <SearchIconWrapper>
-                      <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                      placeholder="Search..."
-                      value={searchText}
-                      onChange={handleSearchTextChange}
-                      inputProps={{ "aria-label": "search" }}
-                    />
-                  </Box>
-                </div>
+                <div style={{marginLeft: "auto"}}>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    border: "1px solid rgba(0, 0, 0.5, 0.1)",
+                    marginLeft: "auto",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    position: "relative",
+                    paddingLeft: 2,
+                    width: "100%",
+                    backgroundColor: "white",
+                    borderRadius: 2,
+                  }}
+                >
+                  <StyledInputBase
+                    placeholder="Search..."
+                    value={searchText}
+                    onChange={handleSearchTextChange}
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  
+                </Box>
+              </div>
                 <Box
                   sx={{
                     p: "0px 0px 0px 0px",
@@ -690,7 +694,7 @@ export default function MyReservations(props) {
                 p={2}
                 borderRadius={1}
                 mt={5}
-                marginTop={12}
+                marginTop={11}
                 justifyContent="space-between"
                 padding="30px"
                 sx={{
@@ -721,30 +725,34 @@ export default function MyReservations(props) {
                   }}
                   maxWidth="90%"
                 > */}
-                  <div>
-                  <Box
-                    sx={{
-                      flexGrow: 1,
-                      display: "flex",
-                      border: "1px solid rgba(0, 0, 0, 0.05)",
-                      marginLeft: "auto",
-                      alignItems: "center",
-                      paddingLeft: 2,
-                      width: "20%",
-                      backgroundColor: "white",
-                    }}
-                  >
-                    <SearchIconWrapper>
-                      <SearchIcon />
-                    </SearchIconWrapper>
-                    <StyledInputBase
-                      placeholder="Search..."
-                      value={searchText}
-                      onChange={handleSearchTextChange}
-                      inputProps={{ "aria-label": "search" }}
-                    />
-                  </Box>
-                  </div>
+                  <div style={{marginLeft: "auto"}}>
+                <Box
+                  sx={{
+                    flexGrow: 1,
+                    display: "flex",
+                    border: "1px solid rgba(0, 0, 0.5, 0.1)",
+                    marginLeft: "auto",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    position: "relative",
+                    paddingLeft: 2,
+                    width: "100%",
+                    backgroundColor: "white",
+                    borderRadius: 2,
+                  }}
+                >
+                  <StyledInputBase
+                    placeholder="Search..."
+                    value={searchText}
+                    onChange={handleSearchTextChange}
+                    inputProps={{ "aria-label": "search" }}
+                  />
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  
+                </Box>
+              </div>
 
                   <Box 
                   sx={{

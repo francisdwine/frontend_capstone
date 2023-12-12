@@ -328,7 +328,7 @@ export default function DashBoardTemplate(props) {
 
       <AppBar
         sx={{
-          position: 'absolute',
+          position: "absolute",
           backgroundColor: "#fecc00",
           top: "150px",
           left: "50%",
@@ -341,8 +341,13 @@ export default function DashBoardTemplate(props) {
           borderRadius: '1px',
           marginLeft: '135px',
           zIndex: 0,
+          "@media (max-width: 768px)": {
+            width: '90%',
+            marginLeft: '5%',
+          },
         }}
       >
+        <Box sx={{ width: '100%', textAlign: 'left' , marginLeft: "7px" }}>
         <Typography
           variant="h4"
           noWrap
@@ -351,11 +356,12 @@ export default function DashBoardTemplate(props) {
           color="black"
           fontWeight="bold"
           margin="auto"
-          justifyContent='flex-start'
-          textAlign={{ xs: 'center', sm: 'left' }}
+          sx={{ padding: '10px' }}
+          //textAlign="left"
         >
           {props.title}
         </Typography>
+        </Box>
       </AppBar>
 
       <Box

@@ -103,7 +103,7 @@ export default function Tracker(props) {
               p={2}
               borderRadius={1}
               mt={5}
-              marginTop={15}
+              marginTop={14}
               padding={{ xs: 2, md: 2 }}
               width="100%"
             >
@@ -127,7 +127,7 @@ export default function Tracker(props) {
                         <Typography
                           sx={{
                             display:"flex",
-                            paddingLeft: -200,
+                            paddingLeft: -195,
                             color: "lightblack",
                             fontSize: { xs: 18, md: 30 },
                             fontWeight: "bold",

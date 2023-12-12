@@ -106,7 +106,7 @@ export default function Logs(props) {
     return null;
   } else {
     return (
-      <div style={{ position: "relative", backgroundColor: "#fff" }}>
+      <div style={{ position: "relative", backgroundColor: "#fff", }}>
         <DashBoardTemplate title="ATTENDANCE LOGS">
           <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
             <Box
@@ -117,8 +117,8 @@ export default function Logs(props) {
               p={2}
               borderRadius={1}
               mt={5}
-              marginTop={15}
-              justifyContent="space-between"
+              marginTop={14}
+              justifyContent="center"
               padding="30px"
               sx={{
                 width: "100%",
@@ -127,28 +127,32 @@ export default function Logs(props) {
                 },
               }}
             >
-              <div>
+              <div style={{marginLeft: "auto"}}>
                 <Box
                   sx={{
                     flexGrow: 1,
                     display: "flex",
-                    border: "1px solid rgba(0, 0, 0, 0.05)",
+                    border: "1px solid rgba(0, 0, 0.5, 0.1)",
                     marginLeft: "auto",
                     alignItems: "center",
+                    justifyContent: "space-between",
+                    position: "relative",
                     paddingLeft: 2,
-                    width: "20%",
+                    width: "100%",
                     backgroundColor: "white",
+                    borderRadius: 2,
                   }}
                 >
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
                   <StyledInputBase
                     placeholder="Search..."
                     value={searchText}
                     onChange={handleSearchTextChange}
                     inputProps={{ "aria-label": "search" }}
                   />
+                  <SearchIconWrapper>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  
                 </Box>
               </div>
 

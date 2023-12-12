@@ -395,7 +395,7 @@ export default function Calendar(props) {
               p={2}
               borderRadius={1}
               mt={5}
-              marginTop={15}
+              marginTop={14}
               justifyContent="space-between"
               padding="30px"
               sx={{

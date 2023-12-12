@@ -60,30 +60,20 @@ const Login = () => {
           flexDirection: "column",
         }}
       >
-        {/* <Snackbar
-          open={open}
-          autoHideDuration={6000}
-          onClose={handleClose}
-          anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
-        >
-          <Alert onClose={handleClose} severity="error" sx={{ width: "100%" }}>
-            {loginError}
-          </Alert>
-        </Snackbar> */}
-        
-          {/* <img src={Wild} alt="logo" width={200} height={50} style={logo} /> */}
           <Box marginTop={5}>
-          <img
-            src={Wild}
-            alt="logo"
-            width={300}
-            height={100}
-            // style={{
-            //   position: "absolute",
-            //   top: 120,
-            //   left: 700,
-            // }}
-          />
+            <a href="http://172.16.103.217/">
+              <img
+                src={Wild}
+                alt="logo"
+                width={300}
+                height={100}
+                // style={{
+                //   position: "absolute",
+                //   top: 120,
+                //   left: 700,
+                // }}
+              />
+            </a>
           </Box>
           <Box>
 
