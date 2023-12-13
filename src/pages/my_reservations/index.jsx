@@ -596,7 +596,7 @@ export default function MyReservations(props) {
                           .map((event, index) => (
                             <StyledTableRow key={index}>
                               <StyledTableCell>
-                                WIL{event.referenceNo.toUpperCase()}
+                                {event.referenceNo.toUpperCase()}
                               </StyledTableCell>
                               <StyledTableCell component="th" scope="row">
                                 {event?.description}
@@ -1415,12 +1415,14 @@ export default function MyReservations(props) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button
                     variant="contained"
+                    sx={{...ButtonStyle1}}
                     onClick={() => cancelBooking(tempId)}
                   >
                     Yes
                   </Button>
                   <Button
                     variant="contained"
+                    sx={{...ButtonStyle1}}
                     onClick={() => {
                       setViewModal(false);
                       setCancelModal(false);

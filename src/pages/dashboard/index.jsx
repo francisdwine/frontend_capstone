@@ -147,6 +147,7 @@ export default function Tracker(props) {
                             elevation={3}
                             sx={{
                               minWidth: { xs: 100, sm: 150 },
+                              minWidth: 195,
                               width: "auto",
                               minHeight: 287,
                               height: "auto",

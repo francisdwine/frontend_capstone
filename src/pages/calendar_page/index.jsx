@@ -304,7 +304,7 @@ export default function Calendar(props) {
     };
 
     axios
-      .post(`http://localhost:8000/api/calculateCost/${venueId}`, costData)
+      .post(`${BASE_URL}/api/calculateCost/${venueId}`, costData)
       .then((response) => {
         //contain the calculated cost
         const calculatedCost = response.data.cost; // Adjust this based on your server response
@@ -1536,12 +1536,14 @@ export default function Calendar(props) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button
                     variant="contained"
+                    sx={{...ButtonStyle1}}
                     onClick={() => cancelBooking(tempId)}
                   >
                     Yes
                   </Button>
-                  <Button
+                  <Button 
                     variant="contained"
+                    sx={{...ButtonStyle1}}
                     onClick={() => {
                       setViewModal(false);
                       setCancelModal(false);
