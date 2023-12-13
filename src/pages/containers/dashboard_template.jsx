@@ -247,7 +247,7 @@ export default function DashBoardTemplate(props) {
         {isUser && (
           <ListItem
             disablePadding
-            sx={{ display: "flex", justifyContent: "center", paddingTop: 60 }}
+            sx={{ display: "flex", justifyContent: "center", paddingTop: 50 }}
           >
             <Button
               variant="contained"
@@ -337,7 +337,7 @@ export default function DashBoardTemplate(props) {
           alignItems: 'center',
           justifyContent: 'center',
           height: '9vh',
-          width: '68%',
+          width: '75%',
           borderRadius: '1px',
           marginLeft: '135px',
           zIndex: 0,
