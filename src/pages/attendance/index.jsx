@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BASE_URL } from "../../links";
 import axios from "axios";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, TextField } from "@mui/material";
 import { modalHeaderStyle, ButtonStyle1 } from "./styles";
 import { CustomAlert } from "../calendar_page";
 
@@ -17,6 +17,7 @@ export default function Attendance(props) {
   const [avail, setAvail] = useState(true);
   const [warningMessage, setWarningMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
+  const scannedNumberRef = useRef(scannedNumber);
 
   const handleAlertClose = () => {
     setAlertOpen(false);
@@ -39,14 +40,16 @@ export default function Attendance(props) {
   };
 
   const handleChange = (e) => {
-    scannedNumber = e.target.value;
-    setTapInput(scannedNumber);
+    const newScannedNumber = e.target.value;
+    console.log('Scanned Number:', newScannedNumber);
+    setTapInput(newScannedNumber);
 
-    if (scannedNumber.length === 10 && /^\d+$/.test(scannedNumber)) {
-      handleSave();
+    if (newScannedNumber.length === 10 && /^\d+$/.test(newScannedNumber)) {
+      console.log('Handling save...');
+      scannedNumberRef.current = newScannedNumber;
     }
   };
-
+  
   useEffect(() => {
     const intervalId = setInterval(() => {
       //assign interval to a variable to clear it.
@@ -55,9 +58,10 @@ export default function Attendance(props) {
     return () => clearInterval(intervalId);
   }, [avail]);
 
-  const handleSave = () => {
+  const handleSave = (scannedNumber) => {
     if (avail === true) {
       const data = { rfid: scannedNumber };
+      console.log(data)
       axios
         .post(`${BASE_URL}/api/logAttendance/`, data)
         .then((response) => {
@@ -83,16 +87,20 @@ export default function Attendance(props) {
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (event.key === "Enter") {
-        handleSave(scannedNumber);
-        console.log(scannedNumber);
+      if (event.key === 'Enter') {
+        const currentScannedNumber = scannedNumberRef.current;
+        console.log('Handling save...', currentScannedNumber);
+        handleSave(currentScannedNumber);
       }
     };
-    document.addEventListener("keypress", handleKeyPress);
+
+    document.addEventListener('keypress', handleKeyPress);
+
     return () => {
-      document.removeEventListener("keypress", handleKeyPress);
+      document.removeEventListener('keypress', handleKeyPress);
     };
   }, [handleSave]);
+  
 
   return (
     <div>
@@ -131,14 +139,15 @@ export default function Attendance(props) {
             Please tap your ID:
           </Typography>
           <div style={{ margin: "20px" }}></div>
-          {/* <TextField
+          <TextField
             label="ID Number"
             variant="outlined"
             fullWidth
             value={tapInput}
             onChange={handleChange}
             sx={{ fontFamily: 'Poppins' }}
-          /> */}
+            autoFocus
+          />
           <Box sx={{ justifyContent: "space-between" }}>
             <div style={{ margin: "20px" }}></div>
             {/* <Button
