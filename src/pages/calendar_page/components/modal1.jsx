@@ -146,7 +146,7 @@ export default function ModalOne(props) {
               </div>
             )}
 
-            <TextField
+            {/* <TextField
               name="officeName"
               onChange={(e) => props.handleChange(e)}
               sx={{ width: "100%" }}
@@ -157,7 +157,7 @@ export default function ModalOne(props) {
               inputProps={{ maxLength: 20 }}
             />
             <br></br>
-            <br></br>
+            <br></br> */}
             <FormControl variant="standard" sx={{ minWidth: "100%" }}>
               <InputLabel id="demo-simple-select-filled-label">
                 Purpose

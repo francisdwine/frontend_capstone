@@ -500,34 +500,33 @@ export default function MyReservations(props) {
               alignItems="center"
               flexDirection="column"
             > */}
-                <div style={{marginLeft: "auto"}}>
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    display: "flex",
-                    border: "1px solid rgba(0, 0, 0.5, 0.1)",
-                    marginLeft: "auto",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    position: "relative",
-                    paddingLeft: 2,
-                    width: "100%",
-                    backgroundColor: "white",
-                    borderRadius: 2,
-                  }}
-                >
-                  <StyledInputBase
-                    placeholder="Search..."
-                    value={searchText}
-                    onChange={handleSearchTextChange}
-                    inputProps={{ "aria-label": "search" }}
-                  />
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
-
-                </Box>
-              </div>
+                <div style={{ marginLeft: "auto" }}>
+                  <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      border: "1px solid rgba(0, 0, 0.5, 0.1)",
+                      marginLeft: "auto",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      position: "relative",
+                      paddingLeft: 2,
+                      width: "100%",
+                      backgroundColor: "white",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <StyledInputBase
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={handleSearchTextChange}
+                      inputProps={{ "aria-label": "search" }}
+                    />
+                    <SearchIconWrapper>
+                      <SearchIcon />
+                    </SearchIconWrapper>
+                  </Box>
+                </div>
                 <Box
                   sx={{
                     p: "0px 0px 0px 0px",
@@ -652,6 +651,13 @@ export default function MyReservations(props) {
                                       //   });
                                       handleEdit(event.id);
                                     }}
+                                    // Conditionally set visibility based on the status
+                                    style={{
+                                      display:
+                                        event.status !== "Cancelled"
+                                          ? "block"
+                                          : "none",
+                                    }}
                                   >
                                     Edit
                                   </Button>
@@ -725,36 +731,35 @@ export default function MyReservations(props) {
                   }}
                   maxWidth="90%"
                 > */}
-                  <div style={{marginLeft: "auto"}}>
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    display: "flex",
-                    border: "1px solid rgba(0, 0, 0.5, 0.1)",
-                    marginLeft: "auto",
-                    alignItems: "center",
-                    justifyContent: "flex-end",
-                    position: "relative",
-                    paddingLeft: 2,
-                    width: "100%",
-                    backgroundColor: "white",
-                    borderRadius: 2,
-                  }}
-                >
-                  <StyledInputBase
-                    placeholder="Search..."
-                    value={searchText}
-                    onChange={handleSearchTextChange}
-                    inputProps={{ "aria-label": "search" }}
-                  />
-                  <SearchIconWrapper>
-                    <SearchIcon />
-                  </SearchIconWrapper>
-
-                </Box>
-              </div>
-
+                <div style={{ marginLeft: "auto" }}>
                   <Box
+                    sx={{
+                      flexGrow: 1,
+                      display: "flex",
+                      border: "1px solid rgba(0, 0, 0.5, 0.1)",
+                      marginLeft: "auto",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      position: "relative",
+                      paddingLeft: 2,
+                      width: "100%",
+                      backgroundColor: "white",
+                      borderRadius: 2,
+                    }}
+                  >
+                    <StyledInputBase
+                      placeholder="Search..."
+                      value={searchText}
+                      onChange={handleSearchTextChange}
+                      inputProps={{ "aria-label": "search" }}
+                    />
+                    <SearchIconWrapper>
+                      <SearchIcon />
+                    </SearchIconWrapper>
+                  </Box>
+                </div>
+
+                <Box
                   sx={{
                     p: "0px 0px 0px 0px",
                     width: "100%",
@@ -765,8 +770,14 @@ export default function MyReservations(props) {
                     height: "auto",
                     overflowX: "auto",
                   }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-start",
+                      marginBottom: "20px",
+                    }}
                   >
-                  <div style={{ display: "flex", justifyContent: "flex-start", marginBottom: "20px" }}>
                     <ButtonGroup>
                       <Button
                         sx={
@@ -801,7 +812,9 @@ export default function MyReservations(props) {
                     </ButtonGroup>
                   </div>
 
-                  <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <div
+                    style={{ display: "flex", justifyContent: "flex-start" }}
+                  >
                     <ButtonGroup>
                       {facilities.map((item, index) => (
                         <Button
@@ -886,16 +899,18 @@ export default function MyReservations(props) {
                               </StyledTableCell>
                               {statusSelected === "All" ? (
                                 <StyledTableCell align="center">
-                                  <Button
-                                    sx={ButtonStyle2}
-                                    onClick={() => {
-                                      setEditModal(true);
-                                      setTempId(event.id);
-                                      //alert(event.id);
-                                    }}
-                                  >
-                                    Edit
-                                  </Button>
+                                  {event.status !== "Cancelled" && (
+                                    <Button
+                                      sx={ButtonStyle2}
+                                      onClick={() => {
+                                        setEditModal(true);
+                                        setTempId(event.id);
+                                        //alert(event.id);
+                                      }}
+                                    >
+                                      Edit
+                                    </Button>
+                                  )}
                                 </StyledTableCell>
                               ) : (
                                 // <StyledTableCell align="center">
@@ -924,8 +939,8 @@ export default function MyReservations(props) {
                       labelRowsPerPage=""
                     />
                   </TableContainer>
-                  </Box>
                 </Box>
+              </Box>
               {/* </Box> */}
               {/* </Box> */}
             </Container>
@@ -1415,14 +1430,14 @@ export default function MyReservations(props) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button
                     variant="contained"
-                    sx={{...ButtonStyle1}}
+                    sx={{ ...ButtonStyle1 }}
                     onClick={() => cancelBooking(tempId)}
                   >
                     Yes
                   </Button>
                   <Button
                     variant="contained"
-                    sx={{...ButtonStyle1}}
+                    sx={{ ...ButtonStyle1 }}
                     onClick={() => {
                       setViewModal(false);
                       setCancelModal(false);

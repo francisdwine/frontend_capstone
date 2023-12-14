@@ -1,6 +1,4 @@
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,700;1,100&display=swap');
-</style>
+import { styled } from '@mui/material/styles';
 
 export const ButtonStyle1 = {
     backgroundColor: "#fecc00",

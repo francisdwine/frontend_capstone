@@ -14,6 +14,8 @@ import {
   Button,
   ButtonGroup,
   Divider,
+  Stack,
+  Snackbar,
   // FormControl,
   Container,
   IconButton,
@@ -27,6 +29,7 @@ import {
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import Modal from "@mui/material/Modal";
+import MuiAlert from '@mui/material/Alert';
 import CloseIcon from "@mui/icons-material/Close";
 // import MenuItem from "@mui/material/MenuItem";
 // import Select from "@mui/material/Select";
@@ -69,7 +72,7 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
-export function CustomAlert({ open, onClose, title, message, success }){
+export function CustomAlert({ open, onClose, message, success }) {
   const defaultBackgroundColor = success ? "#5bb450" : "#e74c3c";
   console.log(success);
   const defaultTextColor = "white";
@@ -77,7 +80,7 @@ export function CustomAlert({ open, onClose, title, message, success }){
   const dialogStyle = {
     "& .MuiPaper-root": {
       backgroundColor: defaultBackgroundColor,
-      maxWidth: "900px",
+      maxWidth: `${message.length * 0}px`, // Adjust the multiplier as needed
       width: "480px",
       color: defaultTextColor,
       position: "absolute",
@@ -85,7 +88,8 @@ export function CustomAlert({ open, onClose, title, message, success }){
       left: "50%",
       transform: "translate(-50%, 0)",
       borderRadius: "10px",
-      height: "100px",
+      height: "10%",
+      minWidth: "30%",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -107,8 +111,8 @@ export function CustomAlert({ open, onClose, title, message, success }){
 
   return (
     <Dialog open={open} onClose={onClose} sx={dialogStyle}>
-      <DialogTitle closeButton>{title}</DialogTitle>
-      <DialogContent sx={{ justifyContent: "center" }}>{message}</DialogContent>
+      {/* <DialogTitle closeButton>{title}</DialogTitle> */}
+      <DialogContent sx={{ justifyContent: "center", textAlign: "center" }}>{message}</DialogContent>
       <DialogActions></DialogActions>
     </Dialog>
   );
@@ -123,8 +127,6 @@ export default function Calendar(props) {
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState("admin"); //default role
   const [info, setInfo] = useState({});
-  const [alertSuccess, setAlertSuccess] = useState(true);
-
 
   const submitBooking = () => {
     // setAttendeeList(attendeeList=>[
@@ -168,7 +170,7 @@ export default function Calendar(props) {
           setBookingsRefresher(!bookingsRefresher);
           setAlertMessage("Booking created successfully!");
           setAlertOpen(true);
-          setAlertSuccess(true);
+          setAlertSuccess(true);          
           setAttendeeList([]);
         }
       });
@@ -284,6 +286,12 @@ export default function Calendar(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
         setCancelModal(false);
+        // <CustomAlert 
+        //   open = {setAlertOpen}
+        //   onClose = {handleAlertClose}
+        //   message={setAlertMessage("Booking cancelled successfully!")}
+        //   success={setAlertSuccess(true)}
+        //   />
         setAlertMessage("Booking cancelled successfully");
         setAlertOpen(true);
         setAlertSuccess(true);
@@ -360,6 +368,7 @@ export default function Calendar(props) {
   const found = (element) => element.name === attendeeName;
   const navigate = useNavigate();
   const [alertOpen, setAlertOpen] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(true);
   const [alertMessage, setAlertMessage] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [alertInfo, setAlertInfo] = useState({
@@ -525,6 +534,11 @@ export default function Calendar(props) {
                     setAlertMessage("Please select a future time");
                     setAlertOpen(true);
                     setAlertSuccess(false);
+                    // setAlertInfo({
+                    //   visible: true,
+                    //   variant: "success",
+                    //   message: "Please select a future time",
+                    // });
                   } else {
                     var dateSplitted = info.startStr.split("T");
                     var startDate = dateSplitted[0];
@@ -556,7 +570,7 @@ export default function Calendar(props) {
                               "You have exceeded the limit of 3 hours booking per week"
                             );
                             setAlertOpen(true);
-                            setAlertSuccess(false);
+                            setAlertSuccess(false);     
                             // alert("You have exceeded the limit of 3 hours booking per week")
                             setTimeout(() => {
                               setAlertInfo((prevAlertInfo) => ({
@@ -644,12 +658,15 @@ export default function Calendar(props) {
                 onClose={handleAlertClose}
                 message={alertMessage}
               />
+              
             </Box>
+            
             <Typography></Typography>
           </Box>
           </Box>
           </Container>
         </DashBoardTemplate>
+        
         {/* modal 1 modal1 modal one modalone */}
         <ModalOne
           error={error}
@@ -1050,7 +1067,7 @@ export default function Calendar(props) {
                   {booking.current.description}
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              {/* <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
@@ -1065,7 +1082,7 @@ export default function Calendar(props) {
                 >
                   {booking.current.officeName}
                 </Typography>
-              </Box>
+              </Box> */}
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"

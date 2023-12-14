@@ -1,9 +1,7 @@
 import { styled } from '@mui/material/styles';
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { TableRow} from "@mui/material";
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,700;1,100&display=swap');
-</style>
+
 export const selectedStyle = {
     backgroundColor: "#fecc00",
     color: "white",

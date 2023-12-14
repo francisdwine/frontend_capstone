@@ -337,7 +337,7 @@ export default function DashBoardTemplate(props) {
           alignItems: 'center',
           justifyContent: 'center',
           height: '9vh',
-          width: '75%',
+          width: '68%',
           borderRadius: '1px',
           marginLeft: '135px',
           zIndex: 0,
