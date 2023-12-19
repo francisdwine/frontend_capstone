@@ -26,6 +26,14 @@ import SearchIcon from "@mui/icons-material/Search";
 import TableBody from "@mui/material/TableBody";
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
+import {
+  Autocomplete,
+  ListItemAvatar,
+  Avatar,
+} from "@mui/material";
+import ClearIcon from "@mui/icons-material/Clear";
+import IconButton from "@mui/material/IconButton";
+import PersonIcon from "@mui/icons-material/Person";
 import axios from "axios";
 import * as React from "react";
 import {
@@ -65,6 +73,15 @@ import FilledAlerts from "../../alerts";
 //     computers: "2",
 //   },
 // ];
+const today = new Date();
+const currentTimeMillis = today.getTime();
+const currentTime = new Date(currentTimeMillis);
+let hours = currentTime.getHours().toString().padStart(2, '0');
+let minutes = currentTime.getMinutes().toString().padStart(2, '0');
+const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+hours = (parseInt(hours) + 1) % 24;
+const currentTimePlusOneHour = `${hours}:${minutes}:${seconds}`;
+
 const maxComputers = 10;
 export default function MyReservations(props) {
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
@@ -86,6 +103,9 @@ export default function MyReservations(props) {
   const found = (element) => element.name === attendeeName;
   const [alertOpen, setAlertOpen] = useState(false);
   const screenwidth = window.innerWidth;
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [info, setInfo] = useState({});
+
   const handleAlertClose = () => {
     setAlertOpen(false);
   };
@@ -105,18 +125,34 @@ export default function MyReservations(props) {
 
   const handleView = (id) => {
     setTempId(id);
-
+  
     let a = events.find((item) => {
       return item.id === id;
     });
     var cancelCost = 0;
-
+  
     if (a.points === 0 && a.coins > 0) {
       cancelCost = a.coins * 0.3;
     } else if (a.coins === 0 && a.points > 0) {
       cancelCost = a.points * 0.3;
     }
     a = { ...a, cancelCost: cancelCost };
+  
+    const selectedEventDate = new Date(a.date);
+    const today = new Date();
+    const timeDifference = selectedEventDate.getTime() - today.getTime();
+    const isEventToday = selectedEventDate.toDateString() === today.toDateString();
+  
+    if (timeDifference < 0 || timeDifference <= 3600000) {
+      // Event is within the next hour, set some state or handle accordingly
+      // For example, you might want to disable the "Cancel Booking" button
+      // or show a message indicating that cancellation is not allowed.
+      // You can set a state variable and use it in your component.
+      setDisableCancel(true);
+    } else {
+      setDisableCancel(false);
+    }
+  
     axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
@@ -125,13 +161,14 @@ export default function MyReservations(props) {
       console.log(id);
     });
   };
+  
 
   const handleEdit = (id) => {
-    setTempId(id);
     setEditModal(true);
     let b = events.find((item) => {
       return item.id === id;
     });
+    setTempId(b.id);
     setViewDetails(b);
     booking.current.title = b.description;
     console.log(b);
@@ -139,7 +176,9 @@ export default function MyReservations(props) {
 
   //init page
   React.useEffect(() => {
-    axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
+    axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
+      setFakeUserDb(res?.data);
+      axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       // stroe lng nakog variable ang index 0 pra di sigeg access
       var indx0 = res?.data[0];
@@ -148,7 +187,9 @@ export default function MyReservations(props) {
       // setAttendeLimit(indx0?.main_rules?.num_attendies);
       // setMaxComputers(indx0?.main_rules?.num_pc);
     });
-  }, []);
+  });
+}, []);
+
 
   const handleChange = (e) => {
     var tempBooking = booking.current;
@@ -225,6 +266,7 @@ export default function MyReservations(props) {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [page, setPage] = useState(0);
   const [isEventToday, setIsEventToday] = useState(false);
+  const [disableCancel, setDisableCancel] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSuccess, setAlertSuccess] = useState(false);
   const [alertInfo, setAlertInfo] = useState({
@@ -233,51 +275,74 @@ export default function MyReservations(props) {
     message: "",
   });
   const [attendeeList, setAttendeeList] = useState([
-    { name: "127-2242-290", id: 2 },
-    { name: "225-5224-280", id: 3 },
-    { name: "Celine", id: 4 },
+    // { name: "127-2242-290", id: 2 },
+    // { name: "225-5224-280", id: 3 },
+    // { name: "Celine", id: 4 },
   ]);
 //to filter by venue id
   useEffect(() => {
+  //   const filtered = events.filter((item) => item.venue === venueId);
+  //   setFilteredEvents(filtered);
+  // }, [venueId, events]);
+
+  if(user?.role === "admin"){
     const filtered = events.filter((item) => item.venue === venueId);
     setFilteredEvents(filtered);
-  }, [venueId, events]);
+  } else {
+    setFilteredEvents(events);
+  }}, [venueId, events, user]);
 
-  //searchbar
-  const handleSearchTextChange = (e) => {
-    const searchText = e.target.value;
-    setSearchText(searchText);
-    if (searchText === "") {
-      // if empty dipslay all events
-      const filtered = events.filter((item) => {
-        return (
-          (item.venue === venueId &&
-            item.description
-              .toLowerCase()
-              .includes(searchText.toLowerCase())) ||
-          (item.venue === venueId &&
-            item.date.toString().includes(searchText)) ||
-          (item.venue === venueId &&
-            item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
-        );
-      });
-      setFilteredEvents(filtered);
-    } else {
-      const filtered = events.filter((item) => {
-        return (
-          (item.venue === venueId &&
-            item.description
-              .toLowerCase()
-              .includes(searchText.toLowerCase())) ||
-          (item.venue === venueId &&
-            item.date.toString().includes(searchText)) ||
-          (item.venue === venueId &&
-            item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
-        );
-      });
-      setFilteredEvents(filtered);
-    }
-  };
+//searchbar
+const handleSearchTextChange = (e) => {
+  const searchText = e.target.value;
+  setSearchText(searchText);
+  if (searchText === "") {
+    // if empty display all events
+    const filtered = events.filter((item) => {
+      return (
+        (user?.role === "admin" &&
+          ((item.venue === venueId &&
+            item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId &&
+              item.date.toString().includes(searchText)) ||
+            (item.venue === venueId &&
+              item.referenceNo.toLowerCase().includes(searchText.toLowerCase())))) ||
+        (user?.role === "user" &&
+          (item.description.toLowerCase().includes(searchText.toLowerCase()) ||
+            item.date.toString().includes(searchText) ||
+            item.referenceNo.toLowerCase().includes(searchText.toLowerCase())))
+      );
+    });
+
+    setFilteredEvents(filtered);
+  }
+  else {
+    const filtered = events.filter((item) => {
+      return (
+        (user?.role === "admin" &&
+          (
+            (item.venue === venueId &&
+              item.description.toLowerCase().includes(searchText.toLowerCase())) ||
+            (item.venue === venueId &&
+              item.date.toString().includes(searchText)) ||
+            (item.venue === venueId &&
+              item.referenceNo.toLowerCase().includes(searchText.toLowerCase()))
+          )
+        ) ||
+        (user?.role === "user" &&
+          (
+            item.description.toLowerCase().includes(searchText.toLowerCase()) ||
+            item.date.toString().includes(searchText) ||
+            item.referenceNo.toLowerCase().includes(searchText.toLowerCase())
+          )
+        )
+      );
+    });
+
+    setFilteredEvents(filtered);
+  }
+
+};
 
   // let filteredEvents = events
   // .filter((item) => {
@@ -354,6 +419,16 @@ export default function MyReservations(props) {
       return;
     }
     {
+      if (attendeeList.some(found) ||attendeeName === user?.username) {
+        setAlertInfo({
+          visible: true,
+          variant: "info",
+          message:
+            "User already added",
+        });
+          return;
+      }
+
       //finds username in database
       userFound = fakeUserDb.find((x) => x.name === attendeeName);
 
@@ -365,7 +440,7 @@ export default function MyReservations(props) {
       // setRefresh(!refresh)
     }
     axios
-      .post(`${BASE_URL}api/addAttendee/${tempId}/`, {
+      .post(`${BASE_URL}/api/addAttendee/${tempId}/`, {
         name: attendeeName,
         user_id: id,
       })
@@ -590,7 +665,7 @@ export default function MyReservations(props) {
                       </TableHead>
                       <TableBody>
                         {/* user */}
-                        {events
+                        {filteredEvents
                           .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                           .map((event, index) => (
                             <StyledTableRow key={index}>
@@ -639,28 +714,25 @@ export default function MyReservations(props) {
 
                               {timeSelected === "Upcoming" ? (
                                 <StyledTableCell align="center">
+                                  {event.status !== "Cancelled" && (
                                   <Button
                                     sx={ButtonStyle2}
                                     onClick={() => {
-                                      // axios
-                                      //   .get(
-                                      //     `http://localhost:8000/api/getAttendees/${tempId}/`
-                                      //   )
-                                      //   .then((res) => {
-                                      //     setAttendeeList(res.data);
-                                      //   });
                                       handleEdit(event.id);
+                                      axios
+                                        .get(
+                                          `http://localhost:8000/api/getAttendees/${event.id}/`
+                                        )
+                                        .then((res) => {
+                                          setEditModal(true);
+                                          setAttendeeList(res.data);
+                                        });
                                     }}
-                                    // Conditionally set visibility based on the status
-                                    style={{
-                                      display:
-                                        event.status !== "Cancelled"
-                                          ? "block"
-                                          : "none",
-                                    }}
+                    
                                   >
                                     Edit
                                   </Button>
+                                  )}
                                 </StyledTableCell>
                               ) : (
                                 // <StyledTableCell align="right">
@@ -1316,27 +1388,23 @@ export default function MyReservations(props) {
                       justifyContent: "flex-end",
                     }}
                   >
-                    {timeSelected !== "History" && (
                       <Button
                         sx={ButtonStyle1}
                         variant="contained"
                         onClick={() => {
-                          if (isEventToday) {
-                            console.log(
-                              "Cannot cancel booking for events happening today"
-                            );
-                          } else {
                             console.log(viewDetails.cancelCost);
                             setCancelModal(true);
                             setOpenInfoModal(false);
-                          }
                         }}
-                        // disable if the event is today
-                        disabled={isEventToday}
+                        disabled={
+                          selectedEvent &&
+                          new Date(selectedEvent.start).toDateString() ===
+                            new Date().toDateString() &&
+                          currentTimePlusOneHour > info.startTime
+                        }
                       >
                         Cancel Booking
                       </Button>
-                    )}
                   </Box>
                 </>
               )}
@@ -1518,7 +1586,7 @@ export default function MyReservations(props) {
               variant="standard"
               inputProps={{ maxLength: 20 }}
             /> */}
-              {/* <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <Box sx={{ display: "flex", justifyContent: "center" }}>
               <TextField
                 name="computers"
                 type="number"
@@ -1536,7 +1604,7 @@ export default function MyReservations(props) {
                 onChange={(e) => handleChange(e)}
                 autoFocus={false}
               />
-            </Box> */}
+            </Box>
               <Button
                 variant="contained"
                 onClick={() => {
@@ -1554,7 +1622,7 @@ export default function MyReservations(props) {
           </Box>
         </Modal>
         {/*Attendees Edit*/}
-        {/* <Modal
+        <Modal
         disableAutoFocus={true}
         open={attendeesModal}
         onClose={() => setAttendeesModal(false)}
@@ -1576,8 +1644,8 @@ export default function MyReservations(props) {
             </Typography>
           </Box>
           <Box p={4}>
-            <Box sx={{ display: "flex", marginTop: "20px" }}> */}
-        {/* <TextField
+            <Box sx={{ display: "flex", marginTop: "20px" }}>
+         {/* <TextField
                 sx={{ width: "100%", marginRight: "20px" }}
                 id="outlined-basic"
                 placeholder="Enter Name or Id"
@@ -1585,15 +1653,15 @@ export default function MyReservations(props) {
                 onChange={(e) => {
                   setAttendeeName(e.target.value);
                 }}
-              />
-              {/* <Autocomplete
+              /> */}
+               <Autocomplete
                 freeSolo
                 defaultValue=""
                 autoSelect={false}
                 id="combo-box-demo"
                 options={fakeUserDb.map((item) => {
                   return {
-                    label: item.name,
+                    label: item.email,
                     id: item.id,
                   };
                 })}
@@ -1607,40 +1675,43 @@ export default function MyReservations(props) {
                     {...params}
                     placeholder="Enter Name or Id"
                     variant="standard"
+                    onChange={(e) => {
+                      setAttendeeName(e.target.value);
+                    }}
                   />
                 )}
               />
               <Button
-                onClick={(e) => {
-                  if (attendeeName === "") {
-                    alert("Please Enter Attendee name");
-                    return;
-                  }
-                  if (
-                    attendeeList.some(found) ||
-                    attendeeName === user.username
-                  ) {
-                  } else {
-                    let isExisting = false;
-                    let id = null;
-                    let userFound = null;
-                    //finds username in database
-                    userFound = fakeUserDb.find((x) => x.name === attendeeName);
+                onClick={ 
+                  // if (attendeeName === "") {
+                  //   alert("Please Enter Attendee name");
+                  //   return;
+                  // }
+                  // if (
+                  //   attendeeList.some(found) ||
+                  //   attendeeName === user?.username
+                  // ) {
+                  // } else {
+                  //   let isExisting = false;
+                  //   let id = null;
+                  //   let userFound = null;
+                  //   //finds username in database
+                  //   userFound = fakeUserDb.find((x) => x.email === attendeeName);
 
-                    if (userFound !== undefined) {
-                      isExisting = true;
-                      id = userFound?.id;
-                    }
-                    const newUser = {
-                      name: attendeeName,
-                      existing: isExisting,
-                      id: id,
-                    };
-                    setAttendeeList([...attendeeList, newUser]);
-                    addAttendee(tempId);
+                  //   if (userFound !== undefined) {
+                  //     isExisting = true;
+                  //     id = userFound?.id;
+                  //   }
+                  //   const newUser = {
+                  //     name: attendeeName,
+                  //     existing: isExisting,
+                  //     id: id,
+                  //   };
+                  //   setAttendeeList([...attendeeList, newUser]);
+                    addAttendee
                     // setRefresh(!refresh)
-                  }
-                }}
+                  
+                }
                 sx={{
                   color: "white",
                   backgroundColor: "#555555",
@@ -1656,7 +1727,7 @@ export default function MyReservations(props) {
                 className="userList"
                 dense={true}
               >
-                <ListItem sx={{ p: "0px 0px 0px 5px" }}>
+                {/* <ListItem sx={{ p: "0px 0px 0px 5px" }}>
                   <ListItemText
                     primary={user.username}
                     secondary={
@@ -1665,7 +1736,7 @@ export default function MyReservations(props) {
                       </Typography>
                     }
                   />
-                </ListItem>
+                </ListItem> */}
                 {attendeeList.map((item, index) => (
                   <ListItem
                     key={index}
@@ -1675,29 +1746,29 @@ export default function MyReservations(props) {
                         edge="end"
                         aria-label="delete"
                         onClick={() => {
-                          deleteUser(index);
+                          //deleteUser(index);
                           deleteAttendee(item.id);
                         }}
                       >
                         <ClearIcon></ClearIcon>
                       </IconButton>
                     }
-                  > */}
-        {/* <ListItemAvatar>
+                  >
+         <ListItemAvatar>
                   <Avatar>
                     <PersonIcon></PersonIcon>
                   </Avatar>
-                </ListItemAvatar> */}
-        {/* <ListItemText
+                </ListItemAvatar> 
+         <ListItemText
                       primary={item.name}
                       secondary={
                         item.existing === true ? (
                           <Typography fontSize={14} color="green">
-                            Existing User:Yes{" "}
+                            {/* Existing User:Yes{" "} */}
                           </Typography>
                         ) : (
                           <Typography fontSize={14} color="#555555">
-                            Existing User:No{" "}
+                            {/* Existing User:No{" "} */}
                           </Typography>
                         )
                       }
@@ -1720,7 +1791,7 @@ export default function MyReservations(props) {
             </Box>
           </Box>
         </Box>
-      </Modal> */}
+      </Modal>
       </div>
     );
   }

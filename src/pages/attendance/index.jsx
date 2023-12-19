@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { BASE_URL } from "../../links";
 import axios from "axios";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography, TextField } from "@mui/material";
+import { Box, Button, Typography, TextField, Snackbar } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import { modalHeaderStyle, ButtonStyle1 } from "./styles";
 import { CustomAlert } from "../calendar_page";
 
@@ -18,6 +19,7 @@ export default function Attendance(props) {
   const [warningMessage, setWarningMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
   const scannedNumberRef = useRef(scannedNumber);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleAlertClose = () => {
     setAlertOpen(false);
@@ -37,6 +39,14 @@ export default function Attendance(props) {
 
   const WelcomeModal = () => {
     setVenueModal(false);
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbarOpen(false);
   };
 
   const handleChange = (e) => {
@@ -61,7 +71,7 @@ export default function Attendance(props) {
   const handleSave = (scannedNumber) => {
     if (avail === true) {
       const data = { rfid: scannedNumber };
-      console.log(data)
+      console.log(data);
       axios
         .post(`${BASE_URL}/api/logAttendance/`, data)
         .then((response) => {
@@ -73,7 +83,6 @@ export default function Attendance(props) {
             closeModal();
           } else if (response.data.state === "noBooking") {
             setAvail(false);
-            // alert("You Have No Booking within 30 minutes!");
             setAlertOpen(true);
           } else {
             setLoggedOutModal(true);
@@ -81,9 +90,11 @@ export default function Attendance(props) {
         })
         .catch((error) => {
           console.error("Error saving data", error);
+          setAlertOpen(true);
         });
     }
   };
+  
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -145,7 +156,7 @@ export default function Attendance(props) {
             fullWidth
             value={tapInput}
             onChange={handleChange}
-            sx={{ fontFamily: 'Poppins' }}
+            sx={{ fontFamily: "Poppins" }}
             autoFocus
           />
           <Box sx={{ justifyContent: "space-between" }}>
@@ -170,6 +181,23 @@ export default function Attendance(props) {
           </Box>
         </Box>
       </Modal>
+
+      {/* Snackbar for not found case */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity="error"
+        >
+          Scanned number not found!
+        </MuiAlert>
+      </Snackbar>
+
       <Modal
         open={isVenueModalOpen && userLoggedIn}
         onClose={() => setVenueModal(true)}
@@ -235,6 +263,7 @@ export default function Attendance(props) {
             OK
           </Button>
         </Box>
+        
       </Modal>
     </div>
   );

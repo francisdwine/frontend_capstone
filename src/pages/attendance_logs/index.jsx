@@ -192,7 +192,7 @@ export default function Logs(props) {
                 <TableContainer>
                   <Table
                     style={{
-                      backgroundColor: "#fecc00",
+                      backgroundColor: "white",
                       width: "100%",
                       textAlign: "center",
                       fontFamily: "Oswald",
@@ -214,6 +214,36 @@ export default function Logs(props) {
                         <StyledTableCell align="center">Logout Time</StyledTableCell>
                       </TableRow>
                     </TableHead>
+                    <TableBody>
+                      {filteredEvents
+                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                        .map((event, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              {event.name}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.isSignedIn === true ? "Yes" : "No"}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.isOverstaying === true ? "Yes" : "No"}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.date}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.signInTime}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.signOutTime}
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        ))}
+                    </TableBody>
                   </Table>
                 </TableContainer>
               </Box>
