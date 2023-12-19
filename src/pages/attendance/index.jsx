@@ -17,9 +17,11 @@ export default function Attendance(props) {
   const [scannedNumber, setScannedNumber] = useState("");
   const [avail, setAvail] = useState(true);
   const [warningMessage, setWarningMessage] = useState("");
-  const [alertOpen, setAlertOpen] = useState(false);
   const scannedNumberRef = useRef(scannedNumber);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const handleAlertClose = () => {
     setAlertOpen(false);
@@ -83,7 +85,14 @@ export default function Attendance(props) {
             closeModal();
           } else if (response.data.state === "noBooking") {
             setAvail(false);
+            setAlertMessage("You Have No Booking within 30 minutes!");
             setAlertOpen(true);
+            setAlertSuccess(true);
+          } else if (response.data.state === "notFound") {
+            setAvail(false);
+            setAlertMessage("ID is not found or is unregistered");
+            setAlertOpen(true);
+            setAlertSuccess(true);
           } else {
             setLoggedOutModal(true);
           }
@@ -93,8 +102,7 @@ export default function Attendance(props) {
           setAlertOpen(true);
         });
     }
-  };
-  
+  };  
 
   useEffect(() => {
     const handleKeyPress = (event) => {
@@ -102,6 +110,7 @@ export default function Attendance(props) {
         const currentScannedNumber = scannedNumberRef.current;
         console.log('Handling save...', currentScannedNumber);
         handleSave(currentScannedNumber);
+        setTapInput("");
       }
     };
 
@@ -117,11 +126,13 @@ export default function Attendance(props) {
     <div>
       {alertOpen && (
         <CustomAlert
-          open={alertOpen}
-          onClose={handleAlertClose}
-          message="You Have No Booking within 30 minutes!"
-        />
+        open={alertOpen}
+        onClose={handleAlertClose}
+        message={alertMessage}
+        color={alertSuccess ? "#e74c3c" : "#e74c3c"}
+      />
       )}
+
       <div style={{ margin: "80px" }}></div>
       <Modal
         open={true}
@@ -181,22 +192,6 @@ export default function Attendance(props) {
           </Box>
         </Box>
       </Modal>
-
-      {/* Snackbar for not found case */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={handleSnackbarClose}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={handleSnackbarClose}
-          severity="error"
-        >
-          Scanned number not found!
-        </MuiAlert>
-      </Snackbar>
 
       <Modal
         open={isVenueModalOpen && userLoggedIn}
@@ -263,7 +258,6 @@ export default function Attendance(props) {
             OK
           </Button>
         </Box>
-        
       </Modal>
     </div>
   );

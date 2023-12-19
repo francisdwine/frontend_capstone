@@ -62,8 +62,10 @@ hours = (parseInt(hours) + 1) % 24;
 const currentTimePlusOneHour = `${hours}:${minutes}:${seconds}`;
 //dynamic max week
 let maxWeeks = 2;
-const after_2_weeks = new Date();
+let after_2_weeks = new Date();
 after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
+let after_1_year = new Date();
+after_1_year.setDate(today.getDate() + 52 * 7);
 
 // [k
 //   {
@@ -87,7 +89,7 @@ export function CustomAlert({ open, onClose, message, color }) {
   const dialogStyle = {
     "& .MuiPaper-root": {
       backgroundColor: defaultBackgroundColor,
-      maxWidth: `${message.length * 0}px`, // Adjust the multiplier as needed
+      maxWidth: `${message.length * 0}px`,
       width: "480px",
       color: defaultTextColor,
       position: "absolute",
@@ -129,7 +131,6 @@ export default function Calendar(props) {
   let { user, setUser, authenticated } = useContext(AuthContext);
   const today = new Date();
   //dynamic max week
-  let maxWeeks = 2;
   const [maxWeekView, setMaxWeekView] = useState(new Date());
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
@@ -240,12 +241,15 @@ export default function Calendar(props) {
     });
   }, []);
 
-  if(user?.role ==="user" && user?.is_staff === false){
-    maxWeekView.setDate(today.getDate() + maxWeeks * 7);
-  }else{
-    maxWeeks = 52;
-    maxWeekView.setDate(today.getDate() + maxWeeks * 7);
-  }
+  useEffect(() => {
+    if(user?.role ==="user" && user?.is_staff === false){
+      setMaxWeekView(after_2_weeks);
+      
+    }else if(user?.role === "admin" || user?.is_staff === true){
+      setMaxWeekView(after_1_year);
+    }
+  }, []);
+
   //display bookings
   const [events, setEvents] = useState([]);
   React.useEffect(() => {
@@ -302,12 +306,6 @@ export default function Calendar(props) {
       .then(() => {
         setBookingsRefresher(!bookingsRefresher); // Refresh the list of bookings
         setCancelModal(false);
-        // <CustomAlert 
-        //   open = {setAlertOpen}
-        //   onClose = {handleAlertClose}
-        //   message={setAlertMessage("Booking cancelled successfully!")}
-        //   success={setAlertSuccess(true)}
-        //   />
         setAlertMessage("Booking cancelled successfully");
         setAlertOpen(true);
         setAlertSuccess(true);
@@ -331,7 +329,7 @@ export default function Calendar(props) {
       .post(`${BASE_URL}/api/calculateCost/${venueId}`, costData)
       .then((response) => {
         //contain the calculated cost
-        const calculatedCost = response.data.cost; // Adjust this based on your server response
+        const calculatedCost = response.data.cost;
         setBookingsRefresher(!bookingsRefresher);
         setCost(calculatedCost);
       })
@@ -889,7 +887,7 @@ export default function Calendar(props) {
                     // console.log(attendLimit);
                     if (attendeeList.length >= attendLimit) {
                       // alert("Limit Exceeded for This Venue");
-                      showAlert("info", "Limit Exceeded for This Venue");
+                      showAlert("info", "Max capacity for venue has been reached");
                       return;
                     }
                     if (attendeeName === "") {
@@ -902,7 +900,7 @@ export default function Calendar(props) {
                       attendeeList.some(found) ||
                       attendeeName === user?.username
                     ) {
-                      showAlert("info", "User already added");
+                      showAlert("info", "User already exist");
                       return;
                     } else {
                       let isExisting = false;
@@ -1507,7 +1505,13 @@ export default function Calendar(props) {
               ></Typography>
             </Box>
 
-            {user?.role === "user" && user?.user_id === info.user ? (
+            {user?.role === "user" && user?.user_id === info.user ? (                
+              <div marginTop= "0px">
+                <Typography
+                sx={{ marginLeft: 5,marginRight: 3, color: "darkred" }}
+                fontFamily="Poppins">
+                  Note: Cancellation not allowed 1 hour before the event.
+                  </Typography>
               <Box
                 sx={{
                   margin: "10px 15px 15px 10px",
@@ -1519,7 +1523,6 @@ export default function Calendar(props) {
                   sx={ButtonStyle1}
                   variant="contained"
                   onClick={() => {
-                    
                       // if event is not today
                       console.log(info.cancelCost);
                       setCancelModal(true);
@@ -1537,6 +1540,7 @@ export default function Calendar(props) {
                   Cancel Booking
                 </Button>
               </Box>
+              </div>
             ) : user?.role === "admin" ? (
               <Box
                 sx={{

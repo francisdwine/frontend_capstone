@@ -138,21 +138,6 @@ export default function MyReservations(props) {
     }
     a = { ...a, cancelCost: cancelCost };
   
-    const selectedEventDate = new Date(a.date);
-    const today = new Date();
-    const timeDifference = selectedEventDate.getTime() - today.getTime();
-    const isEventToday = selectedEventDate.toDateString() === today.toDateString();
-  
-    if (timeDifference < 0 || timeDifference <= 3600000) {
-      // Event is within the next hour, set some state or handle accordingly
-      // For example, you might want to disable the "Cancel Booking" button
-      // or show a message indicating that cancellation is not allowed.
-      // You can set a state variable and use it in your component.
-      setDisableCancel(true);
-    } else {
-      setDisableCancel(false);
-    }
-  
     axios.get(`${BASE_URL}/api/getAttendees/${a.id}/`).then((res) => {
       setAttendeeList(res.data);
       setViewDetails(a);
@@ -691,12 +676,15 @@ const handleSearchTextChange = (e) => {
                                     const selectedEventDate = new Date(
                                       event.date
                                     ); // event.date, date from the table
+                                    
                                     const today = new Date();
                                     const isToday =
                                       selectedEventDate.toDateString() ===
-                                      today.toDateString();
+                                      today.toDateString() && currentTimePlusOneHour > event.startTime;
+                                    
                                     // update
-                                    setIsEventToday(isToday);
+                                     setIsEventToday(isToday);
+                                    
                                     // axios
                                     //   .get(
                                     //     `http://localhost:8000/api/getAttendees/${tempId}/`
@@ -1396,12 +1384,7 @@ const handleSearchTextChange = (e) => {
                             setCancelModal(true);
                             setOpenInfoModal(false);
                         }}
-                        disabled={
-                          selectedEvent &&
-                          new Date(selectedEvent.start).toDateString() ===
-                            new Date().toDateString() &&
-                          currentTimePlusOneHour > info.startTime
-                        }
+                        disabled={isEventToday}
                       >
                         Cancel Booking
                       </Button>
