@@ -151,7 +151,7 @@ export default function Calendar(props) {
     ) {
       booking.current.officeName = "none";
     }
-
+    console.log(booking.current.date)
     axios
       .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
@@ -573,6 +573,8 @@ export default function Calendar(props) {
                               }
                             } else if (item.main_rules.status === false) {
                               setMaxComputers(0);
+                            }else {
+                              setMaxComputers(100);
                             }
                           }}
                         >
@@ -1287,9 +1289,10 @@ export default function Calendar(props) {
                 <Box>
                   <Button
                     onClick={() => {
-                      setOpenModal3(true);
+                      
                       booking.current.coins = cost;
                       submitBooking();
+                      setOpenModal3(false);
                       booking.current.coins = 0;
                       booking.current.points = 0;
                       // setCost(0);
@@ -1303,7 +1306,7 @@ export default function Calendar(props) {
                     onClick={() => {
                       booking.current.points = cost;
                       submitBooking();
-                      setOpenModal3(true);
+                      setOpenModal3(false);
                       booking.current.coins = 0;
                       booking.current.points = 0;
                       // setCost(0);
@@ -1508,7 +1511,7 @@ export default function Calendar(props) {
             {user?.role === "user" && user?.user_id === info.user ? (                
               <div marginTop= "0px">
                 <Typography
-                sx={{ marginLeft: 5,marginRight: 3, color: "darkred" }}
+                sx={{ marginLeft: 5, marginRight: 3, color: "darkred" }}
                 fontFamily="Poppins">
                   Note: Cancellation not allowed 1 hour before the event.
                   </Typography>

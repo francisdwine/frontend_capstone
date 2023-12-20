@@ -928,7 +928,7 @@ const handleSearchTextChange = (e) => {
                           .map((event, index) => (
                             <StyledTableRow key={index}>
                               <StyledTableCell>
-                                WIL{event.referenceNo.toUpperCase()}
+                                {event.referenceNo.toUpperCase()}
                               </StyledTableCell>
                               <StyledTableCell component="th" scope="row">
                                 {event.description}
@@ -1376,6 +1376,7 @@ const handleSearchTextChange = (e) => {
                       justifyContent: "flex-end",
                     }}
                   >
+                    {timeSelected !== "History"  && (
                       <Button
                         sx={ButtonStyle1}
                         variant="contained"
@@ -1387,7 +1388,7 @@ const handleSearchTextChange = (e) => {
                         disabled={isEventToday}
                       >
                         Cancel Booking
-                      </Button>
+                      </Button>)}
                   </Box>
                 </>
               )}

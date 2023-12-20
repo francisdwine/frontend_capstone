@@ -55,7 +55,6 @@ export default function Attendance(props) {
     const newScannedNumber = e.target.value;
     console.log('Scanned Number:', newScannedNumber);
     setTapInput(newScannedNumber);
-
     if (newScannedNumber.length === 10 && /^\d+$/.test(newScannedNumber)) {
       console.log('Handling save...');
       scannedNumberRef.current = newScannedNumber;
@@ -96,6 +95,7 @@ export default function Attendance(props) {
           } else {
             setLoggedOutModal(true);
           }
+          setTapInput("")
         })
         .catch((error) => {
           console.error("Error saving data", error);
@@ -111,6 +111,9 @@ export default function Attendance(props) {
         console.log('Handling save...', currentScannedNumber);
         handleSave(currentScannedNumber);
         setTapInput("");
+        console.log('Scanned Number:', scannedNumberRef.current);
+        console.log('Tap Input:', tapInput);
+        
       }
     };
 
