@@ -50,7 +50,7 @@ import {
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import facilitymap from "../../images/facilitymap.webp";
+import facilitymap from "../../images/map.png";
 
 const today = new Date();
 const currentTimeMillis = today.getTime();
