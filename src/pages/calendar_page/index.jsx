@@ -14,6 +14,8 @@ import {
   Button,
   ButtonGroup,
   Divider,
+  Stack,
+  Snackbar,
   // FormControl,
   Container,
   IconButton,
@@ -27,6 +29,7 @@ import {
 } from "@mui/material";
 import { useState, useRef, useEffect } from "react";
 import Modal from "@mui/material/Modal";
+import MuiAlert from '@mui/material/Alert';
 import CloseIcon from "@mui/icons-material/Close";
 // import MenuItem from "@mui/material/MenuItem";
 // import Select from "@mui/material/Select";
@@ -47,12 +50,22 @@ import {
 import { useContext } from "react";
 import AuthContext from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import facilitymap from "../../images/map.png";
 
 const today = new Date();
+const currentTimeMillis = today.getTime();
+const currentTime = new Date(currentTimeMillis);
+let hours = currentTime.getHours().toString().padStart(2, '0');
+let minutes = currentTime.getMinutes().toString().padStart(2, '0');
+const seconds = currentTime.getSeconds().toString().padStart(2, '0');
+hours = (parseInt(hours) + 1) % 24;
+const currentTimePlusOneHour = `${hours}:${minutes}:${seconds}`;
 //dynamic max week
-const maxWeeks = 2;
-const after_2_weeks = new Date();
+let maxWeeks = 2;
+let after_2_weeks = new Date();
 after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
+let after_1_year = new Date();
+after_1_year.setDate(today.getDate() + 52 * 7);
 
 // [k
 //   {
@@ -69,15 +82,14 @@ after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 //   },
 // ];
 
-export function CustomAlert({ open, onClose, title, message, success }){
-  const defaultBackgroundColor = success ? "#5bb450" : "#e74c3c";
-  console.log(success);
+export function CustomAlert({ open, onClose, message, color }) {
+  const defaultBackgroundColor = color || "#5bb450" // "#5bb450" : "#e74c3c";
   const defaultTextColor = "white";
 
   const dialogStyle = {
     "& .MuiPaper-root": {
       backgroundColor: defaultBackgroundColor,
-      maxWidth: "900px",
+      maxWidth: `${message.length * 0}px`,
       width: "480px",
       color: defaultTextColor,
       position: "absolute",
@@ -85,7 +97,8 @@ export function CustomAlert({ open, onClose, title, message, success }){
       left: "50%",
       transform: "translate(-50%, 0)",
       borderRadius: "10px",
-      height: "100px",
+      height: "10%",
+      minWidth: "30%",
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
@@ -107,8 +120,8 @@ export function CustomAlert({ open, onClose, title, message, success }){
 
   return (
     <Dialog open={open} onClose={onClose} sx={dialogStyle}>
-      <DialogTitle closeButton>{title}</DialogTitle>
-      <DialogContent sx={{ justifyContent: "center" }}>{message}</DialogContent>
+      {/* <DialogTitle closeButton>{title}</DialogTitle> */}
+      <DialogContent sx={{ justifyContent: "center", textAlign: "center" }}>{message}</DialogContent>
       <DialogActions></DialogActions>
     </Dialog>
   );
@@ -116,16 +129,17 @@ export function CustomAlert({ open, onClose, title, message, success }){
 
 export default function Calendar(props) {
   let { user, setUser, authenticated } = useContext(AuthContext);
-
+  const today = new Date();
+  //dynamic max week
+  const [maxWeekView, setMaxWeekView] = useState(new Date());
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
+  const [cancelFee, setCancelFee] = useState(0.0);
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState("admin"); //default role
   const [info, setInfo] = useState({});
-  const [alertSuccess, setAlertSuccess] = useState(true);
-
-
+  const [bookingLimit,setBookingLimit]=useState(3)
   const submitBooking = () => {
     // setAttendeeList(attendeeList=>[
     //   ...attendeeList,
@@ -138,7 +152,7 @@ export default function Calendar(props) {
     ) {
       booking.current.officeName = "none";
     }
-
+    console.log(booking.current.date)
     axios
       .post(`${BASE_URL}/api/createBooking/`, {
         officeName: booking.current.officeName,
@@ -164,11 +178,12 @@ export default function Calendar(props) {
           setAlertMessage(res.data.error);
           setAlertOpen(true);
           setAlertSuccess(false);
+          setOpenModal3(true);
         } else {
           setBookingsRefresher(!bookingsRefresher);
           setAlertMessage("Booking created successfully!");
           setAlertOpen(true);
-          setAlertSuccess(true);
+          setAlertSuccess(true);          
           setAttendeeList([]);
         }
       });
@@ -201,9 +216,9 @@ export default function Calendar(props) {
     var cancelCost = 0;
 
     if (res.points === 0 && res.coins > 0) {
-      cancelCost = res.coins * 0.3;
+      cancelCost = res.coins * cancelFee;
     } else if (res.coins === 0 && res.points > 0) {
-      cancelCost = res.points * 0.3;
+      cancelCost = res.points * cancelFee;
     }
     console.log(cancelCost);
     res = { ...res, cancelCost: cancelCost };
@@ -216,17 +231,61 @@ export default function Calendar(props) {
   React.useEffect(() => {
     axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
+      axios.get(`${BASE_URL}/api/getRules/${user.user_type}/`).then((res) => {
+        if(!res?.data.adv_booking||res?.data.adv_booking===null){
+          let booking_advance = new Date();
+          booking_advance.setDate(today.getDate() + 100 * 7);
+          setMaxWeekView(booking_advance)
+        }
+        else{
+          console.log(res?.data);
+          let booking_advance = new Date();
+          booking_advance.setDate(today.getDate() + res.data.adv_booking * 7);
+          setMaxWeekView(booking_advance);
+        }
+        if(user?.role === "admin" || user?.is_staff === true){
+          setBookingLimit(100)
+        }else{
+          if(!res?.data.lim_booking||res?.data.lim_booking===null){
+            setBookingLimit(100)
+          } 
+          else{
+            setBookingLimit(res?.data?.lim_booking)
+          }
+          
+      }if(!res?.data.cancel_fee||res?.data.cancel_fee===null){
+        setCancelFee(0.3)
+      }
+        else{
+          setCancelFee(res?.data?.cancel_fee/100)
+        }
+      }).catch((error) => {
+        let booking_advance = new Date();
+        booking_advance.setDate(today.getDate() + 100 * 7);
+        setMaxWeekView(booking_advance)
+
+
+      });
       axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
         setFacilities(res?.data);
         // stroe lng nakog variable ang index 0 pra di sigeg access
         var indx0 = res?.data[0];
-        setVenueSelected(indx0.facility.facility_name);
-        setVenueId(indx0?.facility?.facility_id);
-        setAttendeLimit(indx0?.main_rules?.num_attendies);
-        setMaxComputers(indx0?.main_rules?.num_pc);
+        setVenueSelected(indx0.facility_name);
+        setVenueId(indx0?.facility_id);
+        setAttendeLimit(indx0?.num_attendies);
+        setMaxComputers(indx0?.num_pc);
       });
     });
   }, []);
+
+  // useEffect(() => {
+  //   if(user?.role ==="user" && user?.is_staff === false){
+  //     setMaxWeekView(after_2_weeks);
+      
+  //   }else if(user?.role === "admin" || user?.is_staff === true){
+  //     setMaxWeekView(after_1_year);
+  //   }
+  // }, []);
 
   //display bookings
   const [events, setEvents] = useState([]);
@@ -304,15 +363,16 @@ export default function Calendar(props) {
     };
 
     axios
-      .post(`http://localhost:8000/api/calculateCost/${venueId}`, costData)
+      .post(`${BASE_URL}/api/calculateCost/${venueId}`, costData)
       .then((response) => {
         //contain the calculated cost
-        const calculatedCost = response.data.cost; // Adjust this based on your server response
+        const calculatedCost = response.data.cost;
         setBookingsRefresher(!bookingsRefresher);
         setCost(calculatedCost);
       })
       .catch((error) => {
         console.error("Error calculating cost:", error);
+        setOpenModal3(true);
       });
   };
 
@@ -360,14 +420,29 @@ export default function Calendar(props) {
   const found = (element) => element.name === attendeeName;
   const navigate = useNavigate();
   const [alertOpen, setAlertOpen] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(true);
   const [alertMessage, setAlertMessage] = useState("");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [showMap, setShowMap] = useState(false);
   const [alertInfo, setAlertInfo] = useState({
     visible: false,
     variant: "info",
     message: "",
   });
-
+  const showAlert = (variant, message) => {
+    setAlertInfo({
+      visible: true,
+      variant: variant,
+      message: message,
+    });
+  // set a duration for the alert
+    setTimeout(() => {
+      setAlertInfo({
+        ...alertInfo,
+        visible: false,
+      });
+    }, 3000);
+  };
   const handleAlertClose = () => {
     setAlertOpen(false);
   };
@@ -378,15 +453,21 @@ export default function Calendar(props) {
       ...attendeeList.slice(index + 1),
     ]);
   };
+  //for the map
+  const handleViewMapClick = () => {
+    setShowMap(true);
+  };
+
   //to handle security
   if (user === null) {
     navigate("/booking/login");
   } else {
     return (
       <div style={{ position: "relative" }}>
-        
         <DashBoardTemplate title="CALENDAR">
-          <Container sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}>
+          <Container
+            sx={{ minHeight: "1000px", height: "auto", paddingTop: "50px" }}
+          >
             <Box
               backgroundColor="white"
               display="flex"
@@ -405,64 +486,140 @@ export default function Calendar(props) {
                 },
               }}
             >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "start",
-              paddingTop: "40px",
-              justifyContent: "flex-start",
-              marginLeft: "0",
-            }}
-          >
-            <Typography
-              sx={{ paddingLeft: 2, color: "darkred", justifyContent: "flex-start" }}
-              fontFamily="Poppins"
-            >
-              *Click and drag on time-slots to start booking
-              {/* {name} */}
-            </Typography>
-          </div>
-          <br></br>
-          <Box
-            backgroundColor="white"
-            display="flex"
-            alignItems="center"
-            flexDirection="column"
-          >
-            <Box
-              sx={{
-                p: "0px 0px 0px 0px",
-              }}
-              maxWidth="90%"
-            >
-              <div style={{ display: "flex", marginBottom: "20px" }}>
-                <ButtonGroup>
-                  {facilities.map((item, index) => (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "start",
+                  paddingTop: "40px",
+                  justifyContent: "flex-start",
+                  marginLeft: "0",
+                }}
+              >
+                <Typography
+                  sx={{
+                    paddingLeft: 2,
+                    color: "darkred",
+                    justifyContent: "flex-start",
+                  }}
+                  fontFamily="Poppins"
+                >
+                  *Click and drag on time-slots to start booking
+                  {/* {name} */}
+                </Typography>
+              </div>
+              <br></br>
+              <Box
+                backgroundColor="white"
+                display="flex"
+                alignItems="center"
+                flexDirection="column"
+              >
+                <Box
+                  sx={{
+                    p: "0px 0px 0px 0px",
+                  }}
+                  maxWidth="97%"
+                >
+                  <div
+                    sx={{
+                      display: "flex",
+                      border: "1px solid rgba(0, 0, 0.5, 0.1)",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                      position: "relative",
+                      paddingLeft: 25,
+                      width: "100%",
+                      borderRadius: 2,
+                      fontColor: "black",
+                    }}
+                  >
                     <Button
-                      sx={
-                        venueSelected === item?.facility?.facility_name
-                          ? selectedStyle
-                          : unselectedStyle
-                      }
-                      onClick={() => {
-                        booking.current = { ...booking.current, computers: 0 };
-                        setVenueSelected(item?.facility?.facility_name);
-                        setVenueId(item?.facility?.facility_id);
-                        setAttendeLimit(item?.main_rules?.num_attendies);
-                        // setMaxComputers(item?.main_rules?.num_pc)
-                        // alert(item?.main_rules?.status)
-                        if (item?.main_rules.status === true) {
-                          setMaxComputers(item?.main_rules?.num_pc);
-                        } else if (item.main_rules.status === false) {
-                          setMaxComputers(0);
-                        }
+                      variant="contained"
+                      onClick={handleViewMapClick}
+                      style={{ marginLeft: "90%", backgroundColor: "#fecc00", position: "static", }}
+                    >
+                      View Map
+                    </Button>
+
+                    <Modal
+                      open={showMap}
+                      onClose={() => setShowMap(false)}
+                      contentLabel="Map Modal"
+                      disableAutoFocus={true}
+                      style={{
+                        overlay: {
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                        content: {
+                          width: "90%", 
+                          maxWidth: "600px",  
+                          backgroundColor: "white",
+                          borderRadius: "5px",
+                          padding: "20px",
+                        },
                       }}
                     >
-                      {item?.facility?.facility_name}
-                    </Button>
-                  ))}
-                  {/* <Button
+                      <img
+                        src={facilitymap}
+                        alt="Map"
+                        style={{
+                          height: "auto",
+                          width: "auto",
+                          maxWidth: "100%",
+                          marginBottom: "20px",
+                          position: "relative",
+                          top: "5%",
+                          left: "18%",
+                        }}
+                      />
+                    </Modal>
+                  </div>
+
+                  <div style={{ display: "flex", marginBottom: "20px" }}>
+                    <ButtonGroup>
+                      {facilities.map((item, index) => (
+                        <Button
+                          sx={
+                            venueSelected === item?.facility_name
+                              ? selectedStyle
+                              : unselectedStyle
+                          }
+                          onClick={() => {
+                            
+                            booking.current = {
+                              ...booking.current,
+                              computers: 0,
+                            };
+                            setVenueSelected(item?.facility_name);
+                            setVenueId(item?.facility_id);
+
+                            if (item?.num_attendies) {
+                              setAttendeLimit(item?.num_attendies);
+                            } else {
+                              setAttendeLimit(100);
+                            }
+                            // setMaxComputers(item?.main_rules?.num_pc)
+                            // alert(item?.main_rules?.status)
+                            
+                            if (item?.num_pc) {
+                              setMaxComputers(item?.num_pc);
+                            } else {
+                              setMaxComputers(0);
+                            }
+                            
+                            console.log(maxComputers)  
+                          }
+                          
+                        }
+                        >
+                          {item?.facility_name}
+                        </Button>
+                      ))}
+                      {/* <Button
                     sx={
                       venueSelected === "Coworking Space"
                         ? selectedStyle
@@ -502,150 +659,157 @@ export default function Calendar(props) {
                   >
                     Conference Room B
                   </Button> */}
-                </ButtonGroup>
-              </div>
-              <FullCalendar
-                events={events.filter((item) => {
-                  return item.venue === venueId;
-                })}
-                selectAllow={(select) => {
-                  return select.end.getDay() === select.start.getDay();
-                }}
-                // function para sa pili ug timeslot calendar functions
-                select={(info) => {
-                  var currentDate = new Date();
-                  var selectedStartTime = new Date(info.startStr);
+                    </ButtonGroup>
+                  </div>
 
-                  // Check if the selected start time is in the past
-                  if (selectedStartTime <= currentDate) {
-                    setAlertMessage("Please select a future time");
-                    setAlertOpen(true);
-                    setAlertSuccess(false);
-                  } else {
-                    var dateSplitted = info.startStr.split("T");
-                    var startDate = dateSplitted[0];
-                    var startTime = dateSplitted[1].split("+")[0];
-                    var dateSplitted2 = info.endStr.split("T");
-                    var endTime = dateSplitted2[1].split("+")[0];
-                    //kwaon duration sa booking
-                    var startTimeSeconds = startTime
-                      .split(":")
-                      .reduce((acc, time) => 60 * acc + +time);
-                    var endTimeSeconds = endTime
-                      .split(":")
-                      .reduce((acc, time) => 60 * acc + +time);
-                    var hoursDuration =
-                      (endTimeSeconds - startTimeSeconds) / (60 * 60);
-                    var totalDuration = 0;
-                    axios
-                      .post(`${BASE_URL}/api/getDurations/`, {
-                        id: user?.user_id,
-                        date: startDate,
-                      })
-                      .then((response) => {
-                        totalDuration = response.data.duration;
-                        var limit = 3 - totalDuration;
+                  <FullCalendar
+                    events={events.filter((item) => {
+                      return item.venue === venueId;
+                    })}
+                    selectAllow={(select) => {
+                      return select.end.getDay() === select.start.getDay();
+                    }}
+                    // function para sa pili ug timeslot calendar functions
+                    select={(info) => {
+                      var currentDate = new Date();
+                      var selectedStartTime = new Date(info.startStr);
 
-                        if (user?.role === "user") {
-                          if (hoursDuration > limit || limit < 0) {
-                            setAlertMessage(
-                              "You have exceeded the limit of 3 hours booking per week"
-                            );
-                            setAlertOpen(true);
-                            setAlertSuccess(false);
-                            // alert("You have exceeded the limit of 3 hours booking per week")
-                            setTimeout(() => {
-                              setAlertInfo((prevAlertInfo) => ({
-                                ...prevAlertInfo,
-                                visible: false,
-                              }));
-                            }, 3000);
+                      // Check if the selected start time is in the past
+                      if (selectedStartTime <= currentDate) {
+                        setAlertMessage("Please select a future time");
+                        setAlertOpen(true);
+                        setAlertSuccess(false);
+                        // showAlert("info", "Please select a future time");
+                      } else {
+                        var dateSplitted = info.startStr.split("T");
+                        var startDate = dateSplitted[0];
+                        var startTime = dateSplitted[1].split("+")[0];
+                        var dateSplitted2 = info.endStr.split("T");
+                        var endTime = dateSplitted2[1].split("+")[0];
+                        //kwaon duration sa booking
+                        var startTimeSeconds = startTime
+                          .split(":")
+                          .reduce((acc, time) => 60 * acc + +time);
+                        var endTimeSeconds = endTime
+                          .split(":")
+                          .reduce((acc, time) => 60 * acc + +time);
+                        var hoursDuration =
+                          (endTimeSeconds - startTimeSeconds) / (60 * 60);
+                        var totalDuration = 0;
+                        axios
+                          .post(`${BASE_URL}/api/getDurations/`, {
+                            id: user?.user_id,
+                            date: startDate,
+                          })
+                          .then((response) => {
+                            totalDuration = response.data.duration;
+                            var limit = bookingLimit- totalDuration;
+
+                            if (user?.role === "user") {
+                              if (hoursDuration > limit || limit < 0) {
+                                setAlertMessage(
+                                  `You have exceeded the limit of ${bookingLimit} hours booking per week`
+                                );
+                                setAlertOpen(true);
+                                setAlertSuccess(false);
+                                // alert("You have exceeded the limit of 3 hours booking per week")
+                                setTimeout(() => {
+                                  setAlertInfo((prevAlertInfo) => ({
+                                    ...prevAlertInfo,
+                                    visible: false,
+                                  }));
+                                }, 3000);
+                                return null;
+                              }
+                            }
+
+                            var tempBooking = booking.current;
+                            tempBooking.startTime = startTime;
+                            tempBooking.endTime = endTime;
+                            tempBooking.date = startDate;
+                            tempBooking.venue = venueSelected;
+                            booking.current = tempBooking;
+                            // console.log(booking.current);
+                            setOpenModal1(true);
+                          })
+                          .catch((error) => {
+                            console.error("error getting duration:", error);
                             return null;
-                          }
-                        }
+                          });
+                      }
+                    }}
+                    //function para ig click ug usa ka event
+                    eventClick={(e) => {
+                      setSelectedEvent(e.event);
+                      // console.log(e);
+                      if (e.event._def.extendedProps.type === "rule") {
+                        setAlertMessage(
+                          "Booking not available at this time due to a scheduled important event."
+                        );
+                        setAlertOpen(true);
+                      } else if (
+                        e.event._def.extendedProps.type === "booking"
+                      ) {
+                        handleView(e.event.id);
+                      }
+                    }}
+                    unselect={(jsEvent, view) => {}}
+                    // dayClick={(date, jsEvent, view) => {}}
+                    selectOverlap={(event) => {}}
+                    selectable={true}
+                    showNonCurrentDates={false}
+                    slotMinTime="09:00:00"
+                    slotMaxTime="23:00:00"
+                    plugins={[
+                      dayGridPlugin,
+                      timeGridPlugin,
+                      interactionPlugin,
+                      listPlugin,
+                    ]}
+                    // initialView="dayGridMonth"
+                    views={{
+                      dayGridMonth: {
+                        selectable: false,
+                      },
+                      dayGridWeek: {
+                        selectable: false,
+                      },
+                    }}
+                    headerToolbar={{
+                      start: "prev,next today",
+                      center: "title",
+                      end: "dayGridMonth,timeGridWeek,timeGridDay",
+                    }}
+                    allDaySlot={false}
+                    initialView="timeGridWeek"
+                    aspectRatio={25.0}
+                    //events data
 
-                        var tempBooking = booking.current;
-                        tempBooking.startTime = startTime;
-                        tempBooking.endTime = endTime;
-                        tempBooking.date = startDate;
-                        tempBooking.venue = venueSelected;
-                        booking.current = tempBooking;
-                        // console.log(booking.current);
-                        setOpenModal1(true);
-                      })
-                      .catch((error) => {
-                        console.error("error getting duration:", error);
-                        return null;
-                      });
-                  }
-                }}
-                //function para ig click ug usa ka event
-                eventClick={(e) => {
-                  setSelectedEvent(e.event);
-                  // console.log(e);
-                  if (e.event._def.extendedProps.type === "rule") {
-                    setAlertMessage(
-                      "Booking not available at this time due to a scheduled important event."
-                    );
-                    setAlertOpen(true);
-                  } else if (e.event._def.extendedProps.type === "booking") {
-                    handleView(e.event.id);
-                  }
-                }}
-                unselect={(jsEvent, view) => {}}
-                // dayClick={(date, jsEvent, view) => {}}
-                selectOverlap={(event) => {}}
-                selectable={true}
-                showNonCurrentDates={false}
-                slotMinTime="09:00:00"
-                slotMaxTime="23:00:00"
-                plugins={[
-                  dayGridPlugin,
-                  timeGridPlugin,
-                  interactionPlugin,
-                  listPlugin,
-                ]}
-                // initialView="dayGridMonth"
-                views={{
-                  dayGridMonth: {
-                    selectable: false,
-                  },
-                  dayGridWeek: {
-                    selectable: false,
-                  },
-                }}
-                headerToolbar={{
-                  start: "prev,next today",
-                  center: "title",
-                  end: "dayGridMonth,timeGridWeek,timeGridDay",
-                }}
-                allDaySlot={false}
-                initialView="timeGridWeek"
-                aspectRatio={25.0}
-                //events data
+                    eventContent={renderEventContent}
+                    validRange={{
+                      start: today,
+                      end: maxWeekView,
+                    }}
+                    eventBackgroundColor="#fecc00"
+                    eventTextColor="black"
+                    height="100"
+                    contentHeight="auto"
+                    weekends={false}
+                  ></FullCalendar>
+                  <CustomAlert
+                    open={alertOpen}
+                    onClose={handleAlertClose}
+                    message={alertMessage}
+                    color={alertSuccess ? "#5bb450" : "#e74c3c"}
+                  />
+                </Box>
 
-                eventContent={renderEventContent}
-                validRange={{
-                  start: today,
-                  end: after_2_weeks,
-                }}
-                eventBackgroundColor="#fecc00"
-                eventTextColor="black"
-                height="100"
-                contentHeight="auto"
-                weekends={false}
-              ></FullCalendar>
-              <CustomAlert
-                open={alertOpen}
-                onClose={handleAlertClose}
-                message={alertMessage}
-              />
+                <Typography></Typography>
+              </Box>
             </Box>
-            <Typography></Typography>
-          </Box>
-          </Box>
           </Container>
         </DashBoardTemplate>
+
         {/* modal 1 modal1 modal one modalone */}
         <ModalOne
           error={error}
@@ -763,26 +927,21 @@ export default function Calendar(props) {
                     // console.log(attendLimit);
                     if (attendeeList.length >= attendLimit) {
                       // alert("Limit Exceeded for This Venue");
-                      setAlertInfo({
-                        visible: true,
-                        variant: "info",
-                        message: "Limit Exceeded for This Venue.",
-                      });
+                      showAlert("info", "Max capacity for venue has been reached");
                       return;
                     }
                     if (attendeeName === "") {
                       //alert("Please Enter Attendee name");
-                      setAlertInfo({
-                        visible: true,
-                        variant: "info",
-                        message: "Please Enter Attendee name.",
-                      });
+                      showAlert("info", "Please Enter Attendee name.");
                       return;
                     }
+                    //if user already exists in the list
                     if (
                       attendeeList.some(found) ||
                       attendeeName === user?.username
                     ) {
+                      showAlert("info", "User already exist");
+                      return;
                     } else {
                       let isExisting = false;
                       let id = null;
@@ -797,11 +956,7 @@ export default function Calendar(props) {
                         id = userFound?.id;
                       } else {
                         // alert("User not found");
-                        setAlertInfo({
-                          visible: true,
-                          variant: "info",
-                          message: "User not found",
-                        });
+                        showAlert("info", "User not found");
                         return;
                       }
                       const newUser = {
@@ -810,6 +965,7 @@ export default function Calendar(props) {
                         user_id: id,
                       };
                       setAttendeeList([...attendeeList, newUser]);
+                      setAttendeeName("");
                     }
                   }}
                   sx={{
@@ -905,12 +1061,10 @@ export default function Calendar(props) {
                     onClick={() => {
                       if (booking.current.computers > attendeeList.length + 1) {
                         // Set the visibility state and message for the "info" alert
-                        setAlertInfo({
-                          visible: true,
-                          variant: "info",
-                          message:
-                            "You can't borrow computers more than the number of attendees",
-                        });
+                        showAlert(
+                          "info",
+                          "You can't borrow computers more than the number of attendees"
+                        );
                       } else {
                         // console.log(attendeeList.length);
                         calculateCost();
@@ -1046,7 +1200,7 @@ export default function Calendar(props) {
                   {booking.current.description}
                 </Typography>
               </Box>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              {/* <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"
                   fontSize={15}
@@ -1061,7 +1215,7 @@ export default function Calendar(props) {
                 >
                   {booking.current.officeName}
                 </Typography>
-              </Box>
+              </Box> */}
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography
                   fontWeight="bold"
@@ -1173,12 +1327,13 @@ export default function Calendar(props) {
                 <Box>
                   <Button
                     onClick={() => {
-                      setOpenModal3(false);
+                      
                       booking.current.coins = cost;
                       submitBooking();
+                      setOpenModal3(false);
                       booking.current.coins = 0;
                       booking.current.points = 0;
-                      setCost(0);
+                      // setCost(0);
                       setAttendeeList([]);
                     }}
                     sx={ButtonStyle1}
@@ -1189,11 +1344,10 @@ export default function Calendar(props) {
                     onClick={() => {
                       booking.current.points = cost;
                       submitBooking();
+                      setOpenModal3(false);
                       booking.current.coins = 0;
                       booking.current.points = 0;
-                      setCost(0);
-
-                      setOpenModal3(false);
+                      // setCost(0);
                       setAttendeeList([]);
                     }}
                     variant="contained"
@@ -1392,7 +1546,13 @@ export default function Calendar(props) {
               ></Typography>
             </Box>
 
-            {user?.role === "user" && user?.user_id === info.user ? (
+            {user?.role === "user" && user?.user_id === info.user ? (                
+              <div marginTop= "0px">
+                <Typography
+                sx={{ marginLeft: 5, marginRight: 3, color: "darkred" }}
+                fontFamily="Poppins">
+                  Note: Cancellation not allowed 1 hour before the event.
+                  </Typography>
               <Box
                 sx={{
                   margin: "10px 15px 15px 10px",
@@ -1404,25 +1564,24 @@ export default function Calendar(props) {
                   sx={ButtonStyle1}
                   variant="contained"
                   onClick={() => {
-                    const isEventToday = selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString();
-
-                    if (isEventToday) {
-                      // if event is today
-                      console.log("Cannot cancel booking for events happening today");
-                    } else {
                       // if event is not today
                       console.log(info.cancelCost);
                       setCancelModal(true);
                       setOpenInfoModal(false);
                     }
-                  }}
+                  }
                   // disable button
-                  disabled={selectedEvent && new Date(selectedEvent.start).toDateString() === new Date().toDateString()
+                  disabled={
+                    selectedEvent &&
+                    new Date(selectedEvent.start).toDateString() ===
+                      new Date().toDateString() &&
+                    currentTimePlusOneHour > info.startTime
                   }
                 >
                   Cancel Booking
                 </Button>
               </Box>
+              </div>
             ) : user?.role === "admin" ? (
               <Box
                 sx={{
@@ -1532,12 +1691,14 @@ export default function Calendar(props) {
                 <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                   <Button
                     variant="contained"
+                    sx={{ ...ButtonStyle1 }}
                     onClick={() => cancelBooking(tempId)}
                   >
                     Yes
                   </Button>
                   <Button
                     variant="contained"
+                    sx={{ ...ButtonStyle1 }}
                     onClick={() => {
                       setViewModal(false);
                       setCancelModal(false);
@@ -1560,8 +1721,6 @@ function renderEventContent(eventInfo) {
     <>
       <b>{eventInfo.timeText}</b>
       <br></br>
-      <b>description: </b>
-      <i>{eventInfo.event.title}</i>
     </>
   );
 }

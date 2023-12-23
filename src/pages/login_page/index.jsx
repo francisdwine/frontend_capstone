@@ -60,26 +60,39 @@ const Login = () => {
           flexDirection: "column",
         }}
       >
-          <Box marginTop={5}>
-            <a href="http://172.16.103.217/">
-              <img
-                src={Wild}
-                alt="logo"
-                width={300}
-                height={100}
-                // style={{
-                //   position: "absolute",
-                //   top: 120,
-                //   left: 700,
-                // }}
-              />
-            </a>
-          </Box>
-          <Box>
-
+        <Box marginTop={5}>
+          <a href="http://172.16.103.217/">
+            <img
+              src={Wild}
+              alt="logo"
+              width={300}
+              height={100}
+              // style={{
+              //   position: "absolute",
+              //   top: 120,
+              //   left: 700,
+              // }}
+            />
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{ horizontal: "center", vertical: "bottom" }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                {loginError}
+              </Alert>
+            </Snackbar>
+          </a>
+        </Box>
+        <Box>
           <Box
             style={loginstyle}
-            sx={{ p: 5, width: 300, height: "auto", align: "center",}}
+            sx={{ p: 5, width: 300, height: "auto", align: "center" }}
           >
             <Typography
               sx={{ fontWeight: "bold" }}
@@ -124,9 +137,7 @@ const Login = () => {
             </Button>
             <br />
           </Box>
-        
-          </Box>
-         
+        </Box>
       </div>
     );
   }

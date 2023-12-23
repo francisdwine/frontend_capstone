@@ -74,6 +74,32 @@ export const AuthProvider = ({ children }) => {
     setLoginError:setLoginError,
     loginError:loginError
   };
+  // useEffect(() => {
+  //   let tokens=JSON.parse(localStorage.getItem('authTokens'))
+  //   console.log(tokens)
+  //   axios
+  //     .post(`${BASE_URL}/api/token/refresh/`, {
+  //      refresh:tokens?.refresh
+  //     })
+  //     .then((res) => {
+  //       if(res.status==200){
+  //       setAuthTokens(res.data)
+  //       setUser(jwtDecode(res.data.access))
+  //       localStorage.setItem('authTokens',JSON.stringify(res.data))
+  //       console.log("token updated")
+  //       }
+  //       else{
+  //           logoutUser()
+  //       }
+  //     }).catch((error)=>{
+  //       logoutUser()
+  //      });
+  //      if(loading){
+  //       setLoading(false)
+  //      }
+
+  // },[])
+
   useEffect(()=>{
     if(loading){
         updateToken()

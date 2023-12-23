@@ -55,8 +55,8 @@ export default function Logs(props) {
     axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       var indx0 = res?.data[0];
-      setVenueSelected(indx0?.facility?.facility_name);
-      setVenueId(indx0?.facility?.facility_id);
+      setVenueSelected(indx0?.facility_name);
+      setVenueId(indx0?.facility_id);
     });
   }, []);
 
@@ -119,12 +119,13 @@ export default function Logs(props) {
               mt={5}
               marginTop={14}
               justifyContent="center"
-              padding="30px"
+              //padding="30px"
               sx={{
                 width: "100%",
                 "@media (max-width: 2560px)": {
                   padding: "10px",
                 },
+
               }}
             >
               <div style={{marginLeft: "auto"}}>
@@ -152,7 +153,7 @@ export default function Logs(props) {
                   <SearchIconWrapper>
                     <SearchIcon />
                   </SearchIconWrapper>
-                  
+
                 </Box>
               </div>
 
@@ -166,6 +167,7 @@ export default function Logs(props) {
                   minHeight: "500px",
                   height: "auto",
                   overflowX: "auto",
+                  maxWidth:'97%',
                 }}
               >
                 <ButtonGroup sx={{ marginBottom: 2 }}>
@@ -173,16 +175,16 @@ export default function Logs(props) {
                     <Button
                       key={index}
                       sx={
-                        venueSelected === item?.facility?.facility_name
+                        venueSelected === item?.facility_name
                           ? selectedStyle
                           : unselectedStyle
                       }
                       onClick={() => {
-                        setVenueSelected(item?.facility?.facility_name);
-                        setVenueId(item?.facility?.facility_id);
+                        setVenueSelected(item?.facility_name);
+                        setVenueId(item?.facility_id);
                       }}
                     >
-                      {item?.facility?.facility_name}
+                      {item?.facility_name}
                     </Button>
                   ))}
                 </ButtonGroup>
@@ -190,7 +192,7 @@ export default function Logs(props) {
                 <TableContainer>
                   <Table
                     style={{
-                      backgroundColor: "#fecc00",
+                      backgroundColor: "white",
                       width: "100%",
                       textAlign: "center",
                       fontFamily: "Oswald",
@@ -212,6 +214,36 @@ export default function Logs(props) {
                         <StyledTableCell align="center">Logout Time</StyledTableCell>
                       </TableRow>
                     </TableHead>
+                    <TableBody>
+                      {filteredEvents
+                        .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
+                        .map((event, index) => (
+                          <StyledTableRow key={index}>
+                            <StyledTableCell
+                              component="th"
+                              scope="row"
+                              align="center"
+                            >
+                              {event?.name}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.isSignedIn === true ? "Yes" : "No"}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event.isOverstaying === true ? "Yes" : "No"}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event?.date}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event?.signInTime}
+                            </StyledTableCell>
+                            <StyledTableCell align="center">
+                              {event?.signOutTime}
+                            </StyledTableCell>
+                          </StyledTableRow>
+                        ))}
+                    </TableBody>
                   </Table>
                 </TableContainer>
               </Box>

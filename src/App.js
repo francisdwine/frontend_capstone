@@ -11,6 +11,7 @@ import MyReservations from './pages/my_reservations';
 import AttendanceLogs from './pages/attendance_logs';
 import Attendance from './pages/attendance';
 import Login from './pages/login_page';
+import About from './pages/about';
 
 function App() {
   return (
@@ -25,7 +26,9 @@ function App() {
             <Route exact path="/booking/calendar" element={<Calendar />} />
             <Route exact path="/booking/logs" element={<AttendanceLogs />} />
             <Route exact path="/booking/bookings" element={<MyReservations />} />
-            <Route exact path="/attendance" element={<Attendance />} />
+            <Route exact path="/booking/about" element={<About />} />
+
+            {/* <Route exact path="/attendance" element={<Attendance />} /> */}
             <Route exact path="/booking/attendance" element={<Attendance />} />
           </Routes>
           </AuthProvider>

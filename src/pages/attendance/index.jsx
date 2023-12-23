@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BASE_URL } from "../../links";
 import axios from "axios";
 import Modal from "@mui/material/Modal";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, Typography, TextField, Snackbar } from "@mui/material";
+import MuiAlert from "@mui/material/Alert";
 import { modalHeaderStyle, ButtonStyle1 } from "./styles";
 import { CustomAlert } from "../calendar_page";
 
@@ -16,6 +17,10 @@ export default function Attendance(props) {
   const [scannedNumber, setScannedNumber] = useState("");
   const [avail, setAvail] = useState(true);
   const [warningMessage, setWarningMessage] = useState("");
+  const scannedNumberRef = useRef(scannedNumber);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [alertSuccess, setAlertSuccess] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
 
   const handleAlertClose = () => {
@@ -38,15 +43,24 @@ export default function Attendance(props) {
     setVenueModal(false);
   };
 
-  const handleChange = (e) => {
-    scannedNumber = e.target.value;
-    setTapInput(scannedNumber);
-
-    if (scannedNumber.length === 10 && /^\d+$/.test(scannedNumber)) {
-      handleSave();
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
     }
+
+    setSnackbarOpen(false);
   };
 
+  const handleChange = (e) => {
+    const newScannedNumber = e.target.value;
+    console.log('Scanned Number:', newScannedNumber);
+    setTapInput(newScannedNumber);
+    if (newScannedNumber.length === 10 && /^\d+$/.test(newScannedNumber)) {
+      console.log('Handling save...');
+      scannedNumberRef.current = newScannedNumber;
+    }
+  };
+  
   useEffect(() => {
     const intervalId = setInterval(() => {
       //assign interval to a variable to clear it.
@@ -55,9 +69,10 @@ export default function Attendance(props) {
     return () => clearInterval(intervalId);
   }, [avail]);
 
-  const handleSave = () => {
+  const handleSave = (scannedNumber) => {
     if (avail === true) {
       const data = { rfid: scannedNumber };
+      console.log(data);
       axios
         .post(`${BASE_URL}/api/logAttendance/`, data)
         .then((response) => {
@@ -69,40 +84,58 @@ export default function Attendance(props) {
             closeModal();
           } else if (response.data.state === "noBooking") {
             setAvail(false);
-            // alert("You Have No Booking within 30 minutes!");
+            setAlertMessage("You Have No Booking within 30 minutes!");
             setAlertOpen(true);
+            setAlertSuccess(true);
+          } else if (response.data.state === "notFound") {
+            setAvail(false);
+            setAlertMessage("ID is not found or is unregistered");
+            setAlertOpen(true);
+            setAlertSuccess(true);
           } else {
             setLoggedOutModal(true);
           }
+          setTapInput("")
         })
         .catch((error) => {
           console.error("Error saving data", error);
+          setAlertOpen(true);
         });
     }
-  };
+  };  
 
   useEffect(() => {
     const handleKeyPress = (event) => {
-      if (event.key === "Enter") {
-        handleSave(scannedNumber);
-        console.log(scannedNumber);
+      if (event.key === 'Enter') {
+        const currentScannedNumber = scannedNumberRef.current;
+        console.log('Handling save...', currentScannedNumber);
+        handleSave(currentScannedNumber);
+        setTapInput("");
+        console.log('Scanned Number:', scannedNumberRef.current);
+        console.log('Tap Input:', tapInput);
+        
       }
     };
-    document.addEventListener("keypress", handleKeyPress);
+
+    document.addEventListener('keypress', handleKeyPress);
+
     return () => {
-      document.removeEventListener("keypress", handleKeyPress);
+      document.removeEventListener('keypress', handleKeyPress);
     };
   }, [handleSave]);
+  
 
   return (
     <div>
       {alertOpen && (
         <CustomAlert
-          open={alertOpen}
-          onClose={handleAlertClose}
-          message="You Have No Booking within 30 minutes!"
-        />
+        open={alertOpen}
+        onClose={handleAlertClose}
+        message={alertMessage}
+        color={alertSuccess ? "#e74c3c" : "#e74c3c"}
+      />
       )}
+
       <div style={{ margin: "80px" }}></div>
       <Modal
         open={true}
@@ -131,14 +164,15 @@ export default function Attendance(props) {
             Please tap your ID:
           </Typography>
           <div style={{ margin: "20px" }}></div>
-          {/* <TextField
+          <TextField
             label="ID Number"
             variant="outlined"
             fullWidth
             value={tapInput}
             onChange={handleChange}
-            sx={{ fontFamily: 'Poppins' }}
-          /> */}
+            sx={{ fontFamily: "Poppins" }}
+            autoFocus
+          />
           <Box sx={{ justifyContent: "space-between" }}>
             <div style={{ margin: "20px" }}></div>
             {/* <Button
@@ -161,6 +195,7 @@ export default function Attendance(props) {
           </Box>
         </Box>
       </Modal>
+
       <Modal
         open={isVenueModalOpen && userLoggedIn}
         onClose={() => setVenueModal(true)}

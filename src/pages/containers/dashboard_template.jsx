@@ -28,6 +28,7 @@ import AuthContext from "../../context/AuthContext";
 import { useContext, useState } from "react";
 import { BASE_URL } from "../../links";
 
+
 const drawerWidth = 277;
 
 export default function DashBoardTemplate(props) {
@@ -44,7 +45,8 @@ export default function DashBoardTemplate(props) {
     { name: "Facility", path: "/facility/facilitymanagement" },
     { name: "Booking", path: "/booking/calendar" },
     { name: "Wallet", path: "/wallet/dashboard/" },
-    { name: "Crowd Control", path: "/wiladmin/wiladmin/admindashboard" },
+    { name: "Crowd Control", path: "/wiladmin/admindashboard" },
+    
   ];
 
   //admin sidenav
@@ -54,6 +56,7 @@ export default function DashBoardTemplate(props) {
     { name: "Calendar", icon: CalendarMonthIcon, path: "/booking/calendar" },
     { name: "Logs", icon: BookIcon, path: "/booking/logs" },
     { name: "Bookings", icon: ListIcon, path: "/booking/bookings" },
+    { name: "About", path: "/booking/about" },
   ];
 
   //user sidenav
@@ -61,6 +64,7 @@ export default function DashBoardTemplate(props) {
     // { name: "Home", icon: HomeIcon, path: "/home" },
     { name: "Calendar", icon: CalendarMonthIcon, path: "/booking/calendar" },
     { name: "Bookings", icon: ListIcon, path: "/booking/bookings" },
+    { name: "About", path: "/booking/about" },
   ];
 
   const NavItems = user?.role === "admin" ? adminNavItems : userNavItems;
@@ -247,7 +251,7 @@ export default function DashBoardTemplate(props) {
         {isUser && (
           <ListItem
             disablePadding
-            sx={{ display: "flex", justifyContent: "center", paddingTop: 60 }}
+            sx={{ display: "flex", justifyContent: "center", paddingTop: 40 }}
           >
             <Button
               variant="contained"
@@ -337,7 +341,7 @@ export default function DashBoardTemplate(props) {
           alignItems: 'center',
           justifyContent: 'center',
           height: '9vh',
-          width: '68%',
+          width: '75%',
           borderRadius: '1px',
           marginLeft: '135px',
           zIndex: 0,
