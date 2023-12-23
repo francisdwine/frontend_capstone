@@ -45,7 +45,7 @@ export default function DashBoardTemplate(props) {
     { name: "Facility", path: "/facility/facilitymanagement" },
     { name: "Booking", path: "/booking/calendar" },
     { name: "Wallet", path: "/wallet/dashboard/" },
-    { name: "Crowd Control", path: "/wiladmin/wiladmin/admindashboard" },
+    { name: "Crowd Control", path: "/wiladmin/admindashboard" },
     
   ];
 
@@ -251,7 +251,7 @@ export default function DashBoardTemplate(props) {
         {isUser && (
           <ListItem
             disablePadding
-            sx={{ display: "flex", justifyContent: "center", paddingTop: 50 }}
+            sx={{ display: "flex", justifyContent: "center", paddingTop: 40 }}
           >
             <Button
               variant="contained"
@@ -341,7 +341,7 @@ export default function DashBoardTemplate(props) {
           alignItems: 'center',
           justifyContent: 'center',
           height: '9vh',
-          width: '68%',
+          width: '75%',
           borderRadius: '1px',
           marginLeft: '135px',
           zIndex: 0,

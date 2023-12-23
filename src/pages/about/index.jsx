@@ -31,6 +31,11 @@ import { useNavigate } from "react-router-dom";
 import AuthContext from "../../context/AuthContext";
 import { BASE_URL } from "../../links";
 import bgpic from "../../images/reception2.jpg";
+import richdwine from "../../images/rich.jpg";
+import joann from "../../images/joann.jpg";
+import pam from "../../images/pam.jpg";
+import junie from "../../images/junie.png";
+import belle from "../../images/belle.jpg";
 
 export default function About(props) {
   const navigate = useNavigate();
@@ -115,9 +120,9 @@ export default function About(props) {
       <Grid item xs={12} md={4}>
         <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
           <img
-            src="url_to_team_member_1_image.jpg" // Replace with the actual image URL
+            src={belle} // Replace with the actual image URL
             alt="Team Member 1"
-            style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
+            style={{ width: '100%', height: '350px', marginBottom: '8px' }}
           />
           <Typography variant="h6" gutterBottom>
             Team Member 1
@@ -125,9 +130,9 @@ export default function About(props) {
           <Typography variant="body2">
             Name: Belle Hannah Sebial
             <br />
-            Role: Developer
+            Role: Project Manager
             <br />
-            Contact: john@example.com
+            Contact: bellehannah.sebial@cit.edu
           </Typography>
         </Paper>
       </Grid>
@@ -136,9 +141,9 @@ export default function About(props) {
       <Grid item xs={12} md={4}>
         <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
         <img
-            src="url_to_team_member_1_image.jpg" // Replace with the actual image URL
+            src={joann} // Replace with the actual image URL
             alt="Team Member 1"
-            style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
+            style={{ width: '100%', height: '350px', marginBottom: '8px' }}
           />
           <Typography variant="h6" gutterBottom>
             Team Member 2
@@ -146,9 +151,9 @@ export default function About(props) {
           <Typography variant="body2">
             Name: Joann Alfante
             <br />
-            Role: Developer
+            Role: Resource Manager
             <br />
-            Contact: john@example.com
+            Contact: joann.alfante@cit.edu
           </Typography>
         </Paper>
       </Grid>
@@ -157,9 +162,9 @@ export default function About(props) {
       <Grid item xs={12} md={4}>
         <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
         <img
-            src="url_to_team_member_1_image.jpg" // Replace with the actual image URL
+            src={richdwine} // Replace with the actual image URL
             alt="Team Member 1"
-            style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
+            style={{ width: '100%', height: '350px', marginBottom: '8px' }}
           />
           <Typography variant="h6" gutterBottom>
             Team Member 3
@@ -167,9 +172,9 @@ export default function About(props) {
           <Typography variant="body2">
             Name: Francis Dwine Bendulo
             <br />
-            Role: Developer
+            Role: Full Stack Developer
             <br />
-            Contact: john@example.com
+            Contact: francisdwine.bendulo@cit.edu
           </Typography>
         </Paper>
       </Grid>
@@ -178,9 +183,9 @@ export default function About(props) {
       <Grid item xs={12} md={4}>
         <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
         <img
-            src="url_to_team_member_1_image.jpg" // Replace with the actual image URL
+            src={pam} // Replace with the actual image URL
             alt="Team Member 1"
-            style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
+            style={{ width: '100%', height: '350px', marginBottom: '8px' }}
           />
           <Typography variant="h6" gutterBottom>
             Team Member 4
@@ -188,9 +193,9 @@ export default function About(props) {
           <Typography variant="body2">
             Name: Pamela Cañedo
             <br />
-            Role: Developer
+            Role: Front-end Developer
             <br />
-            Contact: john@example.com
+            Contact: pamela.canedo@cit.edu
           </Typography>
         </Paper>
       </Grid>
@@ -199,9 +204,9 @@ export default function About(props) {
       <Grid item xs={12} md={4}>
         <Paper elevation={3} style={{ padding: '16px', textAlign: 'center' }}>
         <img
-            src="url_to_team_member_1_image.jpg" // Replace with the actual image URL
+            src={junie} // Replace with the actual image URL
             alt="Team Member 1"
-            style={{ width: '100%', height: 'auto', marginBottom: '8px' }}
+            style={{ width: '100%', height: '350px', marginBottom: '8px' }}
           />
           <Typography variant="h6" gutterBottom>
             Team Member 5
@@ -209,9 +214,9 @@ export default function About(props) {
           <Typography variant="body2">
             Name: Junie John Roldan
             <br />
-            Role: Developer
+            Role: Tester and Front-end Developer
             <br />
-            Contact: john@example.com
+            Contact: juniejohn.roldan@cit.edu
           </Typography>
         </Paper>
       </Grid>

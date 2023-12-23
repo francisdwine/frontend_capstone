@@ -257,7 +257,7 @@ export default function Tracker(props) {
                           <StyledTableRow key={index}>
                             <StyledTableCell align="center">{row.booking}</StyledTableCell>
                             <StyledTableCell align="center">{row.name}</StyledTableCell>
-                            <StyledTableCell align="center">{row.venueName}</StyledTableCell>
+                            <StyledTableCell align="center">{row.venueId}</StyledTableCell>
                             <StyledTableCell align="center">{row.signInTime}</StyledTableCell>
                           </StyledTableRow>
                         ))}

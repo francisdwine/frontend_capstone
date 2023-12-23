@@ -26,16 +26,16 @@ import SearchIcon from "@mui/icons-material/Search";
 import TableBody from "@mui/material/TableBody";
 import Modal from "@mui/material/Modal";
 import Select from "@mui/material/Select";
-import {
-  Autocomplete,
-  ListItemAvatar,
-  Avatar,
-} from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import IconButton from "@mui/material/IconButton";
 import PersonIcon from "@mui/icons-material/Person";
 import axios from "axios";
 import * as React from "react";
+import {
+  Autocomplete,
+  ListItemAvatar,
+  Avatar,
+} from "@mui/material";
 import {
   selectedStyle,
   unselectedStyle,
@@ -105,6 +105,7 @@ export default function MyReservations(props) {
   const screenwidth = window.innerWidth;
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [info, setInfo] = useState({});
+  const [cancelFee, setCancelFee] = useState(0.0);
 
   const handleAlertClose = () => {
     setAlertOpen(false);
@@ -132,9 +133,9 @@ export default function MyReservations(props) {
     var cancelCost = 0;
   
     if (a.points === 0 && a.coins > 0) {
-      cancelCost = a.coins * 0.3;
+      cancelCost = a.coins * cancelFee;
     } else if (a.coins === 0 && a.points > 0) {
-      cancelCost = a.points * 0.3;
+      cancelCost = a.points * cancelFee;
     }
     a = { ...a, cancelCost: cancelCost };
   
@@ -163,16 +164,28 @@ export default function MyReservations(props) {
   React.useEffect(() => {
     axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
+      axios.get(`${BASE_URL}/api/getRules/${user.user_type}/`).then((res) => {
+        if(!res?.data.cancel_fee||res?.data.cancel_fee===null){
+          setCancelFee(0.3)
+        }
+        else{
+          setCancelFee(res?.data?.cancel_fee/100)
+        }
+      }).catch((error) => {
+        console.error("Error fetching rules:", error);
+
+      });
       axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       // stroe lng nakog variable ang index 0 pra di sigeg access
       var indx0 = res?.data[0];
-      setVenueSelected(indx0.facility.facility_name);
-      setVenueId(indx0?.facility?.facility_id);
+      setVenueSelected(indx0.facility_name);
+      setVenueId(indx0?.facility_id);
       // setAttendeLimit(indx0?.main_rules?.num_attendies);
       // setMaxComputers(indx0?.main_rules?.num_pc);
     });
   });
+
 }, []);
 
 
@@ -879,16 +892,16 @@ const handleSearchTextChange = (e) => {
                       {facilities.map((item, index) => (
                         <Button
                           sx={
-                            venueSelected === item?.facility?.facility_name
+                            venueSelected === item?.facility_name
                               ? selectedStyle
                               : unselectedStyle
                           }
                           onClick={() => {
-                            setVenueSelected(item?.facility?.facility_name);
-                            setVenueId(item?.facility?.facility_id);
+                            setVenueSelected(item?.facility_name);
+                            setVenueId(item?.facility_id);
                           }}
                         >
-                          {item?.facility?.facility_name}
+                          {item?.facility_name}
                         </Button>
                       ))}
                     </ButtonGroup>

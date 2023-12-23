@@ -55,8 +55,8 @@ export default function Logs(props) {
     axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
       setFacilities(res?.data);
       var indx0 = res?.data[0];
-      setVenueSelected(indx0?.facility?.facility_name);
-      setVenueId(indx0?.facility?.facility_id);
+      setVenueSelected(indx0?.facility_name);
+      setVenueId(indx0?.facility_id);
     });
   }, []);
 
@@ -175,16 +175,16 @@ export default function Logs(props) {
                     <Button
                       key={index}
                       sx={
-                        venueSelected === item?.facility?.facility_name
+                        venueSelected === item?.facility_name
                           ? selectedStyle
                           : unselectedStyle
                       }
                       onClick={() => {
-                        setVenueSelected(item?.facility?.facility_name);
-                        setVenueId(item?.facility?.facility_id);
+                        setVenueSelected(item?.facility_name);
+                        setVenueId(item?.facility_id);
                       }}
                     >
-                      {item?.facility?.facility_name}
+                      {item?.facility_name}
                     </Button>
                   ))}
                 </ButtonGroup>
@@ -224,7 +224,7 @@ export default function Logs(props) {
                               scope="row"
                               align="center"
                             >
-                              {event.name}
+                              {event?.name}
                             </StyledTableCell>
                             <StyledTableCell align="center">
                               {event.isSignedIn === true ? "Yes" : "No"}
@@ -233,13 +233,13 @@ export default function Logs(props) {
                               {event.isOverstaying === true ? "Yes" : "No"}
                             </StyledTableCell>
                             <StyledTableCell align="center">
-                              {event.date}
+                              {event?.date}
                             </StyledTableCell>
                             <StyledTableCell align="center">
-                              {event.signInTime}
+                              {event?.signInTime}
                             </StyledTableCell>
                             <StyledTableCell align="center">
-                              {event.signOutTime}
+                              {event?.signOutTime}
                             </StyledTableCell>
                           </StyledTableRow>
                         ))}

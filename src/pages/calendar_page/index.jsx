@@ -135,10 +135,11 @@ export default function Calendar(props) {
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
+  const [cancelFee, setCancelFee] = useState(0.0);
   const [tempId, setTempId] = useState(0);
   const [role, setRole] = useState("admin"); //default role
   const [info, setInfo] = useState({});
-
+  const [bookingLimit,setBookingLimit]=useState(3)
   const submitBooking = () => {
     // setAttendeeList(attendeeList=>[
     //   ...attendeeList,
@@ -177,6 +178,7 @@ export default function Calendar(props) {
           setAlertMessage(res.data.error);
           setAlertOpen(true);
           setAlertSuccess(false);
+          setOpenModal3(true);
         } else {
           setBookingsRefresher(!bookingsRefresher);
           setAlertMessage("Booking created successfully!");
@@ -214,9 +216,9 @@ export default function Calendar(props) {
     var cancelCost = 0;
 
     if (res.points === 0 && res.coins > 0) {
-      cancelCost = res.coins * 0.3;
+      cancelCost = res.coins * cancelFee;
     } else if (res.coins === 0 && res.points > 0) {
-      cancelCost = res.points * 0.3;
+      cancelCost = res.points * cancelFee;
     }
     console.log(cancelCost);
     res = { ...res, cancelCost: cancelCost };
@@ -229,26 +231,61 @@ export default function Calendar(props) {
   React.useEffect(() => {
     axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
+      axios.get(`${BASE_URL}/api/getRules/${user.user_type}/`).then((res) => {
+        if(!res?.data.adv_booking||res?.data.adv_booking===null){
+          let booking_advance = new Date();
+          booking_advance.setDate(today.getDate() + 100 * 7);
+          setMaxWeekView(booking_advance)
+        }
+        else{
+          console.log(res?.data);
+          let booking_advance = new Date();
+          booking_advance.setDate(today.getDate() + res.data.adv_booking * 7);
+          setMaxWeekView(booking_advance);
+        }
+        if(user?.role === "admin" || user?.is_staff === true){
+          setBookingLimit(100)
+        }else{
+          if(!res?.data.lim_booking||res?.data.lim_booking===null){
+            setBookingLimit(100)
+          } 
+          else{
+            setBookingLimit(res?.data?.lim_booking)
+          }
+          
+      }if(!res?.data.cancel_fee||res?.data.cancel_fee===null){
+        setCancelFee(0.3)
+      }
+        else{
+          setCancelFee(res?.data?.cancel_fee/100)
+        }
+      }).catch((error) => {
+        let booking_advance = new Date();
+        booking_advance.setDate(today.getDate() + 100 * 7);
+        setMaxWeekView(booking_advance)
+
+
+      });
       axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
         setFacilities(res?.data);
         // stroe lng nakog variable ang index 0 pra di sigeg access
         var indx0 = res?.data[0];
-        setVenueSelected(indx0.facility.facility_name);
-        setVenueId(indx0?.facility?.facility_id);
-        setAttendeLimit(indx0?.main_rules?.num_attendies);
-        setMaxComputers(indx0?.main_rules?.num_pc);
+        setVenueSelected(indx0.facility_name);
+        setVenueId(indx0?.facility_id);
+        setAttendeLimit(indx0?.num_attendies);
+        setMaxComputers(indx0?.num_pc);
       });
     });
   }, []);
 
-  useEffect(() => {
-    if(user?.role ==="user" && user?.is_staff === false){
-      setMaxWeekView(after_2_weeks);
+  // useEffect(() => {
+  //   if(user?.role ==="user" && user?.is_staff === false){
+  //     setMaxWeekView(after_2_weeks);
       
-    }else if(user?.role === "admin" || user?.is_staff === true){
-      setMaxWeekView(after_1_year);
-    }
-  }, []);
+  //   }else if(user?.role === "admin" || user?.is_staff === true){
+  //     setMaxWeekView(after_1_year);
+  //   }
+  // }, []);
 
   //display bookings
   const [events, setEvents] = useState([]);
@@ -335,6 +372,7 @@ export default function Calendar(props) {
       })
       .catch((error) => {
         console.error("Error calculating cost:", error);
+        setOpenModal3(true);
       });
   };
 
@@ -546,39 +584,39 @@ export default function Calendar(props) {
                       {facilities.map((item, index) => (
                         <Button
                           sx={
-                            venueSelected === item?.facility?.facility_name
+                            venueSelected === item?.facility_name
                               ? selectedStyle
                               : unselectedStyle
                           }
                           onClick={() => {
+                            
                             booking.current = {
                               ...booking.current,
                               computers: 0,
                             };
-                            setVenueSelected(item?.facility?.facility_name);
-                            setVenueId(item?.facility?.facility_id);
+                            setVenueSelected(item?.facility_name);
+                            setVenueId(item?.facility_id);
 
-                            if (item?.main_rules?.num_attendies) {
-                              setAttendeLimit(item?.main_rules?.num_attendies);
+                            if (item?.num_attendies) {
+                              setAttendeLimit(item?.num_attendies);
                             } else {
                               setAttendeLimit(100);
                             }
                             // setMaxComputers(item?.main_rules?.num_pc)
                             // alert(item?.main_rules?.status)
-                            if (item?.main_rules.status === true) {
-                              if (item?.main_rules?.num_pc) {
-                                setMaxComputers(item?.main_rules?.num_pc);
-                              } else {
-                                setMaxComputers(100);
-                              }
-                            } else if (item.main_rules.status === false) {
+                            
+                            if (item?.num_pc) {
+                              setMaxComputers(item?.num_pc);
+                            } else {
                               setMaxComputers(0);
-                            }else {
-                              setMaxComputers(100);
                             }
-                          }}
+                            
+                            console.log(maxComputers)  
+                          }
+                          
+                        }
                         >
-                          {item?.facility?.facility_name}
+                          {item?.facility_name}
                         </Button>
                       ))}
                       {/* <Button
@@ -665,12 +703,12 @@ export default function Calendar(props) {
                           })
                           .then((response) => {
                             totalDuration = response.data.duration;
-                            var limit = 3 - totalDuration;
+                            var limit = bookingLimit- totalDuration;
 
                             if (user?.role === "user") {
                               if (hoursDuration > limit || limit < 0) {
                                 setAlertMessage(
-                                  "You have exceeded the limit of 3 hours booking per week"
+                                  `You have exceeded the limit of ${bookingLimit} hours booking per week`
                                 );
                                 setAlertOpen(true);
                                 setAlertSuccess(false);
