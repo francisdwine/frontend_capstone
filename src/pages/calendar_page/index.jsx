@@ -60,12 +60,12 @@ let minutes = currentTime.getMinutes().toString().padStart(2, '0');
 const seconds = currentTime.getSeconds().toString().padStart(2, '0');
 hours = (parseInt(hours) + 1) % 24;
 const currentTimePlusOneHour = `${hours}:${minutes}:${seconds}`;
-//dynamic max week
 let maxWeeks = 2;
 let after_2_weeks = new Date();
 after_2_weeks.setDate(today.getDate() + maxWeeks * 7);
 let after_1_year = new Date();
 after_1_year.setDate(today.getDate() + 52 * 7);
+//dynamic max week
 
 // [k
 //   {
@@ -131,7 +131,7 @@ export default function Calendar(props) {
   let { user, setUser, authenticated } = useContext(AuthContext);
   const today = new Date();
   //dynamic max week
-  const [maxWeekView, setMaxWeekView] = useState(new Date());
+  const [maxWeekView, setMaxWeekView] = useState(after_2_weeks);
   const [bookingsRefresher, setBookingsRefresher] = useState(true);
   const [cancelModal, setCancelModal] = useState(false);
   const [viewModal, setViewModal] = useState(false);
@@ -231,7 +231,7 @@ export default function Calendar(props) {
   React.useEffect(() => {
     axios.get(`${BASE_URL}/api/getUsers/`).then((res) => {
       setFakeUserDb(res?.data);
-      axios.get(`${BASE_URL}/api/getRules/${user.user_type}/`).then((res) => {
+      axios.get(`${BASE_URL}/api/getRules/${user?.user_type}/`).then((res) => {
         if(!res?.data.adv_booking||res?.data.adv_booking===null){
           let booking_advance = new Date();
           booking_advance.setDate(today.getDate() + 100 * 7);
@@ -252,7 +252,7 @@ export default function Calendar(props) {
           else{
             setBookingLimit(res?.data?.lim_booking)
           }
-          
+        // set Cancel fee based on rules or default 30%
       }if(!res?.data.cancel_fee||res?.data.cancel_fee===null){
         setCancelFee(0.3)
       }
@@ -263,7 +263,6 @@ export default function Calendar(props) {
         let booking_advance = new Date();
         booking_advance.setDate(today.getDate() + 100 * 7);
         setMaxWeekView(booking_advance)
-
 
       });
       axios.get(`${BASE_URL}/facility/get-facility/`).then((res) => {
@@ -277,15 +276,6 @@ export default function Calendar(props) {
       });
     });
   }, []);
-
-  // useEffect(() => {
-  //   if(user?.role ==="user" && user?.is_staff === false){
-  //     setMaxWeekView(after_2_weeks);
-      
-  //   }else if(user?.role === "admin" || user?.is_staff === true){
-  //     setMaxWeekView(after_1_year);
-  //   }
-  // }, []);
 
   //display bookings
   const [events, setEvents] = useState([]);

@@ -1,7 +1,7 @@
 import React from "react";
 import TextField from "@mui/material/TextField";
 import { Button, Box, Typography, Snackbar, Alert } from "@mui/material";
-import { ButtonStyle1, loginstyle, fields, logo } from "./styles";
+import { ButtonStyle1, loginstyle, fields, } from "./styles";
 import { useState } from "react";
 import Wild from "../../images/w4.png";
 import bg from "../../images/basebg.jpg";

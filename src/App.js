@@ -1,7 +1,7 @@
 import './App.css';
 import {
   BrowserRouter, Routes,
-  Route, Redirect, Link,
+  Route,
 } from 'react-router-dom';
 // import wild from "../../images/wil.png";
 import {AuthProvider} from './context/AuthContext';
